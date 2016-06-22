@@ -11,22 +11,47 @@
 namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 {
     using System;
-    using System.ComponentModel;
-    using System.Threading;
     using System.Windows;
-    using Microsoft.Win32;
-    using Microsoft.Kinect;
-    using Microsoft.Kinect.Tools;
 
 
     /// <summary>
     /// Interaction logic for the MainWindow
     /// </summary>
     public sealed partial class MainWindow : Window //, INotifyPropertyChanged, IDisposable
-    {   
+    {
+        /// <summary> Indicates if a playback is currently in progress </summary>
+        private bool isPlaying = false;
+
+        private bool pausing = false;
+
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        /// <summary>
+        /// Enables/Disables the record and playback buttons in the UI
+        /// </summary>
+        private void UpdateState()
+        {
+            if (this.isPlaying && !this.pausing)
+            {
+                this.RecordButton.IsEnabled = false;
+                this.PlayButton.IsEnabled = false;
+                this.PauseButton.IsEnabled = true;
+            }
+            else if (this.pausing)
+            {
+                this.RecordButton.IsEnabled = false;
+                this.PlayButton.IsEnabled = true;
+                this.PauseButton.IsEnabled = false;
+            }
+            else
+            {
+                this.RecordButton.IsEnabled = true;
+                this.PlayButton.IsEnabled = true;
+                this.PauseButton.IsEnabled = false;
+            }
         }
 
         private void RecordButton_Click(object sender, RoutedEventArgs e)
@@ -39,9 +64,11 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private void PlayButton_Click(object sender, RoutedEventArgs e)
         {
-            if (PlayButton.Content.ToString() == "Play")
+            this.isPlaying = true;
+            if (!this.pausing)
             {
-
+                this.pausing = false;
+                this.UpdateState();
                 Microsoft.Win32.OpenFileDialog dialog = new Microsoft.Win32.OpenFileDialog();
                 dialog.FileName = "Videos"; // Default file name
                 dialog.DefaultExt = ".WMV"; // Default file extension
@@ -73,23 +100,41 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
                 //OneArgDelegate playback = new OneArgDelegate(this.PlaybackClip);
                 //playback.BeginInvoke(filePath, null, null);
-
-                MediaPlayer_left.Play();
-                MediaPlayer_right.Play();
-
-                PlayButton.Content = "Pause";
             }
             else
-            {    
-                MediaPlayer_left.Pause();
-                MediaPlayer_right.Pause();
-
+            {
+                this.pausing = false;
+                this.UpdateState();
             }
+            MediaPlayer_left.Play();
+            MediaPlayer_right.Play();
+        }
+
+        private void PauseButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.pausing = true;
+            this.UpdateState();
+            MediaPlayer_left.Pause();
+            MediaPlayer_right.Pause();
         }
 
         private void MediaEnded(object sender, RoutedEventArgs e)
-        {        
-            PlayButton.Content = "Play";
+        {
+            MediaPlayer_left.Close();
+            MediaPlayer_right.Close();
+            this.isPlaying = false;
+            this.UpdateState();
+        }
+
+        private void StopButton_Click(object sender, RoutedEventArgs e)
+        {
+            MediaPlayer_left.Stop();
+            MediaPlayer_left.Close();
+            MediaPlayer_right.Stop();
+            MediaPlayer_right.Close();
+            this.isPlaying = false;
+            this.pausing = false;
+            this.UpdateState();
         }
     }
 }

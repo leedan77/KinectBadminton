@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Microsoft.Samples.Kinect.RecordAndPlaybackBasics"
         mc:Ignorable="d"
-        Title="kinectRecord" Height="600" Width="700"
+        Title="kinectRecord" Height="700" Width="1000"
         Closing="kinectRecord_Closing">
     <Window.Resources>
         <SolidColorBrush x:Key="MediumGreyBrush" Color="#ff6e6e6e" />
@@ -46,6 +46,7 @@
             <StackPanel Grid.Row="2" Grid.ColumnSpan="4" Orientation="Horizontal" Background="White">
                 <Button x:Name="RecordButton" Content="Record" Width="90" Click="RecordButton_Click" Margin="10" Padding="5" />
                 <Button x:Name="RecordStopButton" Content="Stop" Width="90" Click="RecordStopButton_Click" Margin="10" Padding="5" IsEnabled="False"/>
+                <Button x:Name="ConvertButton" Content="Convert" Width="90" Click="ConvertButton_Click" Margin="10" Padding="5" />
             </StackPanel>
             <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding RecordPlaybackStatusText}" HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="{StaticResource KinectBlueBrush}" FontFamily="Segoe UI" FontSize="18" Margin="10"/>
         </Grid>

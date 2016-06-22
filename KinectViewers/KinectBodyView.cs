@@ -12,7 +12,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
     using System.Windows.Media;
     using Microsoft.Kinect;
     using System.IO;
-    using System.Text;
+    using Emgu.CV;
+    using Emgu.CV.Structure;
 
     /// <summary>
     /// Visualizes the Kinect Body stream for display in the UI
@@ -115,6 +116,10 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         /// List of colors for each body tracked
         /// </summary>
         private List<Pen> bodyColors;
+
+        private VideoConverter video_converter = new VideoConverter();
+        private List<Image<Bgr, byte>> video = new List<Image<Bgr, byte>>();
+        public bool converting = false;
 
         /// <summary>
         /// Initializes a new instance of the KinectBodyView class
@@ -251,6 +256,10 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             {
                 // visualize the new body data
                 this.UpdateBodyFrame(this.bodies);
+                if (converting)
+                {
+                    video = video_converter.BodyViewToAVI(this.imageSource);
+                }
             }
         }
 
@@ -423,6 +432,14 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 case HandState.Lasso:
                     drawingContext.DrawEllipse(this.handLassoBrush, null, handPosition, HandSize, HandSize);
                     break;
+            }
+        }
+
+        public List<Image<Bgr, byte>> Video
+        {
+            get
+            {
+                return this.video;
             }
         }
     }

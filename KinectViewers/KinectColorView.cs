@@ -3,14 +3,13 @@
 namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 {
     using System;
-    using System.ComponentModel;
-    using System.Diagnostics;
-    using System.Globalization;
-    using System.IO;
     using System.Windows;
     using System.Windows.Media;
     using System.Windows.Media.Imaging;
     using Microsoft.Kinect;
+    using Emgu.CV;
+    using Emgu.CV.Structure;
+    using System.Collections.Generic;
 
     /// <summary>
     /// Visualizes the Kinect color stream for display in the UI
@@ -26,6 +25,10 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         /// Bitmap to display
         /// </summary>
         private WriteableBitmap colorBitmap = null;
+
+        private VideoConverter video_converter = new VideoConverter();
+        private List<Image<Bgr, byte>> video = new List<Image<Bgr, byte>>();
+        public bool converting = false;
 
         /// <summary>
         /// Initializes a new instance of the KinectColorView class
@@ -106,8 +109,21 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                         }
 
                         this.colorBitmap.Unlock();
+
+                        if (converting)
+                        {
+                            video = video_converter.ColorViewToAVI(this.colorBitmap);
+                        }
                     }
                 }
+            }
+        }
+
+        public List<Image<Bgr, byte>> Video
+        {
+            get
+            {
+                return this.video;
             }
         }
     }

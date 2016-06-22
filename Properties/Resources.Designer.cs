@@ -99,9 +99,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Playback in progress.
         /// </summary>
-        internal static string PlaybackInProgressText {
+        internal static string ConvertingInProgressText {
             get {
-                return ResourceManager.GetString("PlaybackInProgressText", resourceCulture);
+                return ResourceManager.GetString("ConvertingInProgressText", resourceCulture);
             }
         }
         

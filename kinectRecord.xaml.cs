@@ -2,10 +2,12 @@
 using System;
 using System.ComponentModel;
 using System.Threading;
-using System.Windows;
 using Microsoft.Win32;
 using Microsoft.Kinect;
 using Microsoft.Kinect.Tools;
+using Emgu.CV;
+using Emgu.CV.Structure;
+using System.Collections.Generic;
 
 namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 {
@@ -21,6 +23,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         //new add
         /// <summary> Indicates if recording need to stop </summary>
         private bool recordingStop = false;
+
+        private bool converting = false;
 
         private string lastFile = string.Empty;
 
@@ -73,6 +77,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         /// Color visualizer
         /// </summary>
         private KinectColorView kinectColorView = null;
+
+        private string ConvertFilePath;
 
         /// <summary>
         /// Initializes a new instance of the MainWindow class.
@@ -261,9 +267,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 this.kinectSensor.Close();
                 this.kinectSensor = null;
             }
-            this.Owner.Show();
-            
-           
+            this.Owner.Show();            
         }
 
         /// <summary>
@@ -360,12 +364,20 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             {
                 this.RecordButton.IsEnabled = false;
                 this.RecordStopButton.IsEnabled = true;
+                this.ConvertButton.IsEnabled = false;
+            }
+            else if(this.converting)
+            {
+                this.RecordButton.IsEnabled = false;
+                this.RecordStopButton.IsEnabled = false;
+                this.ConvertButton.IsEnabled = false;
             }
             else
             {
                 this.RecordPlaybackStatusText = string.Empty;
                 this.RecordButton.IsEnabled = true;
                 this.RecordStopButton.IsEnabled = false;
+                this.ConvertButton.IsEnabled = true;
             }
         }
 
@@ -391,6 +403,105 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             }
 
             return fileName;
+        }
+
+        private void ConvertButton_Click(object sender, RoutedEventArgs e)
+        {
+            string filePath = this.OpenFileForConvert();
+            ConvertFilePath = filePath;
+            if (!string.IsNullOrEmpty(filePath))
+            {
+                this.lastFile = filePath;
+                this.converting = true;
+                this.kinectColorView.converting = true;
+                this.kinectBodyView.converting = true;
+                this.RecordPlaybackStatusText = Properties.Resources.ConvertingInProgressText;
+                this.UpdateState();
+
+                // Start running the playback asynchronously
+                OneArgDelegate convert = new OneArgDelegate(this.ConvertClip);
+                convert.BeginInvoke(filePath, null, null);
+            }
+        }
+
+        /// <summary>
+        /// Plays back a .xef file to the Kinect sensor
+        /// </summary>
+        /// <param name="filePath">Full path to the .xef file that should be played back to the sensor</param>
+        private void ConvertClip(string filePath)
+        {
+            using (KStudioClient client = KStudio.CreateClient())
+            {
+                client.ConnectToService();
+
+                // Create the playback object
+                using (KStudioPlayback playback = client.CreatePlayback(filePath))
+                {
+                    playback.LoopCount = this.loopCount;
+                    playback.Start();
+
+                    while (playback.State == KStudioPlaybackState.Playing)
+                    {
+                        Thread.Sleep(500);
+                    }
+                }
+
+                client.DisconnectFromService();
+            }
+
+            // Update the UI after the convert playback task has completed
+            makeVideo();
+            this.converting = false;
+            this.kinectColorView.converting = false;
+            this.kinectBodyView.converting = false;
+            this.Dispatcher.BeginInvoke(new NoArgDelegate(UpdateState));
+        }
+
+        /// <summary>
+        /// Launches the OpenFileDialog window to help user find/select an event file for playback
+        /// </summary>
+        /// <returns>Path to the event file selected by the user</returns>
+        private string OpenFileForConvert()
+        {
+            string fileName = string.Empty;
+
+            OpenFileDialog dlg = new OpenFileDialog();
+            dlg.FileName = this.lastFile;
+            dlg.DefaultExt = Properties.Resources.XefExtension; // Default file extension
+            dlg.Filter = Properties.Resources.EventFileDescription + " " + Properties.Resources.EventFileFilter; // Filter files by extension 
+            bool? result = dlg.ShowDialog();
+
+            if (result == true)
+            {
+                fileName = dlg.FileName;
+            }
+
+            return fileName;
+        }
+
+        private void makeVideo()
+        {
+            string removeString = ".xef";
+            string path = ConvertFilePath.Remove(ConvertFilePath.IndexOf(removeString), removeString.Length);
+            List<Image<Bgr, byte>> ColorVideo = this.kinectColorView.Video;
+            List<Image<Bgr, byte>> BodyVideo = this.kinectBodyView.Video;
+            using (VideoWriter vw = new VideoWriter(path + "_color.avi", 30, ColorVideo[0].Width, ColorVideo[0].Height, true))
+            {
+                Console.WriteLine(ColorVideo.Count);
+                for (int i = 0; i < ColorVideo.Count; i++)
+                {
+                    vw.WriteFrame(ColorVideo[i]);
+                }
+            }
+            using (VideoWriter vw = new VideoWriter(path + "_body.avi", 30, BodyVideo[0].Width, BodyVideo[0].Height, true))
+            {
+                Console.WriteLine(BodyVideo.Count);
+                for (int i = 0; i < BodyVideo.Count; i++)
+                {
+                    vw.WriteFrame(BodyVideo[i]);
+                }
+            }
+            ColorVideo.Clear();
         }
     }
 }
