@@ -12,7 +12,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 {
     using System;
     using System.Windows;
-
+    using System.Windows.Threading;
 
     /// <summary>
     /// Interaction logic for the MainWindow
@@ -24,10 +24,25 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private bool pausing = false;
 
+        DispatcherTimer _timer = new DispatcherTimer();
+
         public MainWindow()
         {
             InitializeComponent();
+            _timer.Interval = TimeSpan.FromMilliseconds(1000);
+            _timer.Tick += new EventHandler(ticktock);
+            _timer.Start();
         }
+
+        void ticktock(object sender, EventArgs e)
+        {
+            if (!TimelineSlider.IsMouseCaptureWithin)
+            {
+                TimelineSlider.Value = MediaPlayer_left.Position.TotalSeconds;
+            }
+        }
+    
+
 
         /// <summary>
         /// Enables/Disables the record and playback buttons in the UI
@@ -118,10 +133,17 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             MediaPlayer_right.Pause();
         }
 
+        private void MediaOpened(object sender, RoutedEventArgs e)
+        {
+            TimelineSlider.Minimum = 0;
+            TimelineSlider.Maximum = MediaPlayer_left.NaturalDuration.TimeSpan.TotalSeconds;
+        }
+
+
         private void MediaEnded(object sender, RoutedEventArgs e)
         {
-            MediaPlayer_left.Close();
-            MediaPlayer_right.Close();
+           // MediaPlayer_left.Close();
+           // MediaPlayer_right.Close();
             this.isPlaying = false;
             this.UpdateState();
         }
@@ -135,6 +157,35 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             this.isPlaying = false;
             this.pausing = false;
             this.UpdateState();
+        }
+
+        private void TimelineSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (TimelineSlider.IsMouseCaptureWithin)
+            {
+                MediaPlayer_left.Pause();
+                MediaPlayer_right.Pause();
+                int SliderValue = (int)TimelineSlider.Value;
+
+                // Overloaded constructor takes the arguments days, hours, minutes, seconds, miniseconds.
+                // Create a TimeSpan with miliseconds equal to the slider value.
+                TimeSpan ts = new TimeSpan(0, 0, 0, SliderValue, 0);
+                MediaPlayer_left.Position = ts;
+                MediaPlayer_right.Position = ts;
+                
+            }
+            else
+            {
+                MediaPlayer_left.Play();
+                MediaPlayer_right.Play();
+            }
+            
+        }
+
+        private void SpeedSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            MediaPlayer_left.SpeedRatio = (double)SpeedSlider.Value;
+            MediaPlayer_right.SpeedRatio = (double)SpeedSlider.Value;
         }
     }
 }

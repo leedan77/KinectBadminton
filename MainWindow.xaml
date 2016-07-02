@@ -34,13 +34,16 @@
                 <RowDefinition />
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <MediaElement x:Name="MediaPlayer_left" Grid.Column="0" LoadedBehavior="Manual" HorizontalAlignment="Center" MediaEnded="MediaEnded"/>
-            <MediaElement x:Name="MediaPlayer_right"  Grid.Column="1" LoadedBehavior="Manual" HorizontalAlignment="Center" MediaEnded="MediaEnded"/>
-            <StackPanel Grid.Row="2" Grid.ColumnSpan="4" Orientation="Horizontal" Background="White">
+            <MediaElement x:Name="MediaPlayer_left" Grid.Column="0" LoadedBehavior="Manual" HorizontalAlignment="Center" MediaOpened="MediaOpened" MediaEnded="MediaEnded"/>
+            <MediaElement x:Name="MediaPlayer_right"  Grid.Column="1" LoadedBehavior="Manual" HorizontalAlignment="Center" MediaOpened="MediaOpened" MediaEnded="MediaEnded" />
+            <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal" Background="White">
                 <Button x:Name="RecordButton" Content="Record" Width="90" Click="RecordButton_Click" Margin="10" Padding="5" />
                 <Button x:Name="PlayButton" Content="Play" Width="90" Click="PlayButton_Click" Margin="10" Padding="5" />
                 <Button x:Name="PauseButton" Content="Pause" Width="90" Click="PauseButton_Click" Margin="10" Padding="5" IsEnabled="False"/>
                 <Button x:Name="StopButton" Content="Stop" Width="90" Click="StopButton_Click" Margin="10" Padding="5"/>
+                
+                <Slider x:Name="TimelineSlider" Width="202" Margin="5,10,5,18" ValueChanged="TimelineSlider_ValueChanged" RenderTransformOrigin="0.5,1.533" />
+                <Slider x:Name="SpeedSlider" Width="202" Margin="5,10,5,18" ValueChanged="SpeedSlider_ValueChanged" RenderTransformOrigin="0.5,1.533" Minimum="0.1" Maximum="1" Value="1"/>
             </StackPanel>
             <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding RecordPlaybackStatusText}" HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="{StaticResource KinectBlueBrush}" FontFamily="Segoe UI" FontSize="18" Margin="10"/>
         </Grid>
