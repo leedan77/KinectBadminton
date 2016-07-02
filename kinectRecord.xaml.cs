@@ -513,7 +513,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 {
                     Point pt = e.GetPosition(this);
                     double delta = curX - pt.X;
-                    Console.WriteLine(delta);
                     this.kinectBodyView.angle += delta / 3 * Math.PI / 180;
                     curX = pt.X;
                 }
