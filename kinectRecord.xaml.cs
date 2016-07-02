@@ -16,6 +16,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
     /// </summary>
     public sealed partial class kinectRecord : Window, INotifyPropertyChanged, IDisposable
     {
+        private double curX;
 
         /// <summary> Indicates if a recording is currently in progress </summary>
         private bool isRecording = false;
@@ -502,6 +503,30 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 }
             }
             ColorVideo.Clear();
+        }
+
+        private void Grid_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            if (!converting)
+            {
+                if (e.LeftButton == System.Windows.Input.MouseButtonState.Pressed)
+                {
+                    Point pt = e.GetPosition(this);
+                    double delta = curX - pt.X;
+                    Console.WriteLine(delta);
+                    this.kinectBodyView.angle += delta / 3 * Math.PI / 180;
+                    curX = pt.X;
+                }
+                else
+                {
+                    curX = e.GetPosition(this).X;
+                }
+            }
+        }
+
+        private void ResetButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.kinectBodyView.angle = 0;
         }
     }
 }

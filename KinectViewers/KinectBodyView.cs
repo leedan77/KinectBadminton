@@ -21,7 +21,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
     public sealed class KinectBodyView : IDisposable
     {
         //test angle
-        double angle = 0 * Math.PI / 180;
+        public double angle = 0;
 
         //test output
         int frame_num = 0;
@@ -243,7 +243,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                         // creates an array of 6 bodies, which is the max number of bodies that Kinect can track simultaneously
                         this.bodies = new Body[bodyFrame.BodyCount];
                     }
-
                     // The first time GetAndRefreshBodyData is called, Kinect will allocate each Body in the array.
                     // As long as those body objects are not disposed and not set to null in the array,
                     // those body objects will be re-used.
@@ -271,7 +270,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         public void UpdateBodyFrame(Body[] bodies)
         {
             //output test
-            FileStream fs = File.Open(@"C:\kinect\\test.txt", FileMode.Append);
+            FileStream fs = File.Open(@"D:\kinect\\test.txt", FileMode.Append);
             StreamWriter sw = new StreamWriter(fs);
             sw.WriteLine();
             sw.WriteLine("frame number :" + frame_num);

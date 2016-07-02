@@ -28,7 +28,7 @@
         <TextBlock Grid.Row="0" Margin="0 0 -1 0" HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="{StaticResource MediumGreyBrush}" FontFamily="Segoe UI" FontSize="18">Record and Playback Basics</TextBlock>
         <Image Grid.Row="0" Source="Images\Status.png" Stretch="None" HorizontalAlignment="Center" Margin="0 0 0 5" />
 
-        <Grid Grid.Row="1" Background="Black" Margin="30 0 30 0">
+        <Grid Grid.Row="1" Background="Black" Margin="30 0 30 0" MouseMove="Grid_MouseMove">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
                 <ColumnDefinition />
@@ -47,6 +47,7 @@
                 <Button x:Name="RecordButton" Content="Record" Width="90" Click="RecordButton_Click" Margin="10" Padding="5" />
                 <Button x:Name="RecordStopButton" Content="Stop" Width="90" Click="RecordStopButton_Click" Margin="10" Padding="5" IsEnabled="False"/>
                 <Button x:Name="ConvertButton" Content="Convert" Width="90" Click="ConvertButton_Click" Margin="10" Padding="5" />
+                <Button x:Name="ResetButton" Content="Reset_angle" Width="90" Click="ResetButton_Click" Margin="10" Padding="5" />
             </StackPanel>
             <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding RecordPlaybackStatusText}" HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="{StaticResource KinectBlueBrush}" FontFamily="Segoe UI" FontSize="18" Margin="10"/>
         </Grid>
