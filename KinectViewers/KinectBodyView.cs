@@ -271,7 +271,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         public void UpdateBodyFrame(Body[] bodies)
         {
             //output test
-            FileStream fs = File.Open(@"D:\kinect\\test.txt", FileMode.Append);
+            FileStream fs = File.Open(@"C:\kinect\\test.txt", FileMode.Append);
             StreamWriter sw = new StreamWriter(fs);
             sw.WriteLine();
             sw.WriteLine("frame number :" + frame_num);
