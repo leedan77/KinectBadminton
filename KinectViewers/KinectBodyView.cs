@@ -14,17 +14,47 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
     using System.IO;
     using Emgu.CV;
     using Emgu.CV.Structure;
-
+    using Newtonsoft.Json;
     /// <summary>
     /// Visualizes the Kinect Body stream for display in the UI
     /// </summary>
+    /// 
+
+    class Joints
+    {
+        public string jointType;
+        public double x;
+        public double y;
+        public double z;
+        public Joints(string jointType, double x, double y, double z)
+        {
+            this.jointType = jointType;
+            this.x = x;
+            this.y = y;
+            this.z = z;
+        }
+    }
+
+    class Frames
+    {
+        public int num;
+        public List<Joints> jointList;
+        public Frames(int num, List<Joints> jointList)
+        {
+            this.num = num;
+            this.jointList = jointList;
+        }
+    }
+
     public sealed class KinectBodyView : IDisposable
     {
+
+        private int frameNum = 0;
+
+        private List<Frames> FrameList = new List<Frames>();
         //test angle
         public double angle = 0;
 
-        //test output
-        int frame_num = 0;
 
         /// <summary> Reader for body frames </summary>
         private BodyFrameReader bodyFrameReader = null;
@@ -217,7 +247,11 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         /// </summary>
         public void Dispose()
         {
-            if(this.bodyFrameReader != null)
+
+            string data = JsonConvert.SerializeObject(FrameList);
+            File.WriteAllText("../../../data/data.json", data);
+
+            if (this.bodyFrameReader != null)
             {
                 this.bodyFrameReader.FrameArrived -= Reader_BodyFrameArrived;
                 this.bodyFrameReader.Dispose();
@@ -269,18 +303,14 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         /// <param name="bodies">Array of bodies to update</param>
         public void UpdateBodyFrame(Body[] bodies)
         {
-            //output test
-            FileStream fs = File.Open(@"D:\kinect\\test.txt", FileMode.Append);
-            StreamWriter sw = new StreamWriter(fs);
-            sw.WriteLine();
-            sw.WriteLine("frame number :" + frame_num);
-            sw.Flush();
-            frame_num++;
+            List<Joints> JointList = new List<Joints>();
 
             if (bodies != null)
             {
                 using (DrawingContext dc = this.drawingGroup.Open())
                 {
+                    frameNum++;
+
                     // Draw a transparent background to set the render size
                     dc.DrawRectangle(Brushes.Black, null, new Rect(0.0, 0.0, this.displayWidth, this.displayHeight));
 
@@ -318,12 +348,12 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                                 position.X += spineMid.X;
                                 position.Y += spineMid.Y;
                                 position.Z += spineMid.Z;
-                                //output test
-                                sw.WriteLine("joint" + jointType + " : " + position.X + " " + position.Y + " " + position.Z);
-                                sw.Flush();
+                                JointList.Add(new Joints(jointType.ToString(), position.X, position.Y, position.Z));
                                 DepthSpacePoint depthSpacePoint = this.coordinateMapper.MapCameraPointToDepthSpace(position);
                                 jointPoints[jointType] = new Point(depthSpacePoint.X, depthSpacePoint.Y);
                             }
+
+
 
                             this.DrawBody(joints, jointPoints, dc, drawPen);
 
@@ -336,9 +366,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     this.drawingGroup.ClipGeometry = new RectangleGeometry(new Rect(0.0, 0.0, this.displayWidth, this.displayHeight));
                 }
             }
-            //output test
-            sw.Close();
-            fs.Close();
+            FrameList.Add(new Frames(frameNum, JointList));
         }
 
         /// <summary>

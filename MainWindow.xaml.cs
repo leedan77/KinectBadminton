@@ -14,6 +14,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
     using System.Windows;
     using System.Windows.Threading;
 
+    using System.Diagnostics;
+
     /// <summary>
     /// Interaction logic for the MainWindow
     /// </summary>
@@ -26,12 +28,15 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         DispatcherTimer _timer = new DispatcherTimer();
 
+        private Monitor monitor;
+
         public MainWindow()
         {
             InitializeComponent();
             _timer.Interval = TimeSpan.FromMilliseconds(1000);
             _timer.Tick += new EventHandler(ticktock);
             _timer.Start();
+            monitor = new Monitor();
         }
 
         void ticktock(object sender, EventArgs e)
@@ -41,7 +46,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 TimelineSlider.Value = MediaPlayer_left.Position.TotalSeconds;
             }
         }
-    
+
 
 
         /// <summary>
@@ -142,8 +147,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private void MediaEnded(object sender, RoutedEventArgs e)
         {
-           // MediaPlayer_left.Close();
-           // MediaPlayer_right.Close();
+            // MediaPlayer_left.Close();
+            // MediaPlayer_right.Close();
             this.isPlaying = false;
             this.UpdateState();
         }
@@ -172,14 +177,14 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 TimeSpan ts = new TimeSpan(0, 0, 0, SliderValue, 0);
                 MediaPlayer_left.Position = ts;
                 MediaPlayer_right.Position = ts;
-                
+
             }
             else
             {
                 MediaPlayer_left.Play();
                 MediaPlayer_right.Play();
             }
-            
+
         }
 
         private void SpeedSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)

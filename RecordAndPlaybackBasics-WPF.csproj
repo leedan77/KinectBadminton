@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x64</Platform>
     <ProjectGuid>{DEB27987-B434-4541-A170-61D21D7A9379}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Microsoft.Samples.Kinect.RecordAndPlaybackBasics</RootNamespace>
     <AssemblyName>RecordAndPlaybackBasics-WPF</AssemblyName>
@@ -63,6 +63,10 @@
     <Reference Include="Microsoft.Kinect.Tools, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
       <HintPath>packages\Microsoft.Kinect.Tools.x64.2.0.1410.19000\lib\net45\Microsoft.Kinect.Tools.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -83,6 +87,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Monitor.cs" />
     <Compile Include="VideoConverter.cs" />
     <Page Include="kinectRecord.xaml">
       <SubType>Designer</SubType>
