@@ -29,6 +29,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         DispatcherTimer _timer = new DispatcherTimer();
 
         private SmashMonitor smashMonitor;
+        private ServeMonitor serveMonitor;
 
         public MainWindow()
         {
@@ -37,7 +38,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             _timer.Tick += new EventHandler(ticktock);
             _timer.Start();
             smashMonitor = new SmashMonitor();
-            smashMonitor.start();
+            serveMonitor = new ServeMonitor();
+            //smashMonitor.start();
+            serveMonitor.start();
         }
 
         void ticktock(object sender, EventArgs e)

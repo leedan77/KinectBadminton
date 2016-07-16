@@ -112,7 +112,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
                         if (converting)
                         {
-                            video = video_converter.ColorViewToAVI(this.colorBitmap);
+                            video_converter.ColorViewToAVI(this.colorBitmap);
                         }
                     }
                 }
@@ -123,7 +123,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         {
             get
             {
-                return this.video;
+                return this.video_converter.GetVideo();
+                
             }
         }
     }

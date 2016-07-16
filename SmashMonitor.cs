@@ -20,11 +20,11 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         {
             String jsonString = File.ReadAllText("../../../data/data.json");
             FrameList = JsonConvert.DeserializeObject<List<Frames>>(jsonString);
-            GenerateCompareData();
         }
 
         public void start()
         {
+            GenerateCompareData();
             int nowFrame = 0;
             nowFrame = CheckSide();
             nowFrame = CheckElbowUp(nowFrame);
