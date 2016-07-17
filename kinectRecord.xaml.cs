@@ -52,22 +52,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         /// </summary>
         private string recordPlayStatusText = string.Empty;
 
-        /// left
-        /// <summary>
-        /// Infrared visualizer
-        /// </summary>
-        private KinectIRView kinectIRView = null;
-
-        /// <summary>
-        /// Depth visualizer
-        /// </summary>
-        private KinectDepthView kinectDepthView = null;
-
-        /// <summary>
-        /// BodyIndex visualizer
-        /// </summary>
-        private KinectBodyIndexView kinectBodyIndexView = null;
-
         /// <summary>
         /// Body visualizer
         /// </summary>
@@ -102,22 +86,10 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             this.KinectStatusText = this.kinectSensor.IsAvailable ? Properties.Resources.RunningStatusText
                                                             : Properties.Resources.NoSensorStatusText;
 
-            // left
-            // create the IR visualizer
-            this.kinectIRView = new KinectIRView(this.kinectSensor);
-
-            // create the Depth visualizer
-            this.kinectDepthView = new KinectDepthView(this.kinectSensor);
-
-            // create the BodyIndex visualizer
-            this.kinectBodyIndexView = new KinectBodyIndexView(this.kinectSensor);
-
             // create the Body visualizer
-            this.kinectBodyView = new KinectBodyView(this.kinectSensor);
 
             //new add
             // create the Color visualizer
-            this.kinectColorView = new KinectColorView(this.kinectSensor);
 
             // set data context for display in UI
             //left
@@ -125,9 +97,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             //this.kinectIRViewbox.DataContext = this.kinectIRView;
             //this.kinectDepthViewbox.DataContext = this.kinectDepthView;
             //this.kinectBodyIndexViewbox.DataContext = this.kinectBodyIndexView;
-            this.kinectBodyViewbox.DataContext = this.kinectBodyView;
-            //new add
-            this.kinectColorViewbox.DataContext = this.kinectColorView;
         }
 
         /// <summary>
@@ -192,24 +161,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         /// </summary>
         public void Dispose()
         {
-            //left
-            if (this.kinectIRView != null)
-            {
-                this.kinectIRView.Dispose();
-                this.kinectIRView = null;
-            }
-
-            if (this.kinectDepthView != null)
-            {
-                this.kinectDepthView.Dispose();
-                this.kinectDepthView = null;
-            }
-
-            if (this.kinectBodyIndexView != null)
-            {
-                this.kinectBodyIndexView.Dispose();
-                this.kinectBodyIndexView = null;
-            }
 
             if (this.kinectBodyView != null)
             {
@@ -232,23 +183,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         /// <param name="e">event arguments</param>
         private void kinectRecord_Closing(object sender, CancelEventArgs e)
         {
-            if (this.kinectIRView != null)
-            {
-                this.kinectIRView.Dispose();
-                this.kinectIRView = null;
-            }
-
-            if (this.kinectDepthView != null)
-            {
-                this.kinectDepthView.Dispose();
-                this.kinectDepthView = null;
-            }
-
-            if (this.kinectBodyIndexView != null)
-            {
-                this.kinectBodyIndexView.Dispose();
-                this.kinectBodyIndexView = null;
-            }
 
             if (this.kinectBodyView != null)
             {
@@ -365,20 +299,23 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             {
                 this.RecordButton.IsEnabled = false;
                 this.RecordStopButton.IsEnabled = true;
-                this.ConvertButton.IsEnabled = false;
+                this.BodyConvertButton.IsEnabled = false;
+                this.ColorConvertButton.IsEnabled = false;
             }
             else if(this.converting)
             {
                 this.RecordButton.IsEnabled = false;
                 this.RecordStopButton.IsEnabled = false;
-                this.ConvertButton.IsEnabled = false;
+                this.BodyConvertButton.IsEnabled = false;
+                this.ColorConvertButton.IsEnabled = false;
             }
             else
             {
                 this.RecordPlaybackStatusText = string.Empty;
                 this.RecordButton.IsEnabled = true;
                 this.RecordStopButton.IsEnabled = false;
-                this.ConvertButton.IsEnabled = true;
+                this.BodyConvertButton.IsEnabled = true;
+                this.ColorConvertButton.IsEnabled = true;
             }
         }
 
@@ -406,22 +343,37 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             return fileName;
         }
 
-        private void ConvertButton_Click(object sender, RoutedEventArgs e)
+        private void BodyConvertButton_Click(object sender, RoutedEventArgs e)
         {
+            this.kinectBodyView = new KinectBodyView(this.kinectSensor);
             string filePath = this.OpenFileForConvert();
             ConvertFilePath = filePath;
             if (!string.IsNullOrEmpty(filePath))
             {
                 this.lastFile = filePath;
                 this.converting = true;
-                this.kinectColorView.converting = true;
+                
                 this.kinectBodyView.converting = true;
-                this.RecordPlaybackStatusText = Properties.Resources.ConvertingInProgressText;
-                this.UpdateState();
+                this.kinectViewbox.DataContext = this.kinectBodyView;
+                OneArgDelegate bodyConvert = new OneArgDelegate(this.BodyConvertClip);
+                bodyConvert.BeginInvoke(filePath, null, null);
+            }
+        }
 
-                // Start running the playback asynchronously
-                OneArgDelegate convert = new OneArgDelegate(this.ConvertClip);
-                convert.BeginInvoke(filePath, null, null);
+        private void ColorConvertButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.kinectColorView = new KinectColorView(this.kinectSensor);
+            string filePath = this.OpenFileForConvert();
+            ConvertFilePath = filePath;
+            if (!string.IsNullOrEmpty(filePath))
+            {
+                this.lastFile = filePath;
+                this.converting = true;
+                
+                this.kinectColorView.converting = true;
+                this.kinectViewbox.DataContext = this.kinectColorView;
+                OneArgDelegate colorConvert = new OneArgDelegate(this.ColorConvertClip);
+                colorConvert.BeginInvoke(filePath, null, null);
             }
         }
 
@@ -429,7 +381,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         /// Plays back a .xef file to the Kinect sensor
         /// </summary>
         /// <param name="filePath">Full path to the .xef file that should be played back to the sensor</param>
-        private void ConvertClip(string filePath)
+        private void BodyConvertClip(string filePath)
         {
             using (KStudioClient client = KStudio.CreateClient())
             {
@@ -443,20 +395,93 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
                     while (playback.State == KStudioPlaybackState.Playing)
                     {
-                        Thread.Sleep(500);
+
                     }
+                    playback.Dispose();
                 }
 
                 client.DisconnectFromService();
             }
 
             // Update the UI after the convert playback task has completed
-            makeVideo();
+            makeVideo("body");
+            Console.WriteLine(this.kinectBodyView.Video.Count);
             this.converting = false;
-            this.kinectColorView.converting = false;
             this.kinectBodyView.converting = false;
+            this.kinectBodyView.Dispose();
             this.Dispatcher.BeginInvoke(new NoArgDelegate(UpdateState));
         }
+
+        private void ColorConvertClip(string filePath)
+        {
+            using (KStudioClient client = KStudio.CreateClient())
+            {
+                client.ConnectToService();
+
+                // Create the playback object
+                using (KStudioPlayback playback = client.CreatePlayback(filePath))
+                {
+                    playback.LoopCount = this.loopCount;
+                    playback.Start();
+
+                    while (playback.State == KStudioPlaybackState.Playing)
+                    {
+
+                    }
+                    playback.Dispose();
+                }
+
+                client.DisconnectFromService();
+            }
+
+            // Update the UI after the convert playback task has completed
+            makeVideo("color");
+            Console.WriteLine(this.kinectColorView.Video.Count);
+            this.converting = false;
+            this.kinectColorView.converting = false;
+            this.kinectColorView.Dispose();
+            this.Dispatcher.BeginInvoke(new NoArgDelegate(UpdateState));
+
+
+            /*this.Dispatcher.BeginInvoke(new NoArgDelegate(ChangeViewBox));
+
+            using (KStudioClient client = KStudio.CreateClient())
+            {
+                client.ConnectToService();
+
+                // Create the playback object
+                using (KStudioPlayback playback = client.CreatePlayback(filePath))
+                {
+                    playback.LoopCount = this.loopCount;
+                    playback.Start();
+
+                    while (playback.State == KStudioPlaybackState.Playing)
+                    {
+
+                    }
+                    playback.Dispose();
+                }
+
+                client.DisconnectFromService();
+            }
+
+            // Update the UI after the convert playback task has completed
+            makeVideo("body");
+            Console.WriteLine(this.kinectBodyView.Video.Count);
+            this.converting = false;
+            this.kinectBodyView.converting = false;
+            this.kinectBodyView.Dispose();
+            this.Dispatcher.BeginInvoke(new NoArgDelegate(UpdateState));*/
+        }
+
+        private void ChangeViewBox()
+        {
+            this.kinectBodyView = new KinectBodyView(this.kinectSensor);
+            this.kinectBodyView.converting = true;
+            this.kinectViewbox.DataContext = this.kinectBodyView;
+
+        }
+        
 
         /// <summary>
         /// Launches the OpenFileDialog window to help user find/select an event file for playback
@@ -480,29 +505,38 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             return fileName;
         }
 
-        private void makeVideo()
+        private void makeVideo(string type)
         {
             string removeString = ".xef";
             string path = ConvertFilePath.Remove(ConvertFilePath.IndexOf(removeString), removeString.Length);
-            List<Image<Bgr, byte>> ColorVideo = this.kinectColorView.Video;
-            List<Image<Bgr, byte>> BodyVideo = this.kinectBodyView.Video;
-            using (VideoWriter vw = new VideoWriter(path + "_color.avi", 30, ColorVideo[0].Width, ColorVideo[0].Height, true))
+            if(string.Compare(type, "body") == 0)
             {
-                Console.WriteLine(ColorVideo.Count);
-                for (int i = 0; i < ColorVideo.Count; i++)
-                {
-                    vw.WriteFrame(ColorVideo[i]);
-                }
-            }
-            using (VideoWriter vw = new VideoWriter(path + "_body.avi", 30, BodyVideo[0].Width, BodyVideo[0].Height, true))
-            {
+                List<Image<Bgr, byte>> BodyVideo = this.kinectBodyView.Video;
                 Console.WriteLine(BodyVideo.Count);
-                for (int i = 0; i < BodyVideo.Count; i++)
+                using (VideoWriter vw = new VideoWriter(path + "_body.avi", 30, BodyVideo[0].Width, BodyVideo[0].Height, true))
                 {
-                    vw.WriteFrame(BodyVideo[i]);
+                    for (int i = 0; i < BodyVideo.Count; i++)
+                    {
+                        vw.WriteFrame(BodyVideo[i]);
+                    }
                 }
+                this.kinectBodyView.Video.Clear();
+                BodyVideo.Clear();
             }
-            ColorVideo.Clear();
+            else if(string.Compare(type, "color") == 0)
+            {
+                List<Image<Bgr, byte>> ColorVideo = this.kinectColorView.Video;
+                Console.WriteLine(ColorVideo.Count);
+                using (VideoWriter vw = new VideoWriter(path + "_color.avi", 30, ColorVideo[0].Width, ColorVideo[0].Height, true))
+                {
+                    for (int i = 0; i < ColorVideo.Count; i++)
+                    {
+                        vw.WriteFrame(ColorVideo[i]);
+                    }
+                }
+                this.kinectColorView.Video.Clear();
+                ColorVideo.Clear();
+            }
         }
 
         private void Grid_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)

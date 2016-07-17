@@ -31,23 +31,20 @@
         <Grid Grid.Row="1" Background="Black" Margin="30 0 30 0" MouseMove="Grid_MouseMove">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
-                <ColumnDefinition />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition />
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <Viewbox x:Name="kinectColorViewbox" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center">
-                <Image Source="{Binding ImageSource}" Stretch="UniformToFill" />
-            </Viewbox>
-            <Viewbox x:Name="kinectBodyViewbox" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Center">
+            <Viewbox x:Name="kinectViewbox" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center">
                 <Image Source="{Binding ImageSource}" Stretch="UniformToFill" />
             </Viewbox>
             <StackPanel Grid.Row="2" Grid.ColumnSpan="4" Orientation="Horizontal" Background="White">
-                <Button x:Name="RecordButton" Content="Record" Width="90" Click="RecordButton_Click" Margin="10" Padding="5" />
-                <Button x:Name="RecordStopButton" Content="Stop" Width="90" Click="RecordStopButton_Click" Margin="10" Padding="5" IsEnabled="False"/>
-                <Button x:Name="ConvertButton" Content="Convert" Width="90" Click="ConvertButton_Click" Margin="10" Padding="5" />
-                <Button x:Name="ResetButton" Content="Reset_angle" Width="90" Click="ResetButton_Click" Margin="10" Padding="5" />
+                <Button x:Name="RecordButton" Content="Record" Width="100" Click="RecordButton_Click" Margin="10" Padding="5" />
+                <Button x:Name="RecordStopButton" Content="Stop" Width="100" Click="RecordStopButton_Click" Margin="10" Padding="5" IsEnabled="False"/>
+                <Button x:Name="BodyConvertButton" Content="Convert body" Width="100" Click="BodyConvertButton_Click" Margin="10" Padding="5" />
+                <Button x:Name="ColorConvertButton" Content="Convert color" Width="100" Click="ColorConvertButton_Click" Margin="10" Padding="5" />
+                <Button x:Name="ResetButton" Content="Reset_angle" Width="100" Click="ResetButton_Click" Margin="10" Padding="5" />
             </StackPanel>
             <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding RecordPlaybackStatusText}" HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="{StaticResource KinectBlueBrush}" FontFamily="Segoe UI" FontSize="18" Margin="10"/>
         </Grid>

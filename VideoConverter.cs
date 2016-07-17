@@ -6,6 +6,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
@@ -22,7 +23,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         }
 
-        public List<Image<Bgr, byte>> ColorViewToAVI(WriteableBitmap ColorBitmap)
+        public void ColorViewToAVI(WriteableBitmap ColorBitmap)
         {
             Bitmap bmp;
             using (MemoryStream outStream = new MemoryStream())
@@ -34,7 +35,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             }
             Image<Bgr, byte> img = new Image<Bgr, byte>(bmp);
             video.Add(img);
-            return video;
         }
 
         public List<Image<Bgr, byte>> BodyViewToAVI(DrawingImage image)
@@ -49,6 +49,11 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             bmp = new System.Drawing.Bitmap(ms);
             Image<Bgr, byte> img = new Image<Bgr, byte>(bmp);
             video.Add(img);
+            return video;
+        }
+
+        public List<Image<Bgr, byte>> GetVideo()
+        {
             return video;
         }
 

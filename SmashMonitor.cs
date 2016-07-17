@@ -8,26 +8,23 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 {
-    class Monitor
+    class SmashMonitor
     {
-
-        private string jsonString;
         private List<Frames> FrameList;
         private double hipMaxDiff = 0;
         private double initRightShoulderElbowDiff = 0;
         private double headNeckDiff = 0;
         private double elbowSpineMaxDiff = 0;
 
-        public Monitor()
+        public SmashMonitor()
         {
-            jsonString = File.ReadAllText("../../../data/data.json");
+            String jsonString = File.ReadAllText("../../../data/data.json");
             FrameList = JsonConvert.DeserializeObject<List<Frames>>(jsonString);
-            GenerateCompareData();
-            start();
         }
 
         public void start()
         {
+            GenerateCompareData();
             int nowFrame = 0;
             nowFrame = CheckSide();
             nowFrame = CheckElbowUp(nowFrame);

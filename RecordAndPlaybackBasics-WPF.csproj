@@ -87,7 +87,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Monitor.cs" />
+    <Compile Include="ServeMonitor.cs" />
+    <Compile Include="SmashMonitor.cs" />
     <Compile Include="VideoConverter.cs" />
     <Page Include="kinectRecord.xaml">
       <SubType>Designer</SubType>
