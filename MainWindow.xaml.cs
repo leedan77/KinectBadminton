@@ -31,16 +31,27 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private SmashMonitor smashMonitor;
         private ServeMonitor serveMonitor;
 
+        private String type;
+
         public MainWindow()
         {
             InitializeComponent();
             _timer.Interval = TimeSpan.FromMilliseconds(1000);
             _timer.Tick += new EventHandler(ticktock);
             _timer.Start();
-            smashMonitor = new SmashMonitor();
-            serveMonitor = new ServeMonitor();
-            //smashMonitor.start();
-            serveMonitor.start();
+
+            this.type = "serve";
+
+            if(string.Compare(this.type, "smash") == 0)
+            {
+                smashMonitor = new SmashMonitor();
+                smashMonitor.start();
+            }
+            else if(string.Compare(this.type, "serve") == 0)
+            {
+                serveMonitor = new ServeMonitor();
+                serveMonitor.start();
+            }
         }
 
         void ticktock(object sender, EventArgs e)
@@ -81,7 +92,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private void RecordButton_Click(object sender, RoutedEventArgs e)
         {
             this.Hide();
-            kinectRecord w = new kinectRecord();
+            kinectRecord w = new kinectRecord(this.type);
             w.Owner = this;
             w.Show();
         }
