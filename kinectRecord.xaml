@@ -24,7 +24,16 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="1" Background="Black" Margin="30,67,29.6,0" MouseMove="Grid_MouseMove">
+
+        <Button x:Name="RecordButton" Width="100" Height="35" Click="RecordButton_Click" Grid.Row="0" HorizontalAlignment="Left" Margin="0, 10, 0, 0">
+            <StackPanel Grid.Row="2" Grid.ColumnSpan="4" Orientation="Horizontal">
+                <Image Source="Images/record.png" Width="20" Height="20"/>
+                <TextBlock Text="Record" Padding="5" VerticalAlignment="Center" RenderTransformOrigin="1.755,0.645" />
+            </StackPanel>
+        </Button>
+        
+
+        <Grid Grid.Row="1" Background="Black" MouseMove="Grid_MouseMove" Margin="0,10,-0.4,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
@@ -47,6 +56,6 @@
         <StatusBar Grid.Row="3" HorizontalAlignment="Stretch" Name="statusBar" VerticalAlignment="Bottom" Background="White" Foreground="{StaticResource MediumGreyBrush}">
             <StatusBarItem Content="{Binding KinectStatusText}" />
         </StatusBar>
-        <Button x:Name="RecordButton" Content="Record" Click="RecordButton_Click" Margin="30,21,843.6,615" Padding="5" Grid.RowSpan="2" />
+       
     </Grid>
 </Window>

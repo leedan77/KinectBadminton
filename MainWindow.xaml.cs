@@ -31,9 +31,27 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private SmashMonitor smashMonitor;
         private ServeMonitor serveMonitor;
 
+        private string coachFileName;
+        public string CoachFileName
+        {
+            get
+            {
+                return this.coachFileName;
+            }
+            set
+            {
+                this.coachFileName = value;
+                // play right media
+                MediaPlayer_right.Source = new Uri(this.coachFileName);
+                MediaPlayer_right.Play();
+            }
+        }
+        
+        
+
         public MainWindow()
         {
-            InitializeComponent();
+            InitializeComponent();        
             _timer.Interval = TimeSpan.FromMilliseconds(1000);
             _timer.Tick += new EventHandler(ticktock);
             _timer.Start();
@@ -106,7 +124,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 {
                     MediaPlayer_left.Source = new Uri(dialog.FileName);
                 }
-
+                /*
                 Microsoft.Win32.OpenFileDialog dialog2 = new Microsoft.Win32.OpenFileDialog();
                 dialog.FileName = "Videos"; // Default file name
                 dialog.DefaultExt = ".WMV"; // Default file extension
@@ -118,9 +136,11 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 // Process open file dialog box results 
                 if (result2 == true)
                 {
-                    // Open document 
+                    // Open document                    
                     MediaPlayer_right.Source = new Uri(dialog.FileName);
                 }
+                */
+                // MediaPlayer_right.Source = new Uri(this.CoachFileName);
 
                 //OneArgDelegate playback = new OneArgDelegate(this.PlaybackClip);
                 //playback.BeginInvoke(filePath, null, null);
@@ -131,7 +151,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 this.UpdateState();
             }
             MediaPlayer_left.Play();
-            MediaPlayer_right.Play();
+            
         }
 
         private void PauseButton_Click(object sender, RoutedEventArgs e)
@@ -142,10 +162,16 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             MediaPlayer_right.Pause();
         }
 
-        private void MediaOpened(object sender, RoutedEventArgs e)
+        private void MediaLeftOpened(object sender, RoutedEventArgs e)
         {
             TimelineSlider.Minimum = 0;
             TimelineSlider.Maximum = MediaPlayer_left.NaturalDuration.TimeSpan.TotalSeconds;
+        }
+
+        private void MediaRightOpened(object sender, RoutedEventArgs e)
+        {
+            TimelineSlider.Minimum = 0;
+            TimelineSlider.Maximum = MediaPlayer_right.NaturalDuration.TimeSpan.TotalSeconds;
         }
 
 
@@ -196,5 +222,15 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             MediaPlayer_left.SpeedRatio = (double)SpeedSlider.Value;
             MediaPlayer_right.SpeedRatio = (double)SpeedSlider.Value;
         }
+
+        private void MediaPlayer_right_MouseRightButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            ChooseCoachWindow ccw = new ChooseCoachWindow();
+            ccw.Owner = this;
+            ccw.ShowDialog();
+           
+        }
+
+       
     }
 }
