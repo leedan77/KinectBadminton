@@ -267,7 +267,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 //streamCollection.Add(KStudioEventStreamDataTypeIds.BodyIndex);
 
                 //new add
-                streamCollection.Add(KStudioEventStreamDataTypeIds.UncompressedColor);
+                streamCollection.Add(KStudioEventStreamDataTypeIds.CompressedColor);
 
                 // Create the recording object
                 using (KStudioRecording recording = client.CreateRecording(filePath, streamCollection))
