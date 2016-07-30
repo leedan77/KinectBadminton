@@ -263,7 +263,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 int a = i;
                 if (a == 1)
                 {
-                    image1.Source = new BitmapImage(new Uri("C:\\Users\\Chou\\Desktop\\tick.png"));
+                    image1.Source = new BitmapImage(new Uri(@"Images\tick.png", UriKind.Relative));
                     Button button = new Button()
                     {
                         Content = string.Format("手肘抬高"),
@@ -280,7 +280,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 }
                 else if (a == 2)
                 {
-                    image2.Source = new BitmapImage(new Uri("C:\\Users\\Chou\\Desktop\\tick.png"));
+                    image2.Source = new BitmapImage(new Uri(@"Images\tick.png", UriKind.Relative));
                     Button button = new Button()
                     {
                         Content = string.Format("側身"),
@@ -297,7 +297,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 }
                 else if (a == 3)
                 {
-                    image3.Source = new BitmapImage(new Uri("C:\\Users\\Chou\\Desktop\\cross.png"));
+                    image3.Source = new BitmapImage(new Uri(@"Images\cross.png", UriKind.Relative));
                     Button button = new Button()
                     {
                         Content = string.Format("手肘轉向前"),
@@ -314,7 +314,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 }
                 else if (a == 4)
                 {
-                    image4.Source = new BitmapImage(new Uri("C:\\Users\\Chou\\Desktop\\cross.png"));
+                    image4.Source = new BitmapImage(new Uri(@"Images\cross.png", UriKind.Relative));
                     Button button = new Button()
                     {
                         Content = string.Format("手腕發力"),
@@ -331,7 +331,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 }
                 else if (a == 5)
                 {
-                    image5.Source = new BitmapImage(new Uri("C:\\Users\\Chou\\Desktop\\cross.png"));
+                    image5.Source = new BitmapImage(new Uri(@"Images\cross.png", UriKind.Relative));
                     Button button = new Button()
                     {
                         Content = string.Format("收拍"),
