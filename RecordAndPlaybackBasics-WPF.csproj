@@ -90,6 +90,7 @@
     <Compile Include="ChooseCoachWindow.xaml.cs">
       <DependentUpon>ChooseCoachWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="LobMonitor.cs" />
     <Compile Include="ServeMonitor.cs" />
     <Compile Include="SmashMonitor.cs" />
     <Compile Include="VideoConverter.cs" />
