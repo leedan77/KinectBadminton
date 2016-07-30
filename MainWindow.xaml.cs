@@ -37,10 +37,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private SmashMonitor smashMonitor;
         private ServeMonitor serveMonitor;
-
-<<<<<<< HEAD
+        
         private String type;
-=======
         private string coachFileName;
         public string CoachFileName
         {
@@ -56,9 +54,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 MediaPlayer_right.Play();
             }
         }
-        
-        
->>>>>>> ui
 
         public MainWindow()
         {
