@@ -11,7 +11,34 @@
         <Style TargetType="{x:Type Image}">
             <Setter Property="SnapsToDevicePixels" Value="True" />
         </Style>
+
+        <!-- This style is used for buttons, to remove the WPF default 'animated' mouse over effect -->
+        <Style x:Key="MyButtonStyle" TargetType="Button">
+            <Setter Property="OverridesDefaultStyle" Value="True"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Name="border" 
+                            BorderThickness="1"
+                            Padding="4,2" 
+                            BorderBrush="DarkGray" 
+                            CornerRadius="3" 
+                            Background="{TemplateBinding Background}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="Black" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
+
+
 
     <Grid Margin="10 0 10 0">
         <Grid.RowDefinitions>
@@ -22,28 +49,87 @@
         </Grid.RowDefinitions>
 
         <Image Grid.Row="0" Source="Images\Logo.png" HorizontalAlignment="Left" Stretch="Fill" Height="32" Width="81" Margin="0 10 0 5" />
-        <TextBlock Grid.Row="0" Margin="0 0 -1 0" HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="{StaticResource MediumGreyBrush}" FontFamily="Segoe UI" FontSize="18">Record and Playback Basics</TextBlock>
+        <TextBlock Grid.Row="0" Margin="758,16,-1.4,15.2" VerticalAlignment="Center" Foreground="{StaticResource MediumGreyBrush}" FontFamily="Segoe UI" FontSize="18">Record and Playback Basics</TextBlock>
         <Image Grid.Row="0" Source="Images\Status.png" Stretch="None" HorizontalAlignment="Center" Margin="0 0 0 5" />
 
-        <Grid Grid.Row="1" Background="Black" Margin="30 0 30 0">
+        <Grid Grid.Row="1" Margin="30 0 30 0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
                 <ColumnDefinition />
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="100"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition />
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <MediaElement x:Name="MediaPlayer_left" Grid.Column="0" LoadedBehavior="Manual" HorizontalAlignment="Center" MediaOpened="MediaOpened" MediaEnded="MediaEnded"/>
-            <MediaElement x:Name="MediaPlayer_right"  Grid.Column="1" LoadedBehavior="Manual" HorizontalAlignment="Center" MediaOpened="MediaOpened" MediaEnded="MediaEnded" />
-            <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal" Background="White">
+            <Button Style="{StaticResource MyButtonStyle}" Margin="5, 0" Background="Black">
+                <MediaElement x:Name="MediaPlayer_left" Grid.Column="0" LoadedBehavior="Manual" HorizontalAlignment="Center" MediaOpened="MediaLeftOpened" MediaEnded="MediaEnded"/>
+            </Button>
+            <Button Style="{StaticResource MyButtonStyle}" Grid.Column="1" Margin="5, 0" BorderBrush="Black" Background="Black" MouseDown="MediaPlayer_right_MouseRightButtonDown" >
+                <MediaElement x:Name="MediaPlayer_right"  Grid.Column="1" LoadedBehavior="Manual" HorizontalAlignment="Center" MediaOpened="MediaRightOpened" MediaEnded="MediaEnded"/>
+            </Button>
+            <Grid Grid.Row="0" Grid.Column="2" Background="#E5DDB8">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <UniformGrid  Grid.Row="0" x:Name="grid0">
+                    <TextBlock  Name="textBlock1" TextAlignment="Center" VerticalAlignment="Center" Foreground="#001C70" FontWeight="Heavy" FontSize="20"></TextBlock>
+                </UniformGrid>
+                <Grid Grid.Row="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="40"/>
+                        <RowDefinition Height="40"/>
+                        <RowDefinition Height="40"/>
+                        <RowDefinition Height="40"/>
+                        <RowDefinition Height="40"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="25"/>
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Image Height="20" Width="20" HorizontalAlignment="Right" Name="image1" Grid.Row="0" Grid.Column="0"/>
+                    <Image Height="20" Width="20" HorizontalAlignment="Right" Name="image2" Grid.Row="1" Grid.Column="0"/>
+                    <Image Height="20" Width="20" HorizontalAlignment="Right" Name="image3" Grid.Row="2" Grid.Column="0"/>
+                    <Image Height="20" Width="20" HorizontalAlignment="Right" Name="image4" Grid.Row="3" Grid.Column="0"/>
+                    <Image Height="20" Width="20" HorizontalAlignment="Right" Name="image5" Grid.Row="4" Grid.Column="0"/>
+                    <UniformGrid  Grid.Row="0" Grid.Column="1" x:Name="grid1"></UniformGrid>
+                    <UniformGrid  Grid.Row="1" Grid.Column="1" x:Name="grid2"></UniformGrid>
+                    <UniformGrid  Grid.Row="2" Grid.Column="1" x:Name="grid3"></UniformGrid>
+                    <UniformGrid  Grid.Row="3" Grid.Column="1" x:Name="grid4"></UniformGrid>
+                    <UniformGrid  Grid.Row="4" Grid.Column="1" x:Name="grid5"></UniformGrid>
+                </Grid>
+            </Grid>
+            <Grid Grid.Row="0" Grid.Column="3" Background="#E5DDB8">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="40"/>
+                </Grid.RowDefinitions>
+                <UniformGrid  Grid.Row="0" x:Name="grid6">
+                    <TextBlock  Name="textBlock2" TextAlignment="Center" VerticalAlignment="Center" Foreground="#001C70" FontWeight="Heavy" FontSize="20"></TextBlock>
+                </UniformGrid>
+                <UniformGrid  Grid.Row="1" x:Name="grid11"></UniformGrid>
+                <UniformGrid  Grid.Row="2" x:Name="grid12"></UniformGrid>
+                <UniformGrid  Grid.Row="3" x:Name="grid13"></UniformGrid>
+                <UniformGrid  Grid.Row="4" x:Name="grid14"></UniformGrid>
+                <UniformGrid  Grid.Row="5" x:Name="grid15"></UniformGrid>
+            </Grid>
+            <StackPanel Grid.Row="1" Grid.ColumnSpan="4" Orientation="Horizontal" Background="White">
                 <Button x:Name="RecordButton" Content="Record" Width="90" Click="RecordButton_Click" Margin="10" Padding="5" />
                 <Button x:Name="PlayButton" Content="Play" Width="90" Click="PlayButton_Click" Margin="10" Padding="5" />
                 <Button x:Name="PauseButton" Content="Pause" Width="90" Click="PauseButton_Click" Margin="10" Padding="5" IsEnabled="False"/>
                 <Button x:Name="StopButton" Content="Stop" Width="90" Click="StopButton_Click" Margin="10" Padding="5"/>
+
+                <Slider x:Name="TimelineSlider" Width="100" Margin="5,10,5,18" ValueChanged="TimelineSlider_ValueChanged" RenderTransformOrigin="0.5,1.533" />
                 
-                <Slider x:Name="TimelineSlider" Width="202" Margin="5,10,5,18" ValueChanged="TimelineSlider_ValueChanged" RenderTransformOrigin="0.5,1.533" />
-                <Slider x:Name="SpeedSlider" Width="202" Margin="5,10,5,18" ValueChanged="SpeedSlider_ValueChanged" RenderTransformOrigin="0.5,1.533" Minimum="0.1" Maximum="1" Value="1"/>
+                <Slider x:Name="SpeedSlider" Width="100" Margin="5,10,5,18" ValueChanged="SpeedSlider_ValueChanged" RenderTransformOrigin="0.5,1.533" Minimum="0.1" Maximum="1" Value="1"/>
+                <Button x:Name="student" Content="student" Width="90" Click="student_Click" Margin="10" Padding="5" />
+                <Button x:Name="teacher" Content="teacher" Width="90" Click="teacher_Click" Margin="10" Padding="5" />
             </StackPanel>
             <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding RecordPlaybackStatusText}" HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="{StaticResource KinectBlueBrush}" FontFamily="Segoe UI" FontSize="18" Margin="10"/>
         </Grid>

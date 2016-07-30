@@ -271,7 +271,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 //streamCollection.Add(KStudioEventStreamDataTypeIds.BodyIndex);
 
                 //new add
-                streamCollection.Add(KStudioEventStreamDataTypeIds.UncompressedColor);
+                streamCollection.Add(KStudioEventStreamDataTypeIds.CompressedColor);
 
                 // Create the recording object
                 using (KStudioRecording recording = client.CreateRecording(filePath, streamCollection))
@@ -458,13 +458,13 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
             OpenFileDialog dlg = new OpenFileDialog();
             dlg.FileName = this.lastFile;
-            dlg.DefaultExt = Properties.Resources.XefExtension; // Default file extension
+            dlg.DefaultExt = "avi"; // Default file extension
             dlg.Filter = Properties.Resources.EventFileDescription + " " + Properties.Resources.EventFileFilter; // Filter files by extension 
             bool? result = dlg.ShowDialog();
 
             if (result == true)
             {
-                fileName = dlg.FileName;
+                fileName = dlg.SafeFileName;
             }
 
             return fileName;
@@ -472,13 +472,16 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private void makeVideo(string type)
         {
-            string removeString = ".xef";
-            string path = ConvertFilePath.Remove(ConvertFilePath.IndexOf(removeString), removeString.Length);
+            
+            string cur = Environment.CurrentDirectory;
+            const string coachDataPath = "\\..\\..\\..\\..\\coach_data";
+            string filename = ConvertFilePath;
+            string path = cur + coachDataPath;
             if(string.Compare(type, "body") == 0)
             {
                 List<Image<Bgr, byte>> BodyVideo = this.kinectBodyView.Video;
                 Console.WriteLine(BodyVideo.Count);
-                using (VideoWriter vw = new VideoWriter(path + "_body.avi", 30, BodyVideo[0].Width, BodyVideo[0].Height, true))
+                using (VideoWriter vw = new VideoWriter(path + "\\body\\" + filename + "_body", 30, BodyVideo[0].Width, BodyVideo[0].Height, true))
                 {
                     for (int i = 0; i < BodyVideo.Count; i++)
                     {
@@ -492,7 +495,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             {
                 List<Image<Bgr, byte>> ColorVideo = this.kinectColorView.Video;
                 Console.WriteLine(ColorVideo.Count);
-                using (VideoWriter vw = new VideoWriter(path + "_color.avi", 30, ColorVideo[0].Width, ColorVideo[0].Height, true))
+                using (VideoWriter vw = new VideoWriter(path + "\\color\\" + filename + "_color", 30, ColorVideo[0].Width, ColorVideo[0].Height, true))
                 {
                     for (int i = 0; i < ColorVideo.Count; i++)
                     {

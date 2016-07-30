@@ -24,11 +24,16 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Image Grid.Row="0" Source="Images\Logo.png" HorizontalAlignment="Left" Stretch="Fill" Height="32" Width="81" Margin="0 10 0 5" />
-        <TextBlock Grid.Row="0" Margin="0 0 -1 0" HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="{StaticResource MediumGreyBrush}" FontFamily="Segoe UI" FontSize="18">Record and Playback Basics</TextBlock>
-        <Image Grid.Row="0" Source="Images\Status.png" Stretch="None" HorizontalAlignment="Center" Margin="0 0 0 5" />
 
-        <Grid Grid.Row="1" Background="Black" Margin="30 0 30 0" MouseMove="Grid_MouseMove">
+        <Button x:Name="RecordButton" Width="100" Height="35" Click="RecordButton_Click" Grid.Row="0" HorizontalAlignment="Left" Margin="0, 10, 0, 0">
+            <StackPanel Grid.Row="2" Grid.ColumnSpan="4" Orientation="Horizontal">
+                <Image Source="Images/record.png" Width="20" Height="20"/>
+                <TextBlock Text="Record" Padding="5" VerticalAlignment="Center" RenderTransformOrigin="1.755,0.645" />
+            </StackPanel>
+        </Button>
+        
+
+        <Grid Grid.Row="1" Background="Black" MouseMove="Grid_MouseMove" Margin="0,10,-0.4,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
@@ -40,7 +45,6 @@
                 <Image Source="{Binding ImageSource}" Stretch="UniformToFill" />
             </Viewbox>
             <StackPanel Grid.Row="2" Grid.ColumnSpan="4" Orientation="Horizontal" Background="White">
-                <Button x:Name="RecordButton" Content="Record" Width="100" Click="RecordButton_Click" Margin="10" Padding="5" />
                 <Button x:Name="RecordStopButton" Content="Stop" Width="100" Click="RecordStopButton_Click" Margin="10" Padding="5" IsEnabled="False"/>
                 <Button x:Name="BodyConvertButton" Content="Convert body" Width="100" Click="BodyConvertButton_Click" Margin="10" Padding="5" />
                 <Button x:Name="ColorConvertButton" Content="Convert color" Width="100" Click="ColorConvertButton_Click" Margin="10" Padding="5" />
@@ -52,5 +56,6 @@
         <StatusBar Grid.Row="3" HorizontalAlignment="Stretch" Name="statusBar" VerticalAlignment="Bottom" Background="White" Foreground="{StaticResource MediumGreyBrush}">
             <StatusBarItem Content="{Binding KinectStatusText}" />
         </StatusBar>
+       
     </Grid>
 </Window>

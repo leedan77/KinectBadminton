@@ -13,6 +13,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
     using System;
     using System.Windows;
     using System.Windows.Threading;
+    using System.Windows.Controls;
+    using System.Windows.Media;
+    using System.Windows.Media.Imaging;
 
     using System.Diagnostics;
 
@@ -26,16 +29,40 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private bool pausing = false;
 
+        //for whether to delete grid button
+        private bool teacherFirstTime = true;
+        private bool studentFirstTime = true;
+
         DispatcherTimer _timer = new DispatcherTimer();
 
         private SmashMonitor smashMonitor;
         private ServeMonitor serveMonitor;
 
+<<<<<<< HEAD
         private String type;
+=======
+        private string coachFileName;
+        public string CoachFileName
+        {
+            get
+            {
+                return this.coachFileName;
+            }
+            set
+            {
+                this.coachFileName = value;
+                // play right media
+                MediaPlayer_right.Source = new Uri(this.coachFileName);
+                MediaPlayer_right.Play();
+            }
+        }
+        
+        
+>>>>>>> ui
 
         public MainWindow()
         {
-            InitializeComponent();
+            InitializeComponent();        
             _timer.Interval = TimeSpan.FromMilliseconds(1000);
             _timer.Tick += new EventHandler(ticktock);
             _timer.Start();
@@ -117,7 +144,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 {
                     MediaPlayer_left.Source = new Uri(dialog.FileName);
                 }
-
+                /*
                 Microsoft.Win32.OpenFileDialog dialog2 = new Microsoft.Win32.OpenFileDialog();
                 dialog.FileName = "Videos"; // Default file name
                 dialog.DefaultExt = ".WMV"; // Default file extension
@@ -129,9 +156,11 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 // Process open file dialog box results 
                 if (result2 == true)
                 {
-                    // Open document 
+                    // Open document                    
                     MediaPlayer_right.Source = new Uri(dialog.FileName);
                 }
+                */
+                // MediaPlayer_right.Source = new Uri(this.CoachFileName);
 
                 //OneArgDelegate playback = new OneArgDelegate(this.PlaybackClip);
                 //playback.BeginInvoke(filePath, null, null);
@@ -142,7 +171,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 this.UpdateState();
             }
             MediaPlayer_left.Play();
-            MediaPlayer_right.Play();
+            
         }
 
         private void PauseButton_Click(object sender, RoutedEventArgs e)
@@ -153,10 +182,16 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             MediaPlayer_right.Pause();
         }
 
-        private void MediaOpened(object sender, RoutedEventArgs e)
+        private void MediaLeftOpened(object sender, RoutedEventArgs e)
         {
             TimelineSlider.Minimum = 0;
             TimelineSlider.Maximum = MediaPlayer_left.NaturalDuration.TimeSpan.TotalSeconds;
+        }
+
+        private void MediaRightOpened(object sender, RoutedEventArgs e)
+        {
+            TimelineSlider.Minimum = 0;
+            TimelineSlider.Maximum = MediaPlayer_right.NaturalDuration.TimeSpan.TotalSeconds;
         }
 
 
@@ -207,5 +242,228 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             MediaPlayer_left.SpeedRatio = (double)SpeedSlider.Value;
             MediaPlayer_right.SpeedRatio = (double)SpeedSlider.Value;
         }
+
+        private void MediaPlayer_right_MouseRightButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            ChooseCoachWindow ccw = new ChooseCoachWindow();
+            ccw.Owner = this;
+            ccw.ShowDialog();
+           
+        }
+
+        void button_Click(object sender, RoutedEventArgs e)
+        {
+            Console.WriteLine(string.Format("You clicked on the {0}. button.", (sender as Button).Tag));
+        }
+
+        private void student_Click(object sender, RoutedEventArgs e)
+        {
+            if (studentFirstTime == true)
+            {
+                studentFirstTime = false;
+            }
+            else
+            {
+                grid1.Children.Remove((Button)grid1.Children[0]);
+                grid2.Children.Remove((Button)grid2.Children[0]);
+                grid3.Children.Remove((Button)grid3.Children[0]);
+                grid4.Children.Remove((Button)grid4.Children[0]);
+                grid5.Children.Remove((Button)grid5.Children[0]);
+            }
+            textBlock1.Text = "學員";
+            for (int i = 0; i < 6; ++i)
+            {
+                int a = i;
+                if (a == 1)
+                {
+                    image1.Source = new BitmapImage(new Uri(@"Images\tick.png", UriKind.Relative));
+                    Button button = new Button()
+                    {
+                        Content = string.Format("手肘抬高"),
+                        Tag = i,
+                        BorderThickness = new Thickness(0, 0, 0, 0),
+                        FontSize = 16,
+                        FontWeight = FontWeights.Heavy,
+                        HorizontalAlignment = HorizontalAlignment.Left,
+                        Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString("#001C70"),
+                        Background = (SolidColorBrush)new BrushConverter().ConvertFromString("#E5DDB8"),
+                    };
+                    button.Click += new RoutedEventHandler(button_Click);
+                    this.grid1.Children.Add(button);
+                }
+                else if (a == 2)
+                {
+                    image2.Source = new BitmapImage(new Uri(@"Images\tick.png", UriKind.Relative));
+                    Button button = new Button()
+                    {
+                        Content = string.Format("側身"),
+                        Tag = i,
+                        BorderThickness = new Thickness(0, 0, 0, 0),
+                        FontSize = 16,
+                        FontWeight = FontWeights.Heavy,
+                        HorizontalAlignment = HorizontalAlignment.Left,
+                        Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString("#001C70"),
+                        Background = (SolidColorBrush)new BrushConverter().ConvertFromString("#E5DDB8"),
+                    };
+                    button.Click += new RoutedEventHandler(button_Click);
+                    this.grid2.Children.Add(button);
+                }
+                else if (a == 3)
+                {
+                    image3.Source = new BitmapImage(new Uri(@"Images\cross.png", UriKind.Relative));
+                    Button button = new Button()
+                    {
+                        Content = string.Format("手肘轉向前"),
+                        Tag = i,
+                        BorderThickness = new Thickness(0, 0, 0, 0),
+                        FontSize = 16,
+                        FontWeight = FontWeights.Heavy,
+                        HorizontalAlignment = HorizontalAlignment.Left,
+                        Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString("#001C70"),
+                        Background = (SolidColorBrush)new BrushConverter().ConvertFromString("#E5DDB8"),
+                    };
+                    button.Click += new RoutedEventHandler(button_Click);
+                    this.grid3.Children.Add(button);
+                }
+                else if (a == 4)
+                {
+                    image4.Source = new BitmapImage(new Uri(@"Images\cross.png", UriKind.Relative));
+                    Button button = new Button()
+                    {
+                        Content = string.Format("手腕發力"),
+                        Tag = i,
+                        BorderThickness = new Thickness(0, 0, 0, 0),
+                        FontSize = 16,
+                        FontWeight = FontWeights.Heavy,
+                        HorizontalAlignment = HorizontalAlignment.Left,
+                        Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString("#001C70"),
+                        Background = (SolidColorBrush)new BrushConverter().ConvertFromString("#E5DDB8"),
+                    };
+                    button.Click += new RoutedEventHandler(button_Click);
+                    this.grid4.Children.Add(button);
+                }
+                else if (a == 5)
+                {
+                    image5.Source = new BitmapImage(new Uri(@"Images\cross.png", UriKind.Relative));
+                    Button button = new Button()
+                    {
+                        Content = string.Format("收拍"),
+                        Tag = i,
+                        BorderThickness = new Thickness(0, 0, 0, 0),
+                        FontSize = 16,
+                        FontWeight = FontWeights.Heavy,
+                        HorizontalAlignment = HorizontalAlignment.Left,
+                        Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString("#001C70"),
+                        Background = (SolidColorBrush)new BrushConverter().ConvertFromString("#E5DDB8"),
+                    };
+                    button.Click += new RoutedEventHandler(button_Click);
+                    this.grid5.Children.Add(button);
+                }
+            }
+        }
+
+        private void teacher_Click(object sender, RoutedEventArgs e)
+        {
+            if (teacherFirstTime == true)
+            {
+                teacherFirstTime = false;
+            }
+            else
+            {
+                grid11.Children.Remove((Button)grid11.Children[0]);
+                grid12.Children.Remove((Button)grid12.Children[0]);
+                grid13.Children.Remove((Button)grid13.Children[0]);
+                grid14.Children.Remove((Button)grid14.Children[0]);
+                grid15.Children.Remove((Button)grid15.Children[0]);
+            }
+            textBlock2.Text = "林輝耀";
+            for (int i = 0; i < 5; ++i)
+            {
+                int a = i;
+                if (a == 0)
+                {
+                    Button button = new Button()
+                    {
+                        Content = string.Format("  手肘抬高"),
+                        Tag = i,
+                        BorderThickness = new Thickness(0, 0, 0, 0),
+                        FontSize = 16,
+                        FontWeight = FontWeights.Heavy,
+                        HorizontalAlignment = HorizontalAlignment.Left,
+                        Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString("#001C70"),
+                        Background = (SolidColorBrush)new BrushConverter().ConvertFromString("#E5DDB8"),
+                    };
+                    button.Click += new RoutedEventHandler(button_Click);
+                    this.grid11.Children.Add(button);
+                }
+                else if (a == 1)
+                {
+                    Button button = new Button()
+                    {
+                        Content = string.Format("  側身"),
+                        Tag = i,
+                        BorderThickness = new Thickness(0, 0, 0, 0),
+                        FontSize = 16,
+                        FontWeight = FontWeights.Heavy,
+                        HorizontalAlignment = HorizontalAlignment.Left,
+                        Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString("#001C70"),
+                        Background = (SolidColorBrush)new BrushConverter().ConvertFromString("#E5DDB8"),
+                    };
+                    button.Click += new RoutedEventHandler(button_Click);
+                    this.grid12.Children.Add(button);
+                }
+                else if (a == 2)
+                {
+                    Button button = new Button()
+                    {
+                        Content = string.Format("  手肘轉向前"),
+                        Tag = i,
+                        BorderThickness = new Thickness(0, 0, 0, 0),
+                        FontSize = 16,
+                        FontWeight = FontWeights.Heavy,
+                        HorizontalAlignment = HorizontalAlignment.Left,
+                        Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString("#001C70"),
+                        Background = (SolidColorBrush)new BrushConverter().ConvertFromString("#E5DDB8"),
+                    };
+                    button.Click += new RoutedEventHandler(button_Click);
+                    this.grid13.Children.Add(button);
+                }
+                else if (a == 3)
+                {
+                    Button button = new Button()
+                    {
+                        Content = string.Format("  手腕發力"),
+                        Tag = i,
+                        BorderThickness = new Thickness(0, 0, 0, 0),
+                        FontSize = 16,
+                        FontWeight = FontWeights.Heavy,
+                        HorizontalAlignment = HorizontalAlignment.Left,
+                        Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString("#001C70"),
+                        Background = (SolidColorBrush)new BrushConverter().ConvertFromString("#E5DDB8"),
+                    };
+                    button.Click += new RoutedEventHandler(button_Click);
+                    this.grid14.Children.Add(button);
+                }
+                else if (a == 4)
+                {
+                    Button button = new Button()
+                    {
+                        Content = string.Format("  收拍"),
+                        Tag = i,
+                        BorderThickness = new Thickness(0, 0, 0, 0),
+                        FontSize = 16,
+                        FontWeight = FontWeights.Heavy,
+                        HorizontalAlignment = HorizontalAlignment.Left,
+                        Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString("#001C70"),
+                        Background = (SolidColorBrush)new BrushConverter().ConvertFromString("#E5DDB8"),
+                    };
+                    button.Click += new RoutedEventHandler(button_Click);
+                    this.grid15.Children.Add(button);
+                }
+            }
+        }
+
+
+
     }
 }
