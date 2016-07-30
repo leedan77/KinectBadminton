@@ -40,19 +40,15 @@
 
 
 
-    <Grid Margin="10 0 10 0">
+    <Grid Background="#E5DDB8">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="30" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Image Grid.Row="0" Source="Images\Logo.png" HorizontalAlignment="Left" Stretch="Fill" Height="32" Width="81" Margin="0 10 0 5" />
-        <TextBlock Grid.Row="0" Margin="758,16,-1.4,15.2" VerticalAlignment="Center" Foreground="{StaticResource MediumGreyBrush}" FontFamily="Segoe UI" FontSize="18">Record and Playback Basics</TextBlock>
-        <Image Grid.Row="0" Source="Images\Status.png" Stretch="None" HorizontalAlignment="Center" Margin="0 0 0 5" />
-
-        <Grid Grid.Row="1" Margin="30 0 30 0">
+        <Grid Grid.Row="1" Margin="30 0 30 0" Background="#B6A143">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
                 <ColumnDefinition />
@@ -60,16 +56,58 @@
                 <ColumnDefinition Width="100"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
+                <RowDefinition  Height="50"/>
                 <RowDefinition />
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <Button Style="{StaticResource MyButtonStyle}" Margin="5, 0" Background="Black">
-                <MediaElement x:Name="MediaPlayer_left" Grid.Column="0" LoadedBehavior="Manual" HorizontalAlignment="Center" MediaOpened="MediaLeftOpened" MediaEnded="MediaEnded"/>
-            </Button>
-            <Button Style="{StaticResource MyButtonStyle}" Grid.Column="1" Margin="5, 0" BorderBrush="Black" Background="Black" MouseDown="MediaPlayer_right_MouseRightButtonDown" >
-                <MediaElement x:Name="MediaPlayer_right"  Grid.Column="1" LoadedBehavior="Manual" HorizontalAlignment="Center" MediaOpened="MediaRightOpened" MediaEnded="MediaEnded"/>
-            </Button>
-            <Grid Grid.Row="0" Grid.Column="2" Background="#E5DDB8">
+            <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Left" Orientation="Horizontal">
+                <Button x:Name="RecordButton" Content="Record" Width="90" Click="RecordButton_Click" Margin="10" Padding="5" />
+            </StackPanel>
+            <Grid Grid.Row="1" Grid.Column="0" Margin="30 0 30 0">
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="50"/>
+                </Grid.RowDefinitions>
+                <Button Style="{StaticResource MyButtonStyle}" Grid.Row="0" Margin="5, 0" Background="#001C70">
+                    <MediaElement x:Name="MediaPlayer_left" Grid.Row="0" LoadedBehavior="Manual" HorizontalAlignment="Center" MediaOpened="MediaLeftOpened" MediaEnded="MediaEnded"/>
+                </Button>
+                <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button x:Name="PlayLeftButton" Content="Play" Width="70" Click="PlayLeftButton_Click" Margin="10" Padding="5" />
+                    <Button x:Name="PauseLeftButton" Content="Pause" Width="70" Click="PauseLeftButton_Click" Margin="10" Padding="5" IsEnabled="False"/>
+                    <Button x:Name="StopLeftButton" Content="Stop" Width="70" Click="StopLeftButton_Click" Margin="10" Padding="5"/>
+                </StackPanel>
+                <StackPanel Grid.Row="2" HorizontalAlignment="Center">
+                    <Slider x:Name="LeftTimelineSlider" Width="200" Margin="5,10,5,18" ValueChanged="LeftTimelineSlider_ValueChanged" RenderTransformOrigin="0.5,1.533" />
+                </StackPanel>
+                <StackPanel Grid.Row="3" HorizontalAlignment="Center">
+                    <Slider x:Name="LeftSpeedSlider" Width="200" Margin="5,10,5,18" ValueChanged="RightSpeedSlider_ValueChanged_1" RenderTransformOrigin="0.5,1.533" Minimum="0.1" Maximum="1" Value="1"/>
+                </StackPanel>
+            </Grid>
+            <Grid Grid.Row="1" Grid.Column="1" Margin="30 0 30 0">
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="50"/>
+                </Grid.RowDefinitions>
+                <Button Style="{StaticResource MyButtonStyle}" Grid.Row="0" Margin="5, 0" Background="#001C70" MouseDown="MediaPlayer_right_MouseRightButtonDown" >
+                    <MediaElement x:Name="MediaPlayer_right" Grid.Row="0" LoadedBehavior="Manual" HorizontalAlignment="Center" MediaOpened="MediaRightOpened" MediaEnded="MediaEnded"/>
+                </Button>
+                <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button x:Name="PlayRightButton" Content="Play" Width="70" Click="PlayButton_Click" Margin="10" Padding="5" />
+                    <Button x:Name="PauseRightButton" Content="Pause" Width="70" Click="PauseButton_Click" Margin="10" Padding="5" IsEnabled="False"/>
+                    <Button x:Name="StopRightButton" Content="Stop" Width="70" Click="StopButton_Click" Margin="10" Padding="5"/>
+                </StackPanel>
+                <StackPanel Grid.Row="2" HorizontalAlignment="Center">
+                    <Slider x:Name="RightTimelineSlider" Width="200" Margin="5,10,5,18" ValueChanged="RightTimelineSlider_ValueChanged" RenderTransformOrigin="0.5,1.533" />
+                </StackPanel>
+                <StackPanel Grid.Row="3" HorizontalAlignment="Center">
+                    <Slider x:Name="RightSpeedSlider" Width="200" Margin="5,10,5,18" ValueChanged="RightSpeedSlider_ValueChanged" RenderTransformOrigin="0.5,1.533" Minimum="0.1" Maximum="1" Value="1"/>
+                </StackPanel>
+            </Grid>
+            <Grid Grid.Row="0" Grid.RowSpan="2" Grid.Column="2" Margin="5 5 5 5" Background="#E5DDB8">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="40"/>
                     <RowDefinition />
@@ -101,7 +139,7 @@
                     <UniformGrid  Grid.Row="4" Grid.Column="1" x:Name="grid5"></UniformGrid>
                 </Grid>
             </Grid>
-            <Grid Grid.Row="0" Grid.Column="3" Background="#E5DDB8">
+            <Grid Grid.Row="0" Grid.RowSpan="2" Grid.Column="3" Margin="5 5 5 5" Background="#E5DDB8">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="40"/>
                     <RowDefinition Height="40"/>
@@ -119,15 +157,10 @@
                 <UniformGrid  Grid.Row="4" x:Name="grid14"></UniformGrid>
                 <UniformGrid  Grid.Row="5" x:Name="grid15"></UniformGrid>
             </Grid>
-            <StackPanel Grid.Row="1" Grid.ColumnSpan="4" Orientation="Horizontal" Background="White">
-                <Button x:Name="RecordButton" Content="Record" Width="90" Click="RecordButton_Click" Margin="10" Padding="5" />
+            <StackPanel Grid.Row="2" Grid.ColumnSpan="4" Orientation="Horizontal" Background="White">
                 <Button x:Name="PlayButton" Content="Play" Width="90" Click="PlayButton_Click" Margin="10" Padding="5" />
                 <Button x:Name="PauseButton" Content="Pause" Width="90" Click="PauseButton_Click" Margin="10" Padding="5" IsEnabled="False"/>
                 <Button x:Name="StopButton" Content="Stop" Width="90" Click="StopButton_Click" Margin="10" Padding="5"/>
-
-                <Slider x:Name="TimelineSlider" Width="100" Margin="5,10,5,18" ValueChanged="TimelineSlider_ValueChanged" RenderTransformOrigin="0.5,1.533" />
-                
-                <Slider x:Name="SpeedSlider" Width="100" Margin="5,10,5,18" ValueChanged="SpeedSlider_ValueChanged" RenderTransformOrigin="0.5,1.533" Minimum="0.1" Maximum="1" Value="1"/>
                 <Button x:Name="student" Content="student" Width="90" Click="student_Click" Margin="10" Padding="5" />
                 <Button x:Name="teacher" Content="teacher" Width="90" Click="teacher_Click" Margin="10" Padding="5" />
             </StackPanel>

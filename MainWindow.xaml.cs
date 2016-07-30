@@ -78,9 +78,13 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         void ticktock(object sender, EventArgs e)
         {
-            if (!TimelineSlider.IsMouseCaptureWithin)
+            if (!LeftTimelineSlider.IsMouseCaptureWithin)
             {
-                TimelineSlider.Value = MediaPlayer_left.Position.TotalSeconds;
+                LeftTimelineSlider.Value = MediaPlayer_left.Position.TotalSeconds;
+            }
+            if (!RightTimelineSlider.IsMouseCaptureWithin)
+            {
+                RightTimelineSlider.Value = MediaPlayer_right.Position.TotalSeconds;
             }
         }
 
@@ -179,14 +183,14 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private void MediaLeftOpened(object sender, RoutedEventArgs e)
         {
-            TimelineSlider.Minimum = 0;
-            TimelineSlider.Maximum = MediaPlayer_left.NaturalDuration.TimeSpan.TotalSeconds;
+            LeftTimelineSlider.Minimum = 0;
+            LeftTimelineSlider.Maximum = MediaPlayer_left.NaturalDuration.TimeSpan.TotalSeconds;
         }
 
         private void MediaRightOpened(object sender, RoutedEventArgs e)
         {
-            TimelineSlider.Minimum = 0;
-            TimelineSlider.Maximum = MediaPlayer_right.NaturalDuration.TimeSpan.TotalSeconds;
+            RightTimelineSlider.Minimum = 0;
+            RightTimelineSlider.Maximum = MediaPlayer_right.NaturalDuration.TimeSpan.TotalSeconds;
         }
 
 
@@ -207,35 +211,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             this.isPlaying = false;
             this.pausing = false;
             this.UpdateState();
-        }
-
-        private void TimelineSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            if (TimelineSlider.IsMouseCaptureWithin)
-            {
-                MediaPlayer_left.Pause();
-                MediaPlayer_right.Pause();
-                int SliderValue = (int)TimelineSlider.Value;
-
-                // Overloaded constructor takes the arguments days, hours, minutes, seconds, miniseconds.
-                // Create a TimeSpan with miliseconds equal to the slider value.
-                TimeSpan ts = new TimeSpan(0, 0, 0, SliderValue, 0);
-                MediaPlayer_left.Position = ts;
-                MediaPlayer_right.Position = ts;
-
-            }
-            else
-            {
-                MediaPlayer_left.Play();
-                MediaPlayer_right.Play();
-            }
-
-        }
-
-        private void SpeedSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            MediaPlayer_left.SpeedRatio = (double)SpeedSlider.Value;
-            MediaPlayer_right.SpeedRatio = (double)SpeedSlider.Value;
         }
 
         private void MediaPlayer_right_MouseRightButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -458,7 +433,82 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             }
         }
 
+        private void StopLeftButton_Click(object sender, RoutedEventArgs e)
+        {
 
+        }
 
+        private void PlayLeftButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void PauseLeftButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void StopRightButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void PlayRightButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void PauseRightButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void RightTimelineSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (RightTimelineSlider.IsMouseCaptureWithin)
+            {
+                MediaPlayer_right.Pause();
+                int SliderValue = (int)RightTimelineSlider.Value;
+
+                // Overloaded constructor takes the arguments days, hours, minutes, seconds, miniseconds.
+                // Create a TimeSpan with miliseconds equal to the slider value.
+                TimeSpan ts = new TimeSpan(0, 0, 0, SliderValue, 0);
+                MediaPlayer_right.Position = ts;
+
+            }
+            else
+            {
+                MediaPlayer_right.Play();
+            }
+        }
+
+        private void LeftTimelineSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (LeftTimelineSlider.IsMouseCaptureWithin)
+            {
+                MediaPlayer_left.Pause();
+                int SliderValue = (int)LeftTimelineSlider.Value;
+
+                // Overloaded constructor takes the arguments days, hours, minutes, seconds, miniseconds.
+                // Create a TimeSpan with miliseconds equal to the slider value.
+                TimeSpan ts = new TimeSpan(0, 0, 0, SliderValue, 0);
+                MediaPlayer_left.Position = ts;
+
+            }
+            else
+            {
+                MediaPlayer_left.Play();
+            }
+        }
+
+        private void RightSpeedSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            MediaPlayer_right.SpeedRatio = (double)RightSpeedSlider.Value;
+        }
+
+        private void RightSpeedSlider_ValueChanged_1(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            MediaPlayer_left.SpeedRatio = (double)LeftSpeedSlider.Value;
+        }
     }
 }
