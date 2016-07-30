@@ -18,7 +18,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         public SmashMonitor()
         {
-            String jsonString = File.ReadAllText("../../../data/data.json");
+            String jsonString = File.ReadAllText("../../../data/smashdata.json");
             FrameList = JsonConvert.DeserializeObject<List<Frames>>(jsonString);
         }
 
@@ -86,7 +86,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private int CheckSide()
         {
-            foreach (Frames Frame in FrameList)
+            foreach (Frames Frame in this.FrameList)
             {
                 double hipRight = 0;
                 double hipLeft = 0;
@@ -104,15 +104,15 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     return Frame.num;
                 }
             }
-            return FrameList.Count;
+            return this.FrameList.Count;
         }
 
         private int CheckElbowUp(int nowFrame)
         {
-            for (int i = nowFrame; i < FrameList.Count; i++)
+            for (int i = nowFrame; i < this.FrameList.Count; i++)
             {
                 double shoulderRight = 0, elbowRight = 0;
-                foreach (Joints joint in FrameList[i].jointList)
+                foreach (Joints joint in this.FrameList[i].jointList)
                 {
                     if (string.Compare(joint.jointType, "ShoulderRight") == 0)
                         shoulderRight = joint.y;
@@ -125,16 +125,16 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     return i;
                 }
             }
-            return FrameList.Count;
+            return this.FrameList.Count;
         }
 
         private int CheckElbowForward(int nowFrame)
         {
             double prevRightElbowShoulderDiff = 0, nowRightElbowShoulderDiff = 0;
-            for (int i = nowFrame; i < FrameList.Count; i++)
+            for (int i = nowFrame; i < this.FrameList.Count; i++)
             {
                 double elbowRight = 0, shoulderRight = 0;
-                foreach (Joints joint in FrameList[i].jointList)
+                foreach (Joints joint in this.FrameList[i].jointList)
                 {
                     if (string.Compare(joint.jointType, "ElbowRight") == 0)
                         elbowRight = joint.z;
@@ -148,42 +148,39 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     return i;
                 }
                 prevRightElbowShoulderDiff = nowRightElbowShoulderDiff;
-                //Console.WriteLine(FrameList[i].num + ": " + (elbowRight - shoulderRight));
-                //Console.WriteLine(FrameList[i].num + ": shoulder: " + shoulderRight);
             }
-            return FrameList.Count;
+            return this.FrameList.Count;
         }
 
         private int CheckWristForward(int nowFrame)
         {
             double prevHandtipWristDiff = 0, nowHandtipWristDiff = 0;
-            for (int i = nowFrame; i < FrameList.Count; i++)
+            for (int i = nowFrame; i < this.FrameList.Count; i++)
             {
                 double handTipRight = 0, wristRight = 0;
-                foreach (Joints joint in FrameList[i].jointList)
+                foreach (Joints joint in this.FrameList[i].jointList)
                 {
                     if (string.Compare(joint.jointType, "HandTipRight") == 0)
                         handTipRight = joint.y;
                     else if (string.Compare(joint.jointType, "WristRight") == 0)
                         wristRight = joint.y;
                 }
-                //Console.WriteLine(FrameList[i].num + ": " + (handTipRight - wristRight));
                 nowHandtipWristDiff = handTipRight - wristRight;
-                if (prevHandtipWristDiff - nowHandtipWristDiff > headNeckDiff / 3 && prevHandtipWristDiff != 0)
+                if (prevHandtipWristDiff - nowHandtipWristDiff > this.headNeckDiff / 3 && prevHandtipWristDiff != 0)
                 {
-                    Console.WriteLine(FrameList[i].num + " Wrist forward");
+                    Console.WriteLine(i + " Wrist forward");
                     return i;
                 }
                 prevHandtipWristDiff = nowHandtipWristDiff;
             }
-            return FrameList.Count;
+            return this.FrameList.Count;
         }
         private int CheckElbowEnded(int nowFrame)
         {
             double elbowRight = 0, spineMid = 0;
-            for (int i = nowFrame; i < FrameList.Count; i++)
+            for (int i = nowFrame; i < this.FrameList.Count; i++)
             {
-                foreach (Joints joint in FrameList[i].jointList)
+                foreach (Joints joint in this.FrameList[i].jointList)
                 {
                     if (string.Compare(joint.jointType, "ElbowRight") == 0)
                     {
@@ -192,16 +189,15 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     else if (string.Compare(joint.jointType, "SpineMid") == 0)
                         spineMid = joint.x;
                 }
-                //Console.WriteLine(FrameList[i].num + ": " + (elbowRight - spineMid));
                 double elbowSpineDiff = Math.Abs(elbowRight - spineMid);
                 if (elbowSpineDiff < elbowSpineMaxDiff / 6)
                 {
-                    Console.WriteLine(FrameList[i].num + " Elbow ended");
+                    Console.WriteLine(i + " Elbow ended");
                     return i;
                 }
 
             }
-            return FrameList.Count;
+            return this.FrameList.Count;
         }
     }
 }

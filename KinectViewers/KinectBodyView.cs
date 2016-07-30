@@ -151,12 +151,15 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private List<Image<Bgr, byte>> video = new List<Image<Bgr, byte>>();
         public bool converting = false;
 
+        private String type;
+
         /// <summary>
         /// Initializes a new instance of the KinectBodyView class
         /// </summary>
         /// <param name="kinectSensor">Active instance of the KinectSensor</param>
-        public KinectBodyView(KinectSensor kinectSensor)
+        public KinectBodyView(KinectSensor kinectSensor, String type)
         {
+            this.type = type;
             if (kinectSensor == null)
             {
                 throw new ArgumentNullException("kinectSensor");
@@ -249,7 +252,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         {
 
             string data = JsonConvert.SerializeObject(FrameList);
-            File.WriteAllText("../../../data/data.json", data);
+            File.WriteAllText("../../../data/" + this.type + "data.json", data);
 
             if (this.bodyFrameReader != null)
             {

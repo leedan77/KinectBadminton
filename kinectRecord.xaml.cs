@@ -65,10 +65,12 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private string ConvertFilePath;
 
+        private string type;
+
         /// <summary>
         /// Initializes a new instance of the MainWindow class.
         /// </summary>
-        public kinectRecord()
+        public kinectRecord(string type)
         {
             // initialize the components (controls) of the window
             this.InitializeComponent();
@@ -97,6 +99,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             //this.kinectIRViewbox.DataContext = this.kinectIRView;
             //this.kinectDepthViewbox.DataContext = this.kinectDepthView;
             //this.kinectBodyIndexViewbox.DataContext = this.kinectBodyIndexView;
+
+            this.type = type;
         }
 
         /// <summary>
@@ -345,7 +349,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private void BodyConvertButton_Click(object sender, RoutedEventArgs e)
         {
-            this.kinectBodyView = new KinectBodyView(this.kinectSensor);
+            this.kinectBodyView = new KinectBodyView(this.kinectSensor, this.type);
             string filePath = this.OpenFileForConvert();
             ConvertFilePath = filePath;
             if (!string.IsNullOrEmpty(filePath))
@@ -441,45 +445,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             this.kinectColorView.converting = false;
             this.kinectColorView.Dispose();
             this.Dispatcher.BeginInvoke(new NoArgDelegate(UpdateState));
-
-
-            /*this.Dispatcher.BeginInvoke(new NoArgDelegate(ChangeViewBox));
-
-            using (KStudioClient client = KStudio.CreateClient())
-            {
-                client.ConnectToService();
-
-                // Create the playback object
-                using (KStudioPlayback playback = client.CreatePlayback(filePath))
-                {
-                    playback.LoopCount = this.loopCount;
-                    playback.Start();
-
-                    while (playback.State == KStudioPlaybackState.Playing)
-                    {
-
-                    }
-                    playback.Dispose();
-                }
-
-                client.DisconnectFromService();
-            }
-
-            // Update the UI after the convert playback task has completed
-            makeVideo("body");
-            Console.WriteLine(this.kinectBodyView.Video.Count);
-            this.converting = false;
-            this.kinectBodyView.converting = false;
-            this.kinectBodyView.Dispose();
-            this.Dispatcher.BeginInvoke(new NoArgDelegate(UpdateState));*/
-        }
-
-        private void ChangeViewBox()
-        {
-            this.kinectBodyView = new KinectBodyView(this.kinectSensor);
-            this.kinectBodyView.converting = true;
-            this.kinectViewbox.DataContext = this.kinectBodyView;
-
         }
         
 
