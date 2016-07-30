@@ -343,7 +343,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
             if (result == true)
             {
-                this.ConvertFileName = dlg.SafeFileName;
                 fileName = dlg.FileName;
             }
 
@@ -467,6 +466,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
             if (result == true)
             {
+                this.ConvertFileName = dlg.SafeFileName;
                 fileName = dlg.FileName;
             }
 
