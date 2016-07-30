@@ -496,7 +496,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             {
                 List<Image<Bgr, byte>> ColorVideo = this.kinectColorView.Video;
                 Console.WriteLine(ColorVideo.Count);
-                using (VideoWriter vw = new VideoWriter(path "_color.avi", 30, ColorVideo[0].Width, ColorVideo[0].Height, true))
+                using (VideoWriter vw = new VideoWriter(path +"_color.avi", 30, ColorVideo[0].Width, ColorVideo[0].Height, true))
                 {
                     for (int i = 0; i < ColorVideo.Count; i++)
                     {
