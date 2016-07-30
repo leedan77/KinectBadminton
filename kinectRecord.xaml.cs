@@ -8,6 +8,7 @@ using Microsoft.Kinect.Tools;
 using Emgu.CV;
 using Emgu.CV.Structure;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 {
@@ -409,11 +410,16 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 client.DisconnectFromService();
             }
 
+
+            string filename = Path.GetFileName(filePath);
+            filename = filename.Remove(filename.IndexOf(".xef"), 4);
+
             // Update the UI after the convert playback task has completed
-            makeVideo("body");
+            makeVideo("body", filename);
             Console.WriteLine(this.kinectBodyView.Video.Count);
             this.converting = false;
             this.kinectBodyView.converting = false;
+            this.kinectBodyView.SaveData(filename);
             this.kinectBodyView.Dispose();
             this.Dispatcher.BeginInvoke(new NoArgDelegate(UpdateState));
         }
@@ -440,8 +446,11 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 client.DisconnectFromService();
             }
 
+            string filename = Path.GetFileName(filePath);
+            filename = filename.Remove(filename.IndexOf(".xef"), 4);
+
             // Update the UI after the convert playback task has completed
-            makeVideo("color");
+            makeVideo("color", filename);
             Console.WriteLine(this.kinectColorView.Video.Count);
             this.converting = false;
             this.kinectColorView.converting = false;
@@ -473,19 +482,19 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             return fileName;
         }
 
-        private void makeVideo(string type)
+        private void makeVideo(string type, string filename)
         {
             string removeString = ".xef";
             string path = ConvertFilePath.Remove(ConvertFilePath.IndexOf(removeString), removeString.Length);
             string cur = Environment.CurrentDirectory;
             const string coachDataPath = "\\..\\..\\..\\..\\coach_data";
-            string filename = ConvertFilePath;
             // string path = cur + coachDataPath;
             if (string.Compare(type, "body") == 0)
             {
                 List<Image<Bgr, byte>> BodyVideo = this.kinectBodyView.Video;
                 Console.WriteLine(BodyVideo.Count);
-                using (VideoWriter vw = new VideoWriter(path + "_body.avi", 30, BodyVideo[0].Width, BodyVideo[0].Height, true))
+                Console.WriteLine(this.type);
+                using (VideoWriter vw = new VideoWriter(@"..\..\..\data\coach\" + this.type + @"\body\" + filename + @".avi", 30, BodyVideo[0].Width, BodyVideo[0].Height, true))
                 {
                     for (int i = 0; i < BodyVideo.Count; i++)
                     {
@@ -499,7 +508,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             {
                 List<Image<Bgr, byte>> ColorVideo = this.kinectColorView.Video;
                 Console.WriteLine(ColorVideo.Count);
-                using (VideoWriter vw = new VideoWriter(path + "_color.avi", 30, ColorVideo[0].Width, ColorVideo[0].Height, true))
+                using (VideoWriter vw = new VideoWriter(@"..\..\..\data\coach\" + this.type + @"\color\" + filename + @".avi", 30, ColorVideo[0].Width, ColorVideo[0].Height, true))
                 {
                     for (int i = 0; i < ColorVideo.Count; i++)
                     {

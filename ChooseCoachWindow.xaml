@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Microsoft.Samples.Kinect.RecordAndPlaybackBasics"
         mc:Ignorable="d"
-        Title="選擇你的範本" Height="300" Width="300"
+        Title="選擇影片" Height="300" Width="300"
         WindowStartupLocation="CenterOwner">
     <Window.Resources>
         

@@ -25,7 +25,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         FileInfo[] fileInfo;
         ArrayList list;
         string cur = Environment.CurrentDirectory;
-        const string coachDataPath = "\\..\\..\\..\\..\\coach_data";
 
         private string coachDataType;
         public string CoachDataType
@@ -37,12 +36,15 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             set
             {
                 coachDataType = value;
-                dirInfo = new DirectoryInfo(cur + coachDataPath + coachDataType);
-                fileInfo = dirInfo.GetFiles("*.avi*");
+                Console.WriteLine(coachDataType);
+                //dirInfo = new DirectoryInfo(cur + coachDataPath + coachDataType);
+                dirInfo = new DirectoryInfo(cur + "\\..\\..\\..\\data\\coach\\smash\\json");
+                //fileInfo = dirInfo.GetFiles("*.avi*");
+                fileInfo = dirInfo.GetFiles("*.json*");
                 list = new ArrayList();
                 foreach (FileInfo f in fileInfo)
                 {
-                    list.Add(f.Name.Remove(f.Name.Length - 4));
+                    list.Add(f.Name.Remove(f.Name.Length - ".json".Length));
                 }
                 CoachListBox.ItemsSource = list;
             }
@@ -62,6 +64,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             var parent = this.Owner as MainWindow;
             parent.CoachFileName = fileInfo[CoachListBox.SelectedIndex].FullName;
             Console.WriteLine(fileInfo[CoachListBox.SelectedIndex].FullName);
+            parent.CoachChoosen(CoachListBox.SelectedItem.ToString());
             this.Close();
         }
 

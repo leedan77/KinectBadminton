@@ -251,15 +251,18 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         public void Dispose()
         {
 
-            string data = JsonConvert.SerializeObject(FrameList);
-            File.WriteAllText("../../../data/" + this.type + "data.json", data);
-
             if (this.bodyFrameReader != null)
             {
                 this.bodyFrameReader.FrameArrived -= Reader_BodyFrameArrived;
                 this.bodyFrameReader.Dispose();
                 this.bodyFrameReader = null;
             }
+        }
+
+        public void SaveData(String name)
+        {
+            string data = JsonConvert.SerializeObject(FrameList);
+            File.WriteAllText("../../../data/coach/" + this.type + "/json/" + name + ".json", data);
         }
 
         /// <summary>
