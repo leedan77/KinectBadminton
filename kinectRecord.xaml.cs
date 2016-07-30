@@ -479,13 +479,13 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             string path = ConvertFilePath.Remove(ConvertFilePath.IndexOf(removeString), removeString.Length);
             string cur = Environment.CurrentDirectory;
             const string coachDataPath = "\\..\\..\\..\\..\\coach_data";
-            string filename = this.ConvertFileName.Remove(ConvertFileName.IndexOf(removeString), removeString.Length);
+            string filename = ConvertFilePath;
             // string path = cur + coachDataPath;
-            if(string.Compare(type, "body") == 0)
+            if (string.Compare(type, "body") == 0)
             {
                 List<Image<Bgr, byte>> BodyVideo = this.kinectBodyView.Video;
                 Console.WriteLine(BodyVideo.Count);
-                using (VideoWriter vw = new VideoWriter(cur + coachDataPath + filename + "_body.avi", 30, BodyVideo[0].Width, BodyVideo[0].Height, true))
+                using (VideoWriter vw = new VideoWriter(path + "_body.avi", 30, BodyVideo[0].Width, BodyVideo[0].Height, true))
                 {
                     for (int i = 0; i < BodyVideo.Count; i++)
                     {
@@ -495,12 +495,11 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 this.kinectBodyView.Video.Clear();
                 BodyVideo.Clear();
             }
-            else if(string.Compare(type, "color") == 0)
+            else if (string.Compare(type, "color") == 0)
             {
                 List<Image<Bgr, byte>> ColorVideo = this.kinectColorView.Video;
                 Console.WriteLine(ColorVideo.Count);
-                using (VideoWriter vw = new VideoWriter(cur + coachDataPath + filename + "_color.avi", 30, ColorVideo[0].Width, ColorVideo[0].Height, true))
-
+                using (VideoWriter vw = new VideoWriter(path + "_color.avi", 30, ColorVideo[0].Width, ColorVideo[0].Height, true))
                 {
                     for (int i = 0; i < ColorVideo.Count; i++)
                     {
