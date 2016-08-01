@@ -25,20 +25,32 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         FileInfo[] fileInfo;
         ArrayList list;
         string cur = Environment.CurrentDirectory;
-
-        private string coachDataType;
-        public string CoachDataType
+        private string menuType;
+        public string MenuType
         {
             get
             {
-                return coachDataType;
+                return $"\\..\\..\\..\\data\\{menuType}\\smash\\json";
             }
             set
             {
-                coachDataType = value;
-                Console.WriteLine(coachDataType);
+                menuType = value;
+            }
+        }
+
+        private string dataType;
+        public string DataType
+        {
+            get
+            {
+                return dataType;
+            }
+            set
+            {
+                dataType = value;
+                Console.WriteLine(MenuType);
                 //dirInfo = new DirectoryInfo(cur + coachDataPath + coachDataType);
-                dirInfo = new DirectoryInfo(cur + "\\..\\..\\..\\data\\coach\\smash\\json");
+                dirInfo = new DirectoryInfo(cur + this.MenuType);
                 //fileInfo = dirInfo.GetFiles("*.avi*");
                 fileInfo = dirInfo.GetFiles("*.json*");
                 list = new ArrayList();
@@ -50,10 +62,11 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             }
         }
 
-        public ChooseCoachWindow()
+        public ChooseCoachWindow(string type)
         {
             InitializeComponent();
-            CoachDataType = "\\color";           
+            this.menuType = type;
+            DataType = "\\color";           
            
         }
 
@@ -62,7 +75,10 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private void CoachListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             var parent = this.Owner as MainWindow;
-            parent.CoachFileName = fileInfo[CoachListBox.SelectedIndex].FullName;
+            if (this.menuType == "coach")
+                parent.CoachFileName = fileInfo[CoachListBox.SelectedIndex].FullName;
+            else 
+                parent.StudentFileName = fileInfo[CoachListBox.SelectedIndex].FullName;
             Console.WriteLine(fileInfo[CoachListBox.SelectedIndex].FullName);
             parent.CoachChoosen(CoachListBox.SelectedItem.ToString());
             this.Close();
@@ -73,12 +89,12 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             if (colorRadio.IsChecked == true)
             {
                 Console.WriteLine("color");
-                CoachDataType = "\\color";
+                DataType = "\\color";
             }
             else
             {
                 Console.WriteLine("body");
-                CoachDataType = "\\body";
+                DataType = "\\body";
             }
         }
     }

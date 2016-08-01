@@ -70,7 +70,7 @@
                     <RowDefinition Height="50"/>
                     <RowDefinition Height="50"/>
                 </Grid.RowDefinitions>
-                <Button Style="{StaticResource MyButtonStyle}" Grid.Row="0" Margin="5, 0" Background="#001C70">
+                <Button Style="{StaticResource MyButtonStyle}" Grid.Row="0" Margin="5, 0" Background="#001C70" MouseDown="MediaPlay_left_MouseDown">
                     <MediaElement x:Name="MediaPlayer_left" Grid.Row="0" LoadedBehavior="Manual" HorizontalAlignment="Center" MediaOpened="MediaLeftOpened" MediaEnded="MediaEnded"/>
                 </Button>
                 <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">

@@ -39,6 +39,22 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private ServeMonitor serveMonitor;
         
         private String type;
+        private string studentFileName;
+        public string StudentFileName
+        {
+            get
+            {
+                return this.studentFileName;
+            }
+            set
+            {
+                this.studentFileName = value;
+                // play right media
+                MediaPlayer_left.Source = new Uri(this.studentFileName);
+                MediaPlayer_left.Play();
+            }
+        }
+
         private string coachFileName;
         public string CoachFileName
         {
@@ -215,7 +231,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private void MediaPlayer_right_MouseRightButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            ChooseCoachWindow ccw = new ChooseCoachWindow();
+            ChooseCoachWindow ccw = new ChooseCoachWindow("coach");
             ccw.Owner = this;
             ccw.ShowDialog();
            
@@ -418,6 +434,13 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private void RightSpeedSlider_ValueChanged_1(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             MediaPlayer_left.SpeedRatio = (double)LeftSpeedSlider.Value;
+        }
+
+        private void MediaPlay_left_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            ChooseCoachWindow ccw = new ChooseCoachWindow("student");
+            ccw.Owner = this;
+            ccw.ShowDialog();
         }
     }
 }
