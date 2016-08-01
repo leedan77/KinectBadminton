@@ -289,6 +289,18 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         public void CoachChoosen(String name)
         {
+            if (teacherFirstTime == true)
+            {
+                teacherFirstTime = false;
+            }
+            else
+            {
+                grid1.Children.Remove((Button)grid11.Children[0]);
+                grid2.Children.Remove((Button)grid12.Children[0]);
+                grid3.Children.Remove((Button)grid13.Children[0]);
+                grid4.Children.Remove((Button)grid14.Children[0]);
+                grid5.Children.Remove((Button)grid15.Children[0]);
+            }
             textBlock2.Text = name;
             for (int i = 0; i < 5; ++i)
             {
