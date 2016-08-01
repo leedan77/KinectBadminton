@@ -484,17 +484,15 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private void makeVideo(string type, string filename)
         {
-            string removeString = ".xef";
-            string path = ConvertFilePath.Remove(ConvertFilePath.IndexOf(removeString), removeString.Length);
-            string cur = Environment.CurrentDirectory;
-            const string coachDataPath = "\\..\\..\\..\\..\\coach_data";
-            // string path = cur + coachDataPath;
             if (string.Compare(type, "body") == 0)
             {
                 List<Image<Bgr, byte>> BodyVideo = this.kinectBodyView.Video;
                 Console.WriteLine(BodyVideo.Count);
                 Console.WriteLine(this.type);
-                using (VideoWriter vw = new VideoWriter(@"..\..\..\data\coach\" + this.type + @"\body\" + filename + @".avi", 30, BodyVideo[0].Width, BodyVideo[0].Height, true))
+                string path = @"..\..\..\data\coach\" + this.type + @"\body\";
+                Directory.CreateDirectory(path);
+                
+                using (VideoWriter vw = new VideoWriter(path + filename + @".avi", 30, BodyVideo[0].Width, BodyVideo[0].Height, true))
                 {
                     for (int i = 0; i < BodyVideo.Count; i++)
                     {
@@ -508,7 +506,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             {
                 List<Image<Bgr, byte>> ColorVideo = this.kinectColorView.Video;
                 Console.WriteLine(ColorVideo.Count);
-                using (VideoWriter vw = new VideoWriter(@"..\..\..\data\coach\" + this.type + @"\color\" + filename + @".avi", 30, ColorVideo[0].Width, ColorVideo[0].Height, true))
+                string path = @"..\..\..\data\coach\" + this.type + @"\color\";
+                Directory.CreateDirectory(path);
+                using (VideoWriter vw = new VideoWriter(path + filename + @".avi", 30, ColorVideo[0].Width, ColorVideo[0].Height, true))
                 {
                     for (int i = 0; i < ColorVideo.Count; i++)
                     {
