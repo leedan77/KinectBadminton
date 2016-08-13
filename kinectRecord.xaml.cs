@@ -542,5 +542,38 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         {
             this.kinectBodyView.angle = 0;
         }
+
+        private void IdentiyButton_Checked(object sender, RoutedEventArgs e)
+        {
+            if (teacherRadio.IsChecked == true)
+            {
+                Console.WriteLine("teacher");
+                //DataType = "\\color";
+            }
+            else
+            {
+                Console.WriteLine("student");
+                //DataType = "\\body";
+            }
+        }
+
+        private void MotionRadio_Click(object sender, RoutedEventArgs e)
+        {
+            if (smashRadio.IsChecked == true)
+            {
+                Console.WriteLine("smash");
+                //DataType = "\\color";
+            }
+            else if (lobRadio.IsChecked == true)
+            {
+                Console.WriteLine("lob");
+                //DataType = "\\body";
+            }
+            else
+            {
+                Console.WriteLine("serve");
+                //DataType = "\\body";
+            }
+        }
     }
 }
