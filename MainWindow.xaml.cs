@@ -26,8 +26,13 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
     {
         /// <summary> Indicates if a playback is currently in progress </summary>
         private bool isPlaying = false;
-
         private bool pausing = false;
+
+        private bool leftIsPlaying = false;
+        private bool leftPausing = false;
+
+        private bool rightIsPlaying = false;
+        private bool rightPausing = false;
 
         //for whether to delete grid button
         private bool teacherFirstTime = true;
@@ -130,6 +135,51 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 this.PauseButton.IsEnabled = false;
             }
         }
+
+        private void leftUpdateState()
+        {
+            if (this.leftIsPlaying && !this.leftPausing)
+            {
+                this.RecordButton.IsEnabled = false;
+                this.PlayLeftButton.IsEnabled = false;
+                this.PauseLeftButton.IsEnabled = true;
+            }
+            else if (this.leftPausing)
+            {
+                this.RecordButton.IsEnabled = false;
+                this.PlayLeftButton.IsEnabled = true;
+                this.PauseLeftButton.IsEnabled = false;
+            }
+            else
+            {
+                this.RecordButton.IsEnabled = true;
+                this.PlayLeftButton.IsEnabled = true;
+                this.PauseLeftButton.IsEnabled = false;
+            }
+        }
+
+        private void rightUpdateState()
+        {
+            if (this.rightIsPlaying && !this.rightPausing)
+            {
+                this.RecordButton.IsEnabled = false;
+                this.PlayRightButton.IsEnabled = false;
+                this.PauseRightButton.IsEnabled = true;
+            }
+            else if (this.rightPausing)
+            {
+                this.RecordButton.IsEnabled = false;
+                this.PlayRightButton.IsEnabled = true;
+                this.PauseRightButton.IsEnabled = false;
+            }
+            else
+            {
+                this.RecordButton.IsEnabled = true;
+                this.PlayRightButton.IsEnabled = true;
+                this.PauseRightButton.IsEnabled = false;
+            }
+        }
+
 
         private void RecordButton_Click(object sender, RoutedEventArgs e)
         {
@@ -360,32 +410,92 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private void StopLeftButton_Click(object sender, RoutedEventArgs e)
         {
-
+            MediaPlayer_left.Stop();
+            MediaPlayer_left.Close();
+            this.leftIsPlaying = false;
+            this.leftPausing = false;
+            this.leftUpdateState();
         }
 
         private void PlayLeftButton_Click(object sender, RoutedEventArgs e)
         {
+            this.leftIsPlaying = true;
+            if (!this.leftPausing)
+            {
+                this.leftPausing = false; //useless
+                this.leftUpdateState();
+                Microsoft.Win32.OpenFileDialog dialog = new Microsoft.Win32.OpenFileDialog();
+                dialog.FileName = "Videos"; // Default file name
+                dialog.DefaultExt = ".WMV"; // Default file extension
+                dialog.Filter = "AVI文件|*.avi|所有文件|*.*"; // Filter files by extension 
 
+                // Show open file dialog box
+                Nullable<bool> result = dialog.ShowDialog();
+
+                // Process open file dialog box results 
+                if (result == true)
+                {
+                    MediaPlayer_left.Source = new Uri(dialog.FileName);
+                }
+            }
+            else
+            {
+                this.leftPausing = false;
+                this.leftUpdateState();
+            }
+            MediaPlayer_left.Play();
         }
 
         private void PauseLeftButton_Click(object sender, RoutedEventArgs e)
         {
-
+            this.leftPausing = true;
+            this.leftUpdateState();
+            MediaPlayer_left.Pause();
         }
 
         private void StopRightButton_Click(object sender, RoutedEventArgs e)
         {
-
+            MediaPlayer_right.Stop();
+            MediaPlayer_right.Close();
+            this.rightIsPlaying = false;
+            this.rightPausing = false;
+            this.rightUpdateState();
         }
 
         private void PlayRightButton_Click(object sender, RoutedEventArgs e)
         {
+            this.rightIsPlaying = true;
+            if (!this.rightPausing)
+            {
+                this.rightPausing = false; //useless
+                this.rightUpdateState();
+                Microsoft.Win32.OpenFileDialog dialog = new Microsoft.Win32.OpenFileDialog();
+                dialog.FileName = "Videos"; // Default file name
+                dialog.DefaultExt = ".WMV"; // Default file extension
+                dialog.Filter = "AVI文件|*.avi|所有文件|*.*"; // Filter files by extension 
 
+                // Show open file dialog box
+                Nullable<bool> result = dialog.ShowDialog();
+
+                // Process open file dialog box results 
+                if (result == true)
+                {
+                    MediaPlayer_right.Source = new Uri(dialog.FileName);
+                }
+            }
+            else
+            {
+                this.rightPausing = false;
+                this.rightUpdateState();
+            }
+            MediaPlayer_right.Play();
         }
 
         private void PauseRightButton_Click(object sender, RoutedEventArgs e)
         {
-
+            this.rightPausing = true;
+            this.rightUpdateState();
+            MediaPlayer_right.Pause();
         }
 
         private void RightTimelineSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -401,7 +511,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 MediaPlayer_right.Position = ts;
 
             }
-            else
+            else if(this.rightIsPlaying && !this.rightPausing)
             {
                 MediaPlayer_right.Play();
             }
@@ -420,7 +530,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 MediaPlayer_left.Position = ts;
 
             }
-            else
+            else if(this.leftIsPlaying && !this.leftPausing)
             {
                 MediaPlayer_left.Play();
             }

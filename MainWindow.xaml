@@ -96,9 +96,9 @@
                     <MediaElement x:Name="MediaPlayer_right" Grid.Row="0" LoadedBehavior="Manual" HorizontalAlignment="Center" MediaOpened="MediaRightOpened" MediaEnded="MediaEnded"/>
                 </Button>
                 <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
-                    <Button x:Name="PlayRightButton" Content="Play" Width="70" Click="PlayButton_Click" Margin="10" Padding="5" />
-                    <Button x:Name="PauseRightButton" Content="Pause" Width="70" Click="PauseButton_Click" Margin="10" Padding="5" IsEnabled="False"/>
-                    <Button x:Name="StopRightButton" Content="Stop" Width="70" Click="StopButton_Click" Margin="10" Padding="5"/>
+                    <Button x:Name="PlayRightButton" Content="Play" Width="70" Click="PlayRightButton_Click" Margin="10" Padding="5" />
+                    <Button x:Name="PauseRightButton" Content="Pause" Width="70" Click="PauseRightButton_Click" Margin="10" Padding="5" IsEnabled="False"/>
+                    <Button x:Name="StopRightButton" Content="Stop" Width="70" Click="StopRightButton_Click" Margin="10" Padding="5"/>
                 </StackPanel>
                 <StackPanel Grid.Row="2" HorizontalAlignment="Center">
                     <Slider x:Name="RightTimelineSlider" Width="200" Margin="5,10,5,18" ValueChanged="RightTimelineSlider_ValueChanged" RenderTransformOrigin="0.5,1.533" />
