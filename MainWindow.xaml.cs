@@ -283,9 +283,34 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
            
         }
 
-        void button_Click(object sender, RoutedEventArgs e)
+        void student_Button_Click(object sender, RoutedEventArgs e)
         {
-            Console.WriteLine(string.Format("You clicked on the {0}. button.", (sender as Button).Tag));
+            Console.WriteLine(string.Format("You clicked on the {0}. student_button.", (sender as Button).Tag));
+            if (leftIsPlaying)
+            {
+                int second = (int)(sender as Button).Tag+120;
+                MediaPlayer_left.Pause();
+                MediaPlayer_left.Position = new TimeSpan(0, 0, 0, second, 0);
+                if (!leftPausing)
+                {
+                    MediaPlayer_left.Play();
+                }
+            }
+        }
+
+        void teacher_Button_Click(object sender, RoutedEventArgs e)
+        {
+            Console.WriteLine(string.Format("You clicked on the {0}. teacher_button.", (sender as Button).Tag));
+            if (rightIsPlaying)
+            {
+                int second = (int)(sender as Button).Tag + 120;
+                MediaPlayer_right.Pause();
+                MediaPlayer_right.Position = new TimeSpan(0, 0, 0, second, 0);
+                if (!rightPausing)
+                {
+                    MediaPlayer_right.Play();
+                }
+            }
         }
 
         private void student_Click(object sender, RoutedEventArgs e)
@@ -318,7 +343,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString("#001C70"),
                     Background = (SolidColorBrush)new BrushConverter().ConvertFromString("#E5DDB8"),
                 };
-                button.Click += new RoutedEventHandler(button_Click);
+                button.Click += new RoutedEventHandler(student_Button_Click);
 
                 if (i == 0)
                 {
@@ -371,7 +396,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString("#001C70"),
                     Background = (SolidColorBrush)new BrushConverter().ConvertFromString("#E5DDB8"),
                 };
-                button.Click += new RoutedEventHandler(button_Click);
+                button.Click += new RoutedEventHandler(teacher_Button_Click);
 
                 if (i == 0)
                 {
@@ -400,6 +425,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         {
             MediaPlayer_left.Stop();
             MediaPlayer_left.Close();
+            MediaPlayer_left.Position = new TimeSpan(0, 0, 0, 0, 0);
             this.leftIsPlaying = false;
             this.leftPausing = false;
             this.leftUpdateState();
@@ -445,6 +471,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         {
             MediaPlayer_right.Stop();
             MediaPlayer_right.Close();
+            MediaPlayer_right.Position = new TimeSpan(0, 0, 0, 0, 0);
             this.rightIsPlaying = false;
             this.rightPausing = false;
             this.rightUpdateState();
