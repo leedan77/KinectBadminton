@@ -34,10 +34,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private bool rightIsPlaying = false;
         private bool rightPausing = false;
 
-        //for whether to delete grid button
-        private bool teacherFirstTime = true;
-        private bool studentFirstTime = true;
-
         DispatcherTimer _timer = new DispatcherTimer();
 
         private SmashMonitor smashMonitor;
@@ -294,11 +290,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private void student_Click(object sender, RoutedEventArgs e)
         {
-            if (studentFirstTime == true)
-            {
-                studentFirstTime = false;
-            }
-            else
+            if(grid1.Children.Count != 0)
             {
                 grid1.Children.Remove((Button)grid1.Children[0]);
                 grid2.Children.Remove((Button)grid2.Children[0]);
@@ -355,17 +347,13 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         public void CoachChoosen(String name)
         {
-            if (teacherFirstTime == true)
+            if(grid11.Children.Count != 0)
             {
-                teacherFirstTime = false;
-            }
-            else
-            {
-                grid1.Children.Remove((Button)grid11.Children[0]);
-                grid2.Children.Remove((Button)grid12.Children[0]);
-                grid3.Children.Remove((Button)grid13.Children[0]);
-                grid4.Children.Remove((Button)grid14.Children[0]);
-                grid5.Children.Remove((Button)grid15.Children[0]);
+                grid11.Children.Remove((Button)grid11.Children[0]);
+                grid12.Children.Remove((Button)grid12.Children[0]);
+                grid13.Children.Remove((Button)grid13.Children[0]);
+                grid14.Children.Remove((Button)grid14.Children[0]);
+                grid15.Children.Remove((Button)grid15.Children[0]);
             }
             textBlock2.Text = name;
             for (int i = 0; i < 5; ++i)
