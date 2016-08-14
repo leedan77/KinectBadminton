@@ -30,6 +30,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private string lastFile = string.Empty;
 
+        private string idenity = "student";
+        private string motion = "Serve";
+
         /// <summary> Number of playback iterations </summary>
         private uint loopCount = 0;
 
@@ -334,17 +337,33 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         {
             string fileName = string.Empty;
 
-            SaveFileDialog dlg = new SaveFileDialog();
-            dlg.FileName = "recordAndPlaybackBasics.xef";
-            dlg.DefaultExt = Properties.Resources.XefExtension;
-            dlg.AddExtension = true;
-            dlg.Filter = Properties.Resources.EventFileDescription + " " + Properties.Resources.EventFileFilter;
-            dlg.CheckPathExists = true;
-            bool? result = dlg.ShowDialog();
-
-            if (result == true)
+            if (idenity == "teacher")
             {
-                fileName = dlg.FileName;
+                SaveFileDialog dlg = new SaveFileDialog();
+                dlg.FileName = "recordAndPlaybackBasics.xef";
+                dlg.DefaultExt = Properties.Resources.XefExtension;
+                dlg.AddExtension = true;
+                dlg.Filter = Properties.Resources.EventFileDescription + " " + Properties.Resources.EventFileFilter;
+                dlg.CheckPathExists = true;
+                bool? result = dlg.ShowDialog();
+
+                if (result == true)
+                {
+                    fileName = dlg.FileName;
+                }
+            }
+            //idenity == student
+            else
+            {
+                if (string.IsNullOrWhiteSpace(studentName.Text) || studentName.Text == "please enter your neme here !")
+                {
+                    MessageBox.Show("please enter your name", "Error");
+                }
+                else
+                {
+                    string folderName = studentName.Text+"-"+motion+"-"+DateTime.Now.ToString("HH:mm:ss(yyyy/MM/dd)");
+                    Console.WriteLine(folderName);
+                }
             }
 
             return fileName;
@@ -547,13 +566,13 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         {
             if (teacherRadio.IsChecked == true)
             {
-                Console.WriteLine("teacher");
-                //DataType = "\\color";
+                idenity =  "teacher";
+                //Console.WriteLine(idenity);
             }
             else
             {
-                Console.WriteLine("student");
-                //DataType = "\\body";
+                idenity = "student";
+                //Console.WriteLine(idenity);
             }
         }
 
@@ -561,18 +580,18 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         {
             if (smashRadio.IsChecked == true)
             {
-                Console.WriteLine("smash");
-                //DataType = "\\color";
+                motion = "Smash";
+                //Console.WriteLine(motion);
             }
             else if (lobRadio.IsChecked == true)
             {
-                Console.WriteLine("lob");
-                //DataType = "\\body";
+                motion = "Lob";
+                //Console.WriteLine(motion);
             }
             else
             {
-                Console.WriteLine("serve");
-                //DataType = "\\body";
+                motion = "Serve";
+                //Console.WriteLine(motion);
             }
         }
     }

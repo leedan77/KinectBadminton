@@ -38,6 +38,9 @@
                 <RadioButton x:Name="lobRadio" GroupName="motion" HorizontalAlignment="Center" Margin="0, 10, 50, 10" Click="MotionRadio_Click" Content="挑球"/>
                 <RadioButton x:Name="smashRadio" GroupName="motion" HorizontalAlignment="Center" Margin="0, 10, 50, 10" Click="MotionRadio_Click" Content="殺球"/>
             </StackPanel>
+            <TextBox VerticalAlignment="Center" Margin="10,10,0,0" FontSize="20" Name="studentName" Width="300">
+                please enter your neme here !
+            </TextBox>
         </StackPanel>
         <Grid Grid.Row="1" Background="Black" MouseMove="Grid_MouseMove" Margin="0,10,-0.4,0">
             <Grid.ColumnDefinitions>
