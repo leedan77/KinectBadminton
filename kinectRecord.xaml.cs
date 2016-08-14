@@ -361,8 +361,19 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 }
                 else
                 {
-                    string folderName = studentName.Text+"-"+motion+"-"+DateTime.Now.ToString("HH:mm:ss(yyyy/MM/dd)");
-                    Console.WriteLine(folderName);
+                    string folderName = studentName.Text+"-"+motion+"-"+DateTime.Now.ToString("HH-mm-ss(yyyy-MM-dd)");
+                    //Console.WriteLine(folderName);
+                    string cur = Environment.CurrentDirectory;
+                    string relativePath = $"\\..\\..\\..\\data\\student\\";
+                    string filePath = cur + relativePath + folderName;
+                    if (Directory.Exists(filePath))
+                    {
+                        MessageBox.Show("The folder has existed", "Error");
+                    }
+                    else
+                    {
+                        Directory.CreateDirectory(filePath);
+                    }
                 }
             }
 
