@@ -74,6 +74,7 @@
                     <MediaElement x:Name="MediaPlayer_left" Grid.Row="0" LoadedBehavior="Manual" HorizontalAlignment="Center" MediaOpened="MediaLeftOpened" MediaEnded="MediaEnded"/>
                 </Button>
                 <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Image x:Name="MenuLeftButton" Source="Images/menu.png" Height="30" MouseLeftButtonDown="MenuLeftButton_MouseLeftButtonDown"></Image>
                     <Button x:Name="PlayLeftButton" Content="Play" Width="70" Click="PlayLeftButton_Click" Margin="10" Padding="5" />
                     <Button x:Name="PauseLeftButton" Content="Pause" Width="70" Click="PauseLeftButton_Click" Margin="10" Padding="5" IsEnabled="False"/>
                     <Button x:Name="StopLeftButton" Content="Stop" Width="70" Click="StopLeftButton_Click" Margin="10" Padding="5"/>
@@ -81,8 +82,14 @@
                 <StackPanel Grid.Row="2" HorizontalAlignment="Center">
                     <Slider x:Name="LeftTimelineSlider" Width="200" Margin="5,10,5,18" ValueChanged="LeftTimelineSlider_ValueChanged" RenderTransformOrigin="0.5,1.533" />
                 </StackPanel>
-                <StackPanel Grid.Row="3" HorizontalAlignment="Center">
-                    <Slider x:Name="LeftSpeedSlider" Width="200" Margin="5,10,5,18" ValueChanged="RightSpeedSlider_ValueChanged_1" RenderTransformOrigin="0.5,1.533" Minimum="0.1" Maximum="1" Value="1"/>
+                <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Image Source="Images/turtle-128.png" Width="35" Margin="0, -10, 0, 0"></Image>
+                    <Slider x:Name="LeftSpeedSlider" Width="200" Margin="5,10,5,18" ValueChanged="RightSpeedSlider_ValueChanged_1" RenderTransformOrigin="0.5,1.533" Minimum="0.1" Maximum="1" Value="1"
+                            Ticks="0.1, 0.25, 0.5, 0.75, 1" 
+                            TickPlacement="BottomRight"
+                            AutoToolTipPlacement="BottomRight"
+                            AutoToolTipPrecision="2"
+                            IsSnapToTickEnabled="True"/>
                 </StackPanel>
             </Grid>
             <Grid Grid.Row="1" Grid.Column="1" Margin="30 0 30 0">
@@ -96,6 +103,7 @@
                     <MediaElement x:Name="MediaPlayer_right" Grid.Row="0" LoadedBehavior="Manual" HorizontalAlignment="Center" MediaOpened="MediaRightOpened" MediaEnded="MediaEnded"/>
                 </Button>
                 <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Image x:Name="MenuRightButton" Source="Images/menu.png" Height="30" MouseLeftButtonDown="MenuRightButton_MouseLeftButtonDown"></Image>
                     <Button x:Name="PlayRightButton" Content="Play" Width="70" Click="PlayRightButton_Click" Margin="10" Padding="5" />
                     <Button x:Name="PauseRightButton" Content="Pause" Width="70" Click="PauseRightButton_Click" Margin="10" Padding="5" IsEnabled="False"/>
                     <Button x:Name="StopRightButton" Content="Stop" Width="70" Click="StopRightButton_Click" Margin="10" Padding="5"/>
@@ -103,8 +111,14 @@
                 <StackPanel Grid.Row="2" HorizontalAlignment="Center">
                     <Slider x:Name="RightTimelineSlider" Width="200" Margin="5,10,5,18" ValueChanged="RightTimelineSlider_ValueChanged" RenderTransformOrigin="0.5,1.533" />
                 </StackPanel>
-                <StackPanel Grid.Row="3" HorizontalAlignment="Center">
-                    <Slider x:Name="RightSpeedSlider" Width="200" Margin="5,10,5,18" ValueChanged="RightSpeedSlider_ValueChanged" RenderTransformOrigin="0.5,1.533" Minimum="0.1" Maximum="1" Value="1"/>
+                <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Image Source="Images/turtle-128.png" Width="35" Margin="0, -10, 0, 0"></Image>
+                    <Slider x:Name="RightSpeedSlider" Width="200" Margin="5,10,5,18" ValueChanged="RightSpeedSlider_ValueChanged" RenderTransformOrigin="0.5,1.533" Minimum="0.1" Maximum="1" Value="1"
+                            Ticks="0.1, 0.25, 0.5, 0.75, 1" 
+                            TickPlacement="BottomRight"
+                            AutoToolTipPlacement="BottomRight"
+                            AutoToolTipPrecision="2"
+                            IsSnapToTickEnabled="True"/>
                 </StackPanel>
             </Grid>
             <Grid Grid.Row="0" Grid.RowSpan="2" Grid.Column="2" Margin="5 5 5 5" Background="#E5DDB8">
