@@ -75,7 +75,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         public MainWindow()
         {
             InitializeComponent();        
-            _timer.Interval = TimeSpan.FromMilliseconds(1000);
+            _timer.Interval = TimeSpan.FromMilliseconds(16);
             _timer.Tick += new EventHandler(ticktock);
             _timer.Start();
 
@@ -97,11 +97,13 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         {
             if (!LeftTimelineSlider.IsMouseCaptureWithin)
             {
-                LeftTimelineSlider.Value = MediaPlayer_left.Position.TotalSeconds;
+                LeftTimelineSlider.Value = MediaPlayer_left.Position.TotalMilliseconds;
+                LeftMediaLabel.Text = String.Format("{0:ss}:{0:fff}", MediaPlayer_left.Position);
             }
             if (!RightTimelineSlider.IsMouseCaptureWithin)
             {
-                RightTimelineSlider.Value = MediaPlayer_right.Position.TotalSeconds;
+                RightTimelineSlider.Value = MediaPlayer_right.Position.TotalMilliseconds;
+                RightMediaLabel.Text = String.Format("{0:ss}:{0:fff}", MediaPlayer_right.Position);
             }
         }
 
@@ -246,13 +248,16 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private void MediaLeftOpened(object sender, RoutedEventArgs e)
         {
             LeftTimelineSlider.Minimum = 0;
-            LeftTimelineSlider.Maximum = MediaPlayer_left.NaturalDuration.TimeSpan.TotalSeconds;
+            LeftTimelineSlider.Maximum = MediaPlayer_left.NaturalDuration.TimeSpan.TotalMilliseconds;
+            //LeftTimelineSlider.Ticks = 
+            Console.WriteLine(LeftTimelineSlider.Maximum);
         }
 
         private void MediaRightOpened(object sender, RoutedEventArgs e)
         {
             RightTimelineSlider.Minimum = 0;
-            RightTimelineSlider.Maximum = MediaPlayer_right.NaturalDuration.TimeSpan.TotalSeconds;
+            RightTimelineSlider.Maximum = MediaPlayer_right.NaturalDuration.TimeSpan.TotalMilliseconds;
+       
         }
 
 
@@ -519,10 +524,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             {
                 MediaPlayer_right.Pause();
                 int SliderValue = (int)RightTimelineSlider.Value;
-
                 // Overloaded constructor takes the arguments days, hours, minutes, seconds, miniseconds.
                 // Create a TimeSpan with miliseconds equal to the slider value.
-                TimeSpan ts = new TimeSpan(0, 0, 0, SliderValue, 0);
+                TimeSpan ts = new TimeSpan(0, 0, 0, 0, SliderValue);
                 MediaPlayer_right.Position = ts;
 
             }
@@ -538,12 +542,11 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             {
                 MediaPlayer_left.Pause();
                 int SliderValue = (int)LeftTimelineSlider.Value;
-
+                Console.WriteLine(SliderValue);
                 // Overloaded constructor takes the arguments days, hours, minutes, seconds, miniseconds.
                 // Create a TimeSpan with miliseconds equal to the slider value.
-                TimeSpan ts = new TimeSpan(0, 0, 0, SliderValue, 0);
+                TimeSpan ts = new TimeSpan(0, 0, 0, 0, SliderValue);
                 MediaPlayer_left.Position = ts;
-
             }
             else if(this.leftIsPlaying && !this.leftPausing)
             {
