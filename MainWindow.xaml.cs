@@ -293,7 +293,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             Console.WriteLine(string.Format("You clicked on the {0}. student_button.", (sender as Button).Tag));
             if (leftIsPlaying)
             {
-                int second = (int)(sender as Button).Tag+120;
+                int second = (int)(sender as Button).Tag;
                 MediaPlayer_left.Pause();
                 MediaPlayer_left.Position = new TimeSpan(0, 0, 0, second, 0);
                 if (!leftPausing)
@@ -308,7 +308,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             Console.WriteLine(string.Format("You clicked on the {0}. teacher_button.", (sender as Button).Tag));
             if (rightIsPlaying)
             {
-                int second = (int)(sender as Button).Tag + 120;
+                int second = (int)(sender as Button).Tag;
                 MediaPlayer_right.Pause();
                 MediaPlayer_right.Position = new TimeSpan(0, 0, 0, second, 0);
                 if (!rightPausing)
