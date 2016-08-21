@@ -18,7 +18,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
     using System.Windows.Media.Imaging;
 
     using System.Diagnostics;
-
+    using System.IO;
     /// <summary>
     /// Interaction logic for the MainWindow
     /// </summary>
@@ -38,7 +38,14 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private SmashMonitor smashMonitor;
         private ServeMonitor serveMonitor;
-        
+
+        private string cur = Environment.CurrentDirectory;
+        private string dataBasePath = $"\\..\\..\\..\\data";
+
+        private string student_color_or_body;
+        private string coach_color_or_body;
+        public string action_type;
+
         private String type;
         private string studentFileName;
         public string StudentFileName
@@ -51,8 +58,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             {
                 this.studentFileName = value;
                 // play right media
-                MediaPlayer_left.Source = new Uri(this.studentFileName);
-                MediaPlayer_left.Play();
+                string path = cur + dataBasePath + $"\\student\\{action_type}\\{StudentFileName}\\{student_color_or_body}.avi";
+                MediaPlayer_left.Source = new Uri(path);
+                MediaPlayer_left.Stop();
             }
         }
 
@@ -67,15 +75,16 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             {
                 this.coachFileName = value;
                 // play right media
-                MediaPlayer_right.Source = new Uri(this.coachFileName);
-                MediaPlayer_right.Play();
+                string path = cur + dataBasePath + $"\\coach\\{action_type}\\{CoachFileName}\\{coach_color_or_body}.avi";
+                MediaPlayer_right.Source = new Uri(path);
+                MediaPlayer_right.Stop();
             }
         }
 
         public MainWindow()
         {
             InitializeComponent();        
-            _timer.Interval = TimeSpan.FromMilliseconds(1000);
+            _timer.Interval = TimeSpan.FromMilliseconds(16);
             _timer.Tick += new EventHandler(ticktock);
             _timer.Start();
 
@@ -91,17 +100,23 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 serveMonitor = new ServeMonitor();
                 serveMonitor.start();
             }
+
+            this.action_type = "lob";
+            this.student_color_or_body = "color";
+            this.coach_color_or_body = "color";
         }
 
         void ticktock(object sender, EventArgs e)
         {
             if (!LeftTimelineSlider.IsMouseCaptureWithin)
             {
-                LeftTimelineSlider.Value = MediaPlayer_left.Position.TotalSeconds;
+                LeftTimelineSlider.Value = MediaPlayer_left.Position.TotalMilliseconds;
+                LeftMediaLabel.Text = String.Format("{0:ss}:{0:fff}", MediaPlayer_left.Position);
             }
             if (!RightTimelineSlider.IsMouseCaptureWithin)
             {
-                RightTimelineSlider.Value = MediaPlayer_right.Position.TotalSeconds;
+                RightTimelineSlider.Value = MediaPlayer_right.Position.TotalMilliseconds;
+                RightMediaLabel.Text = String.Format("{0:ss}:{0:fff}", MediaPlayer_right.Position);
             }
         }
 
@@ -205,26 +220,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 {
                     MediaPlayer_left.Source = new Uri(dialog.FileName);
                 }
-                /*
-                Microsoft.Win32.OpenFileDialog dialog2 = new Microsoft.Win32.OpenFileDialog();
-                dialog.FileName = "Videos"; // Default file name
-                dialog.DefaultExt = ".WMV"; // Default file extension
-                dialog.Filter = "AVI文件|*.avi|所有文件|*.*"; // Filter files by extension 
 
-                // Show open file dialog box
-                Nullable<bool> result2 = dialog.ShowDialog();
-
-                // Process open file dialog box results 
-                if (result2 == true)
-                {
-                    // Open document                    
-                    MediaPlayer_right.Source = new Uri(dialog.FileName);
-                }
-                */
-                // MediaPlayer_right.Source = new Uri(this.CoachFileName);
-
-                //OneArgDelegate playback = new OneArgDelegate(this.PlaybackClip);
-                //playback.BeginInvoke(filePath, null, null);
             }
             else
             {
@@ -246,13 +242,16 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private void MediaLeftOpened(object sender, RoutedEventArgs e)
         {
             LeftTimelineSlider.Minimum = 0;
-            LeftTimelineSlider.Maximum = MediaPlayer_left.NaturalDuration.TimeSpan.TotalSeconds;
+            LeftTimelineSlider.Maximum = MediaPlayer_left.NaturalDuration.TimeSpan.TotalMilliseconds;
+            //LeftTimelineSlider.Ticks = 
+            Console.WriteLine(LeftTimelineSlider.Maximum);
         }
 
         private void MediaRightOpened(object sender, RoutedEventArgs e)
         {
             RightTimelineSlider.Minimum = 0;
-            RightTimelineSlider.Maximum = MediaPlayer_right.NaturalDuration.TimeSpan.TotalSeconds;
+            RightTimelineSlider.Maximum = MediaPlayer_right.NaturalDuration.TimeSpan.TotalMilliseconds;
+       
         }
 
 
@@ -277,7 +276,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private void MediaPlayer_right_MouseRightButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            ChooseCoachWindow ccw = new ChooseCoachWindow("coach");
+            ChooseCoachWindow ccw = new ChooseCoachWindow("coach", action_type);
             ccw.Owner = this;
             ccw.ShowDialog();
            
@@ -288,7 +287,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             Console.WriteLine(string.Format("You clicked on the {0}. student_button.", (sender as Button).Tag));
             if (leftIsPlaying)
             {
-                int second = (int)(sender as Button).Tag+120;
+                int second = (int)(sender as Button).Tag;
                 MediaPlayer_left.Pause();
                 MediaPlayer_left.Position = new TimeSpan(0, 0, 0, second, 0);
                 if (!leftPausing)
@@ -303,7 +302,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             Console.WriteLine(string.Format("You clicked on the {0}. teacher_button.", (sender as Button).Tag));
             if (rightIsPlaying)
             {
-                int second = (int)(sender as Button).Tag + 120;
+                int second = (int)(sender as Button).Tag;
                 MediaPlayer_right.Pause();
                 MediaPlayer_right.Position = new TimeSpan(0, 0, 0, second, 0);
                 if (!rightPausing)
@@ -438,19 +437,19 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             {
                 this.leftPausing = false; //useless
                 this.leftUpdateState();
-                Microsoft.Win32.OpenFileDialog dialog = new Microsoft.Win32.OpenFileDialog();
-                dialog.FileName = "Videos"; // Default file name
-                dialog.DefaultExt = ".WMV"; // Default file extension
-                dialog.Filter = "AVI文件|*.avi|所有文件|*.*"; // Filter files by extension 
+                //Microsoft.Win32.OpenFileDialog dialog = new Microsoft.Win32.OpenFileDialog();
+                //dialog.FileName = "Videos"; // Default file name
+                //dialog.DefaultExt = ".WMV"; // Default file extension
+                //dialog.Filter = "AVI文件|*.avi|所有文件|*.*"; // Filter files by extension 
 
-                // Show open file dialog box
-                Nullable<bool> result = dialog.ShowDialog();
+                //// Show open file dialog box
+                //Nullable<bool> result = dialog.ShowDialog();
 
-                // Process open file dialog box results 
-                if (result == true)
-                {
-                    MediaPlayer_left.Source = new Uri(dialog.FileName);
-                }
+                //// Process open file dialog box results 
+                //if (result == true)
+                //{
+                //    MediaPlayer_left.Source = new Uri(dialog.FileName);
+                //}
             }
             else
             {
@@ -484,19 +483,19 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             {
                 this.rightPausing = false; //useless
                 this.rightUpdateState();
-                Microsoft.Win32.OpenFileDialog dialog = new Microsoft.Win32.OpenFileDialog();
-                dialog.FileName = "Videos"; // Default file name
-                dialog.DefaultExt = ".WMV"; // Default file extension
-                dialog.Filter = "AVI文件|*.avi|所有文件|*.*"; // Filter files by extension 
+                //Microsoft.Win32.OpenFileDialog dialog = new Microsoft.Win32.OpenFileDialog();
+                //dialog.FileName = "Videos"; // Default file name
+                //dialog.DefaultExt = ".WMV"; // Default file extension
+                //dialog.Filter = "AVI文件|*.avi|所有文件|*.*"; // Filter files by extension 
 
-                // Show open file dialog box
-                Nullable<bool> result = dialog.ShowDialog();
+                //// Show open file dialog box
+                //Nullable<bool> result = dialog.ShowDialog();
 
-                // Process open file dialog box results 
-                if (result == true)
-                {
-                    MediaPlayer_right.Source = new Uri(dialog.FileName);
-                }
+                //// Process open file dialog box results 
+                //if (result == true)
+                //{
+                //    MediaPlayer_right.Source = new Uri(dialog.FileName);
+                //}
             }
             else
             {
@@ -519,10 +518,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             {
                 MediaPlayer_right.Pause();
                 int SliderValue = (int)RightTimelineSlider.Value;
-
                 // Overloaded constructor takes the arguments days, hours, minutes, seconds, miniseconds.
                 // Create a TimeSpan with miliseconds equal to the slider value.
-                TimeSpan ts = new TimeSpan(0, 0, 0, SliderValue, 0);
+                TimeSpan ts = new TimeSpan(0, 0, 0, 0, SliderValue);
                 MediaPlayer_right.Position = ts;
 
             }
@@ -538,12 +536,11 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             {
                 MediaPlayer_left.Pause();
                 int SliderValue = (int)LeftTimelineSlider.Value;
-
+                Console.WriteLine(SliderValue);
                 // Overloaded constructor takes the arguments days, hours, minutes, seconds, miniseconds.
                 // Create a TimeSpan with miliseconds equal to the slider value.
-                TimeSpan ts = new TimeSpan(0, 0, 0, SliderValue, 0);
+                TimeSpan ts = new TimeSpan(0, 0, 0, 0, SliderValue);
                 MediaPlayer_left.Position = ts;
-
             }
             else if(this.leftIsPlaying && !this.leftPausing)
             {
@@ -563,9 +560,101 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private void MediaPlay_left_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            ChooseCoachWindow ccw = new ChooseCoachWindow("student");
+            ChooseCoachWindow ccw = new ChooseCoachWindow("student", action_type);
             ccw.Owner = this;
             ccw.ShowDialog();
+        }
+
+        private void MenuLeftButton_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            ChooseCoachWindow ccw = new ChooseCoachWindow("student", action_type);
+            ccw.Owner = this;
+            ccw.ShowDialog();
+        }
+
+        private void MenuRightButton_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            ChooseCoachWindow ccw = new ChooseCoachWindow("coach", action_type);
+            ccw.Owner = this;
+            ccw.ShowDialog();
+        }
+
+        private void ToggleButton_Checked(object sender, RoutedEventArgs e)
+        {
+            if (leftColorRadio.IsChecked == true)
+            {
+                student_color_or_body = "color";
+                string path = cur + dataBasePath + $"\\student\\{action_type}\\{StudentFileName}\\{student_color_or_body}.avi";
+                resetUri(MediaPlayer_left, path);
+            }
+            else if (leftBodyRadio.IsChecked == true)
+            {
+                student_color_or_body = "body";
+                string path = cur + dataBasePath + $"\\student\\{action_type}\\{StudentFileName}\\{student_color_or_body}.avi";
+                resetUri(MediaPlayer_left, path);
+            }
+            if (rightBodyRadio.IsChecked == true)
+            {
+                coach_color_or_body = "body";
+                string path = cur + dataBasePath + $"\\coach\\{action_type}\\{CoachFileName}\\{coach_color_or_body}.avi";
+                resetUri(MediaPlayer_right, path);
+            }
+            else if (rightColorRadio.IsChecked == true)
+            {
+                coach_color_or_body = "color";
+                string path = cur + dataBasePath + $"\\coach\\{action_type}\\{CoachFileName}\\{coach_color_or_body}.avi";
+                resetUri(MediaPlayer_right, path);
+
+            }
+        }
+
+        private void ActionSwitch_Click(object sender, RoutedEventArgs e)
+        {
+            if (lobRadio.IsChecked == true)
+            {
+                action_type = "lob";
+                string path = cur + dataBasePath + $"\\student\\{action_type}\\{StudentFileName}\\{student_color_or_body}.avi";
+                if(File.Exists(path))
+                {
+                    Console.WriteLine("file exist");
+                } 
+                else
+                {
+                    Console.WriteLine("file not exist");
+                }
+            }
+            else if (serveRadio.IsChecked == true)
+            {
+                action_type = "serve";
+                string path = cur + dataBasePath + $"\\student\\{action_type}\\{StudentFileName}\\{student_color_or_body}.avi";
+                if (File.Exists(path))
+                {
+                    Console.WriteLine("file exist");
+                }
+                else
+                {
+                    Console.WriteLine("file not exist");
+                }
+            }
+            else if (smashRadio.IsChecked == true)
+            {
+                action_type = "smash";
+                string path = cur + dataBasePath + $"\\student\\{action_type}\\{StudentFileName}\\{student_color_or_body}.avi";
+                if (File.Exists(path))
+                {
+                    Console.WriteLine("file exist");
+                }
+                else
+                {
+                    Console.WriteLine("file not exist");
+                }
+            }
+        }
+
+        private void resetUri(MediaElement me, string path)
+        {
+            me.Source = new Uri(path);
+            me.Stop();
         }
     }
 }

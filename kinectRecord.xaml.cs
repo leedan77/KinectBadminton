@@ -30,6 +30,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private string lastFile = string.Empty;
 
+        private string idenity = "student";
+        private string motion = "Serve";
+
         /// <summary> Number of playback iterations </summary>
         private uint loopCount = 0;
 
@@ -334,17 +337,44 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         {
             string fileName = string.Empty;
 
-            SaveFileDialog dlg = new SaveFileDialog();
-            dlg.FileName = "recordAndPlaybackBasics.xef";
-            dlg.DefaultExt = Properties.Resources.XefExtension;
-            dlg.AddExtension = true;
-            dlg.Filter = Properties.Resources.EventFileDescription + " " + Properties.Resources.EventFileFilter;
-            dlg.CheckPathExists = true;
-            bool? result = dlg.ShowDialog();
-
-            if (result == true)
+            if (idenity == "teacher")
             {
-                fileName = dlg.FileName;
+                SaveFileDialog dlg = new SaveFileDialog();
+                dlg.FileName = "recordAndPlaybackBasics.xef";
+                dlg.DefaultExt = Properties.Resources.XefExtension;
+                dlg.AddExtension = true;
+                dlg.Filter = Properties.Resources.EventFileDescription + " " + Properties.Resources.EventFileFilter;
+                dlg.CheckPathExists = true;
+                bool? result = dlg.ShowDialog();
+
+                if (result == true)
+                {
+                    fileName = dlg.FileName;
+                }
+            }
+            //idenity == student
+            else
+            {
+                if (string.IsNullOrWhiteSpace(studentName.Text) || studentName.Text == "please enter your neme here !")
+                {
+                    MessageBox.Show("please enter your name", "Error");
+                }
+                else
+                {
+                    string folderName = studentName.Text+"_"+DateTime.Now.ToString("HH-mm-ss(yyyy-MM-dd)");
+                    //Console.WriteLine(folderName);
+                    string cur = Environment.CurrentDirectory;
+                    string relativePath = $"\\..\\..\\..\\data\\student\\{motion}\\";
+                    string filePath = cur + relativePath + folderName;
+                    if (Directory.Exists(filePath))
+                    {
+                        MessageBox.Show("The folder has existed", "Error");
+                    }
+                    else
+                    {
+                        Directory.CreateDirectory(filePath);
+                    }
+                }
             }
 
             return fileName;
@@ -541,6 +571,39 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private void ResetButton_Click(object sender, RoutedEventArgs e)
         {
             this.kinectBodyView.angle = 0;
+        }
+
+        private void IdentiyButton_Checked(object sender, RoutedEventArgs e)
+        {
+            if (teacherRadio.IsChecked == true)
+            {
+                idenity =  "teacher";
+                //Console.WriteLine(idenity);
+            }
+            else
+            {
+                idenity = "student";
+                //Console.WriteLine(idenity);
+            }
+        }
+
+        private void MotionRadio_Click(object sender, RoutedEventArgs e)
+        {
+            if (smashRadio.IsChecked == true)
+            {
+                motion = "smash";
+                //Console.WriteLine(motion);
+            }
+            else if (lobRadio.IsChecked == true)
+            {
+                motion = "lob";
+                //Console.WriteLine(motion);
+            }
+            else
+            {
+                motion = "serve";
+                //Console.WriteLine(motion);
+            }
         }
     }
 }
