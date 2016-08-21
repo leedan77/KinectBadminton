@@ -361,10 +361,10 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 }
                 else
                 {
-                    string folderName = studentName.Text+"-"+motion+"-"+DateTime.Now.ToString("HH-mm-ss(yyyy-MM-dd)");
+                    string folderName = studentName.Text+"_"+DateTime.Now.ToString("HH-mm-ss(yyyy-MM-dd)");
                     //Console.WriteLine(folderName);
                     string cur = Environment.CurrentDirectory;
-                    string relativePath = $"\\..\\..\\..\\data\\student\\";
+                    string relativePath = $"\\..\\..\\..\\data\\student\\{motion}\\";
                     string filePath = cur + relativePath + folderName;
                     if (Directory.Exists(filePath))
                     {
@@ -591,17 +591,17 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         {
             if (smashRadio.IsChecked == true)
             {
-                motion = "Smash";
+                motion = "smash";
                 //Console.WriteLine(motion);
             }
             else if (lobRadio.IsChecked == true)
             {
-                motion = "Lob";
+                motion = "lob";
                 //Console.WriteLine(motion);
             }
             else
             {
-                motion = "Serve";
+                motion = "serve";
                 //Console.WriteLine(motion);
             }
         }
