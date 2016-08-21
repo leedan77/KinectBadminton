@@ -44,6 +44,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         /// </summary>
         /// <param name="arg">string argument</param>
         private delegate void OneArgDelegate(string arg);
+        
+        private delegate void TwoArgDelegate(string arg1, string arg2);
 
         /// <summary> Active Kinect sensor </summary>
         private KinectSensor kinectSensor = null;
@@ -70,13 +72,12 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private string ConvertFilePath;
 
         private string ConvertFileName;
-
-        private string type;
+        
 
         /// <summary>
         /// Initializes a new instance of the MainWindow class.
         /// </summary>
-        public kinectRecord(string type)
+        public kinectRecord()
         {
             // initialize the components (controls) of the window
             this.InitializeComponent();
@@ -105,8 +106,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             //this.kinectIRViewbox.DataContext = this.kinectIRView;
             //this.kinectDepthViewbox.DataContext = this.kinectDepthView;
             //this.kinectBodyIndexViewbox.DataContext = this.kinectBodyIndexView;
-
-            this.type = type;
         }
 
         /// <summary>
@@ -355,13 +354,13 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             //idenity == student
             else
             {
-                if (string.IsNullOrWhiteSpace(studentName.Text) || studentName.Text == "please enter your neme here !")
+                if (string.IsNullOrWhiteSpace(nameBox.Text) || nameBox.Text == "please enter your neme here !")
                 {
                     MessageBox.Show("please enter your name", "Error");
                 }
                 else
                 {
-                    string folderName = studentName.Text+"_"+DateTime.Now.ToString("HH-mm-ss(yyyy-MM-dd)");
+                    string folderName = nameBox.Text+"_"+DateTime.Now.ToString("HH-mm-ss(yyyy-MM-dd)");
                     //Console.WriteLine(folderName);
                     string cur = Environment.CurrentDirectory;
                     string relativePath = $"\\..\\..\\..\\data\\student\\{motion}\\";
@@ -382,7 +381,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private void BodyConvertButton_Click(object sender, RoutedEventArgs e)
         {
-            this.kinectBodyView = new KinectBodyView(this.kinectSensor, this.type);
+            this.kinectBodyView = new KinectBodyView(this.kinectSensor, this.motion);
             string filePath = this.OpenFileForConvert();
             ConvertFilePath = filePath;
             if (!string.IsNullOrEmpty(filePath))
@@ -392,8 +391,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 
                 this.kinectBodyView.converting = true;
                 this.kinectViewbox.DataContext = this.kinectBodyView;
-                OneArgDelegate bodyConvert = new OneArgDelegate(this.BodyConvertClip);
-                bodyConvert.BeginInvoke(filePath, null, null);
+                TwoArgDelegate bodyConvert = new TwoArgDelegate(this.BodyConvertClip);
+                bodyConvert.BeginInvoke(filePath, nameBox.Text, null, null);
             }
         }
 
@@ -409,8 +408,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 
                 this.kinectColorView.converting = true;
                 this.kinectViewbox.DataContext = this.kinectColorView;
-                OneArgDelegate colorConvert = new OneArgDelegate(this.ColorConvertClip);
-                colorConvert.BeginInvoke(filePath, null, null);
+                TwoArgDelegate bodyConvert = new TwoArgDelegate(this.ColorConvertClip);
+                bodyConvert.BeginInvoke(filePath, nameBox.Text, null, null);
             }
         }
 
@@ -418,7 +417,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         /// Plays back a .xef file to the Kinect sensor
         /// </summary>
         /// <param name="filePath">Full path to the .xef file that should be played back to the sensor</param>
-        private void BodyConvertClip(string filePath)
+        private void BodyConvertClip(string filePath, string personName)
         {
             using (KStudioClient client = KStudio.CreateClient())
             {
@@ -440,21 +439,17 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 client.DisconnectFromService();
             }
 
-
-            string filename = Path.GetFileName(filePath);
-            filename = filename.Remove(filename.IndexOf(".xef"), 4);
-
             // Update the UI after the convert playback task has completed
-            makeVideo("body", filename);
-            Console.WriteLine(this.kinectBodyView.Video.Count);
+            makeVideo("body", personName);
             this.converting = false;
             this.kinectBodyView.converting = false;
-            this.kinectBodyView.SaveData(filename);
+            //this.kinectBodyView.SaveData(personName);
+            this.kinectBodyView.Judge(personName);
             this.kinectBodyView.Dispose();
             this.Dispatcher.BeginInvoke(new NoArgDelegate(UpdateState));
         }
 
-        private void ColorConvertClip(string filePath)
+        private void ColorConvertClip(string filePath, string personName)
         {
             using (KStudioClient client = KStudio.CreateClient())
             {
@@ -476,12 +471,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 client.DisconnectFromService();
             }
 
-            string filename = Path.GetFileName(filePath);
-            filename = filename.Remove(filename.IndexOf(".xef"), 4);
-
             // Update the UI after the convert playback task has completed
-            makeVideo("color", filename);
-            Console.WriteLine(this.kinectColorView.Video.Count);
+            makeVideo("color", personName);
             this.converting = false;
             this.kinectColorView.converting = false;
             this.kinectColorView.Dispose();
@@ -512,42 +503,30 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             return fileName;
         }
 
-        private void makeVideo(string type, string filename)
+        private void makeVideo(string type, string personName)
         {
+            List<Image<Bgr, byte>> Video = new List<Image<Bgr, byte>>();
             if (string.Compare(type, "body") == 0)
+                Video = this.kinectBodyView.Video;
+            else if(string.Compare(type, "color") == 0)
+                Video = this.kinectColorView.Video;
+            Console.WriteLine(Video.Count);
+            Console.WriteLine(this.motion);
+            string path = @"..\..\..\data\coach\" + this.motion + @"\" + personName + @"\";
+            Directory.CreateDirectory(path);
+
+            using (VideoWriter vw = new VideoWriter(path + type + @".avi", 30, Video[0].Width, Video[0].Height, true))
             {
-                List<Image<Bgr, byte>> BodyVideo = this.kinectBodyView.Video;
-                Console.WriteLine(BodyVideo.Count);
-                Console.WriteLine(this.type);
-                string path = @"..\..\..\data\coach\" + this.type + @"\body\";
-                Directory.CreateDirectory(path);
-                
-                using (VideoWriter vw = new VideoWriter(path + filename + @".avi", 30, BodyVideo[0].Width, BodyVideo[0].Height, true))
+                for (int i = 0; i < Video.Count; i++)
                 {
-                    for (int i = 0; i < BodyVideo.Count; i++)
-                    {
-                        vw.WriteFrame(BodyVideo[i]);
-                    }
+                    vw.WriteFrame(Video[i]);
                 }
+            }
+            if (string.Compare(type, "body") == 0)
                 this.kinectBodyView.Video.Clear();
-                BodyVideo.Clear();
-            }
             else if (string.Compare(type, "color") == 0)
-            {
-                List<Image<Bgr, byte>> ColorVideo = this.kinectColorView.Video;
-                Console.WriteLine(ColorVideo.Count);
-                string path = @"..\..\..\data\coach\" + this.type + @"\color\";
-                Directory.CreateDirectory(path);
-                using (VideoWriter vw = new VideoWriter(path + filename + @".avi", 30, ColorVideo[0].Width, ColorVideo[0].Height, true))
-                {
-                    for (int i = 0; i < ColorVideo.Count; i++)
-                    {
-                        vw.WriteFrame(ColorVideo[i]);
-                    }
-                }
                 this.kinectColorView.Video.Clear();
-                ColorVideo.Clear();
-            }
+            Video.Clear();
         }
 
         private void Grid_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)

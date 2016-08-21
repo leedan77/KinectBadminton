@@ -31,6 +31,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         {
             get
             {
+                Console.WriteLine(menuType);
+                Console.WriteLine(action_type);
                 return $"\\..\\..\\..\\data\\{menuType}\\{action_type}";
             }
             set

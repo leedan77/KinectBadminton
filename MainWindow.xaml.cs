@@ -36,17 +36,13 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         DispatcherTimer _timer = new DispatcherTimer();
 
-        private SmashMonitor smashMonitor;
-        private ServeMonitor serveMonitor;
-
         private string cur = Environment.CurrentDirectory;
         private string dataBasePath = $"\\..\\..\\..\\data";
 
         private string student_color_or_body;
         private string coach_color_or_body;
         public string action_type;
-
-        private String type;
+        
         private string studentFileName;
         public string StudentFileName
         {
@@ -87,10 +83,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             _timer.Interval = TimeSpan.FromMilliseconds(16);
             _timer.Tick += new EventHandler(ticktock);
             _timer.Start();
+            
 
-            this.type = "smash";
-
-            if(string.Compare(this.type, "smash") == 0)
+            /*if(string.Compare(this.type, "smash") == 0)
             {
                 smashMonitor = new SmashMonitor();
                 smashMonitor.start();
@@ -99,7 +94,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             {
                 serveMonitor = new ServeMonitor();
                 serveMonitor.start();
-            }
+            }*/
 
             this.action_type = "lob";
             this.student_color_or_body = "color";
@@ -195,7 +190,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private void RecordButton_Click(object sender, RoutedEventArgs e)
         {
             this.Hide();
-            kinectRecord w = new kinectRecord(this.type);
+            kinectRecord w = new kinectRecord();
             w.Owner = this;
             w.Show();
         }

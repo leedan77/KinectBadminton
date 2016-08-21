@@ -262,7 +262,19 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         public void SaveData(String name)
         {
             string data = JsonConvert.SerializeObject(FrameList);
-            File.WriteAllText("../../../data/coach/" + this.type + "/json/" + name + ".json", data);
+            File.WriteAllText("../../../data/coach/" + this.type + "/" + name + "/joints.json", data);
+        }
+
+        public void Judge(String name)
+        {
+            if (String.Compare(this.type, "smash") == 0)
+            {
+                Console.WriteLine("hi");
+                SmashMonitor smashMonitor = new SmashMonitor(this.FrameList);
+                smashMonitor.start();
+                string judgeResult = JsonConvert.SerializeObject(smashMonitor.GetResult());
+                File.WriteAllText("../../../data/coach/" + this.type + "/" + name + "/judgement.json", judgeResult);
+            }
         }
 
         /// <summary>
