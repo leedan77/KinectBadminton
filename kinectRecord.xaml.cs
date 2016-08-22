@@ -31,7 +31,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private string lastFile = string.Empty;
 
         private string idenity = "student";
-        private string motion = "Serve";
+        private string motion = "serve";
 
         /// <summary> Number of playback iterations </summary>
         private uint loopCount = 0;
@@ -336,7 +336,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         {
             string fileName = string.Empty;
 
-            if (idenity == "teacher")
+            if (idenity == "coach")
             {
                 SaveFileDialog dlg = new SaveFileDialog();
                 dlg.FileName = "recordAndPlaybackBasics.xef";
@@ -444,7 +444,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             this.converting = false;
             this.kinectBodyView.converting = false;
             //this.kinectBodyView.SaveData(personName);
-            this.kinectBodyView.Judge(personName);
+            this.kinectBodyView.Judge(personName, this.idenity);
             this.kinectBodyView.Dispose();
             this.Dispatcher.BeginInvoke(new NoArgDelegate(UpdateState));
         }
@@ -503,28 +503,30 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             return fileName;
         }
 
-        private void makeVideo(string type, string personName)
+        private void makeVideo(string video_type, string personName)
         {
             List<Image<Bgr, byte>> Video = new List<Image<Bgr, byte>>();
-            if (string.Compare(type, "body") == 0)
+            if (string.Compare(video_type, "body") == 0)
+            {
                 Video = this.kinectBodyView.Video;
-            else if(string.Compare(type, "color") == 0)
+                
+            }
+            else if(string.Compare(video_type, "color") == 0)
                 Video = this.kinectColorView.Video;
             Console.WriteLine(Video.Count);
-            Console.WriteLine(this.motion);
-            string path = @"..\..\..\data\coach\" + this.motion + @"\" + personName + @"\";
+            string path = @"..\..\..\data\" + this.idenity + @"\" + this.motion + @"\" + personName + @"\";
             Directory.CreateDirectory(path);
 
-            using (VideoWriter vw = new VideoWriter(path + type + @".avi", 30, Video[0].Width, Video[0].Height, true))
+            using (VideoWriter vw = new VideoWriter(path + video_type + @".avi", 30, Video[0].Width, Video[0].Height, true))
             {
                 for (int i = 0; i < Video.Count; i++)
                 {
                     vw.WriteFrame(Video[i]);
                 }
             }
-            if (string.Compare(type, "body") == 0)
+            if (string.Compare(video_type, "body") == 0)
                 this.kinectBodyView.Video.Clear();
-            else if (string.Compare(type, "color") == 0)
+            else if (string.Compare(video_type, "color") == 0)
                 this.kinectColorView.Video.Clear();
             Video.Clear();
         }
@@ -554,9 +556,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private void IdentiyButton_Checked(object sender, RoutedEventArgs e)
         {
-            if (teacherRadio.IsChecked == true)
+            if (coachRadio.IsChecked == true)
             {
-                idenity =  "teacher";
+                idenity =  "coach";
                 //Console.WriteLine(idenity);
             }
             else

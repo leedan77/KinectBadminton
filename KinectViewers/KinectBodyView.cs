@@ -259,21 +259,27 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             }
         }
 
-        public void SaveData(String name)
+        public void Judge(String name, String person_type)
         {
-            string data = JsonConvert.SerializeObject(FrameList);
-            File.WriteAllText("../../../data/coach/" + this.type + "/" + name + "/joints.json", data);
-        }
-
-        public void Judge(String name)
-        {
-            if (String.Compare(this.type, "smash") == 0)
+            if (this.type == "smash")
             {
-                Console.WriteLine("hi");
                 SmashMonitor smashMonitor = new SmashMonitor(this.FrameList);
                 smashMonitor.start();
                 string judgeResult = JsonConvert.SerializeObject(smashMonitor.GetResult());
-                File.WriteAllText("../../../data/coach/" + this.type + "/" + name + "/judgement.json", judgeResult);
+                File.WriteAllText("../../../data/" + person_type + "/" + this.type + "/" + name + "/judgement.json", judgeResult);
+            }
+
+            else if(this.type == "serve")
+            {
+                ServeMonitor serveMonitor = new ServeMonitor(this.FrameList);
+                serveMonitor.start();
+                string judgeResult = JsonConvert.SerializeObject(serveMonitor.GetResult());
+                File.WriteAllText("../../../data/" + person_type + "/" + this.type + "/" + name + "/judgement.json", judgeResult);
+            }
+
+            else if(this.type == "lob")
+            {
+
             }
         }
 

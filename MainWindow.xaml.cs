@@ -19,9 +19,10 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
     using System.Diagnostics;
     using System.IO;
-    /// <summary>
-    /// Interaction logic for the MainWindow
-    /// </summary>
+    using Newtonsoft.Json;
+    using System.Collections.Generic;/// <summary>
+                                     /// Interaction logic for the MainWindow
+                                     /// </summary>
     public sealed partial class MainWindow : Window //, INotifyPropertyChanged, IDisposable
     {
         /// <summary> Indicates if a playback is currently in progress </summary>
@@ -44,6 +45,10 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         public string action_type;
         
         private string studentFileName;
+
+        public int coachVideoCount = 0;
+        public int studentVideoCount = 0;
+
         public string StudentFileName
         {
             get
@@ -239,7 +244,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             LeftTimelineSlider.Minimum = 0;
             LeftTimelineSlider.Maximum = MediaPlayer_left.NaturalDuration.TimeSpan.TotalMilliseconds;
             //LeftTimelineSlider.Ticks = 
-            Console.WriteLine(LeftTimelineSlider.Maximum);
         }
 
         private void MediaRightOpened(object sender, RoutedEventArgs e)
@@ -364,53 +368,148 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             }
         }
 
-        public void CoachChoosen(String name)
+        public void LoadJudgement(String name, String action_type, String person_type)
         {
-            if(grid11.Children.Count != 0)
+            String judgementDir = "../../../data/" + person_type + "/" + action_type + "/" + name + "/judgement.json";
+            String rawJsonData = File.ReadAllText(judgementDir);
+            List<String> goals = new List<String>();
+            List<int> judgement = JsonConvert.DeserializeObject<List<int>>(rawJsonData);
+            
+            foreach (int i in judgement)
             {
-                grid11.Children.Remove((Button)grid11.Children[0]);
-                grid12.Children.Remove((Button)grid12.Children[0]);
-                grid13.Children.Remove((Button)grid13.Children[0]);
-                grid14.Children.Remove((Button)grid14.Children[0]);
-                grid15.Children.Remove((Button)grid15.Children[0]);
+                Console.WriteLine(i);
             }
-            textBlock2.Text = name;
-            for (int i = 0; i < 5; ++i)
+
+            if(action_type == "smash")
             {
+                goals.Add("手肘抬高");
+                goals.Add("側身");
+                goals.Add("手肘轉向前");
+                goals.Add("手腕發力");
+                goals.Add("收拍");
+            }
+            else if(action_type == "serve")
+            {
+                goals.Add("重心腳在右腳");
+                goals.Add("重心轉移到左腳");
+                goals.Add("左手放球");
+                goals.Add("轉腰");
+                goals.Add("手腕發力");
+                goals.Add("肩膀向前");
+            }
+            else if(action_type == "lob")
+            {
+                goals.Add("持拍立腕");
+                goals.Add("手腕轉動");
+                goals.Add("右腳跨步");
+                goals.Add("腳跟著地");
+                goals.Add("拇指發力上勾");
+            }
 
-                string[] content = { "手肘抬高", "側身", "手肘轉向前", "手腕發力", "收拍" };
-                Button button = new Button()
+            if(person_type == "coach")
+            {
+                if (grid11.Children.Count != 0)
                 {
-                    Content = string.Format(content[i]),
-                    Tag = i + 1,
-                    BorderThickness = new Thickness(0, 0, 0, 0),
-                    FontSize = 16,
-                    FontWeight = FontWeights.Heavy,
-                    HorizontalAlignment = HorizontalAlignment.Left,
-                    Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString("#001C70"),
-                    Background = (SolidColorBrush)new BrushConverter().ConvertFromString("#E5DDB8"),
-                };
-                button.Click += new RoutedEventHandler(teacher_Button_Click);
+                    grid11.Children.Remove((Button)grid11.Children[0]);
+                    grid12.Children.Remove((Button)grid12.Children[0]);
+                    grid13.Children.Remove((Button)grid13.Children[0]);
+                    grid14.Children.Remove((Button)grid14.Children[0]);
+                    grid15.Children.Remove((Button)grid15.Children[0]);
+                }
+                textBlock2.Text = name;
+                for (int i = 0; i < goals.Count; ++i)
+                {
+                    Button button = new Button()
+                    {
+                        Content = string.Format(goals[i]),
+                        Tag = i + 1,
+                        BorderThickness = new Thickness(0, 0, 0, 0),
+                        FontSize = 16,
+                        FontWeight = FontWeights.Heavy,
+                        HorizontalAlignment = HorizontalAlignment.Left,
+                        Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString("#001C70"),
+                        Background = (SolidColorBrush)new BrushConverter().ConvertFromString("#E5DDB8"),
+                    };
+                    button.Click += new RoutedEventHandler(teacher_Button_Click);
 
-                if (i == 0)
-                {
-                    this.grid11.Children.Add(button);
+                    if (i == 0)
+                        this.grid11.Children.Add(button);
+                    else if (i == 1)
+                        this.grid12.Children.Add(button);
+                    else if (i == 2)
+                        this.grid13.Children.Add(button);
+                    else if (i == 3)
+                        this.grid14.Children.Add(button);
+                    else if (i == 4)
+                        this.grid15.Children.Add(button);
                 }
-                else if (i == 1)
+            }
+            else if(person_type == "student")
+            {
+                if (grid1.Children.Count != 0)
                 {
-                    this.grid12.Children.Add(button);
+                    grid1.Children.Remove((Button)grid1.Children[0]);
+                    grid2.Children.Remove((Button)grid2.Children[0]);
+                    grid3.Children.Remove((Button)grid3.Children[0]);
+                    grid4.Children.Remove((Button)grid4.Children[0]);
+                    grid5.Children.Remove((Button)grid5.Children[0]);
                 }
-                else if (i == 2)
+                textBlock1.Text = "學員";
+                if(judgement.Count > 0)
+                    image1.Source = new BitmapImage(new Uri(@"Images\tick.png", UriKind.Relative));
+                else
+                    image1.Source = new BitmapImage(new Uri(@"Images\cross.png", UriKind.Relative));
+                if (judgement.Count > 1)
+                    image2.Source = new BitmapImage(new Uri(@"Images\tick.png", UriKind.Relative));
+                else
+                    image2.Source = new BitmapImage(new Uri(@"Images\cross.png", UriKind.Relative));
+                if (judgement.Count > 2)
+                    image3.Source = new BitmapImage(new Uri(@"Images\tick.png", UriKind.Relative));
+                else
+                    image3.Source = new BitmapImage(new Uri(@"Images\cross.png", UriKind.Relative));
+                if (judgement.Count > 3)
+                    image4.Source = new BitmapImage(new Uri(@"Images\tick.png", UriKind.Relative));
+                else
+                    image4.Source = new BitmapImage(new Uri(@"Images\cross.png", UriKind.Relative));
+                if (judgement.Count > 4)
+                    image5.Source = new BitmapImage(new Uri(@"Images\tick.png", UriKind.Relative));
+                else
+                    image5.Source = new BitmapImage(new Uri(@"Images\cross.png", UriKind.Relative));
+                for (int i = 0; i < goals.Count; ++i)
                 {
-                    this.grid13.Children.Add(button);
-                }
-                else if (i == 3)
-                {
-                    this.grid14.Children.Add(button);
-                }
-                else if (i == 4)
-                {
-                    this.grid15.Children.Add(button);
+                    Button button = new Button()
+                    {
+                        Content = string.Format(goals[i]),
+                        Tag = i + 1,
+                        BorderThickness = new Thickness(0, 0, 0, 0),
+                        FontSize = 16,
+                        FontWeight = FontWeights.Heavy,
+                        HorizontalAlignment = HorizontalAlignment.Left,
+                        Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString("#001C70"),
+                        Background = (SolidColorBrush)new BrushConverter().ConvertFromString("#E5DDB8"),
+                    };
+                    button.Click += new RoutedEventHandler(student_Button_Click);
+
+                    if (i == 0)
+                    {
+                        this.grid1.Children.Add(button);
+                    }
+                    else if (i == 1)
+                    {
+                        this.grid2.Children.Add(button);
+                    }
+                    else if (i == 2)
+                    {
+                        this.grid3.Children.Add(button);
+                    }
+                    else if (i == 3)
+                    {
+                        this.grid4.Children.Add(button);
+                    }
+                    else if (i == 4)
+                    {
+                        this.grid5.Children.Add(button);
+                    }
                 }
             }
         }
@@ -531,7 +630,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             {
                 MediaPlayer_left.Pause();
                 int SliderValue = (int)LeftTimelineSlider.Value;
-                Console.WriteLine(SliderValue);
                 // Overloaded constructor takes the arguments days, hours, minutes, seconds, miniseconds.
                 // Create a TimeSpan with miliseconds equal to the slider value.
                 TimeSpan ts = new TimeSpan(0, 0, 0, 0, SliderValue);

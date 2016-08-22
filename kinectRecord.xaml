@@ -31,7 +31,7 @@
             </Button>
             <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Horizontal" Margin="30, 10, 0, 0">
                 <RadioButton x:Name="studentRadio" GroupName="idenity" HorizontalAlignment="Center" Margin="0, 10, 50, 10" IsChecked="True" Click="IdentiyButton_Checked">學員</RadioButton>
-                <RadioButton x:Name="teacherRadio" GroupName="idenity" HorizontalAlignment="Center" Margin="0, 10, 50, 10" Click="IdentiyButton_Checked">標準</RadioButton>
+                <RadioButton x:Name="coachRadio" GroupName="idenity" HorizontalAlignment="Center" Margin="0, 10, 50, 10" Click="IdentiyButton_Checked">標準</RadioButton>
             </StackPanel>
             <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Horizontal" Margin="30, 10, 0, 0">
                 <RadioButton x:Name="serveRadio" GroupName="motion" HorizontalAlignment="Center" Margin="0, 10, 50, 10" IsChecked="True" Click="MotionRadio_Click" Content="發球"/>

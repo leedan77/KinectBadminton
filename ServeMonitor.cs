@@ -26,11 +26,12 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private double hipWidthWhenBalanceChange = 0;
         
         private double headNeckDiff = 0;
+        private List<int> result;
 
-        public ServeMonitor()
+        public ServeMonitor(List<Frames> frameList)
         {
-            String jsonString = File.ReadAllText("../../../data/servedata.json");
-            FrameList = JsonConvert.DeserializeObject<List<Frames>>(jsonString);
+            this.FrameList = frameList;
+            this.result = new List<int>();
         }
         public void start()
         {
@@ -40,6 +41,10 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             nowFrame = CheckBalancePoint(nowFrame, "left");
             nowFrame = CheckWaistTwist(nowFrame);
             nowFrame = CheckWristForward(nowFrame);
+        }
+        public List<int> GetResult()
+        {
+            return this.result;
         }
         private void GenerateCompareData()
         {
@@ -123,6 +128,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     if(Math.Abs(hipAngleRightHorAngle - 90) < Math.Abs(hipAngleLeftHorAngle - 90) - 5)
                     {
                         Console.WriteLine(i + " Balance right");
+                        this.result.Add(i);
                         return i;
                     }
                 }
@@ -132,6 +138,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     {
                         Console.WriteLine(i + " Balance left");
                         this.hipWidthWhenBalanceChange = hipRightx - hipLeftx;
+                        this.result.Add(i);
                         return i;
                     }
                 }
@@ -157,9 +164,10 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     }
                 }
                 hipWidth = hipRightx - hipLeftx;
-                if(hipWidth < this.hipWidthWhenBalanceChange / 2.5)
+                if(hipWidth < this.hipWidthWhenBalanceChange / 3 * 2)
                 {
                     Console.WriteLine(i + " Twist waist");
+                    this.result.Add(i);
                     return i;
                 }
             }

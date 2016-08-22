@@ -31,8 +31,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         {
             get
             {
-                Console.WriteLine(menuType);
-                Console.WriteLine(action_type);
                 return $"\\..\\..\\..\\data\\{menuType}\\{action_type}";
             }
             set
@@ -87,11 +85,11 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         {
             var parent = this.Owner as MainWindow;
             string selectedItem = CoachListBox.SelectedItem.ToString();
-            if (this.menuType == "coach")
+            if (this.menuType == "coach") 
                 parent.CoachFileName = selectedItem;
-            else
+            else if(this.menuType == "student")
                 parent.StudentFileName = selectedItem;
-            parent.CoachChoosen(selectedItem);
+            parent.LoadJudgement(selectedItem, action_type, menuType);
             this.Close();
         }
 
