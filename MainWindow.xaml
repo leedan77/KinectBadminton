@@ -90,13 +90,13 @@
                     <MediaElement x:Name="MediaPlayer_left" Grid.Row="0" LoadedBehavior="Manual" HorizontalAlignment="Center" MediaOpened="MediaLeftOpened" MediaEnded="MediaEnded"/>
                 </Button>
                 <Viewbox Grid.Row="1" Height="40" HorizontalAlignment="Left">
-                    <RadioButton x:Name="lobRadio" GroupName="action" Grid.Row="0" HorizontalAlignment="Center" Margin="30, 10, 0, 10" IsChecked="True" Click="ActionSwitch_Click" Content="挑球"/>
+                    <RadioButton x:Name="lobRadio" GroupName="action" Grid.Row="0" HorizontalAlignment="Center" Margin="5, 10, 0, 10" IsChecked="True" Click="ActionSwitch_Click" Content="挑球"/>
                 </Viewbox>
                 <Viewbox Grid.Row="2" Height="40" HorizontalAlignment="Left">
-                    <RadioButton x:Name="serveRadio" GroupName="action" Grid.Row="0" HorizontalAlignment="Center" Margin="30, 10, 0, 10" Click="ActionSwitch_Click" Content="發球"/>
+                    <RadioButton x:Name="serveRadio" GroupName="action" Grid.Row="0" HorizontalAlignment="Center" Margin="5, 10, 0, 10" Click="ActionSwitch_Click" Content="發球"/>
                 </Viewbox>
                 <Viewbox Grid.Row="3" Height="40" HorizontalAlignment="Left">
-                    <RadioButton x:Name="smashRadio" GroupName="action" Grid.Row="0" HorizontalAlignment="Center" Margin="30, 10, 0, 10" Click="ActionSwitch_Click" Content="殺球"/>
+                    <RadioButton x:Name="smashRadio" GroupName="action" Grid.Row="0" HorizontalAlignment="Center" Margin="5, 10, 0, 10" Click="ActionSwitch_Click" Content="殺球"/>
                 </Viewbox>
                 <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
                     
