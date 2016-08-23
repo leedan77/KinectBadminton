@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Microsoft.Samples.Kinect.RecordAndPlaybackBasics"
         mc:Ignorable="d"
-        Title="選擇你的範本" Height="300" Width="300"
+        Title="選擇影片" Height="300" Width="300"
         WindowStartupLocation="CenterOwner">
     <Window.Resources>
         
@@ -16,12 +16,6 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <Viewbox Height="40">
-            <RadioButton x:Name="colorRadio" GroupName="type" Grid.Row="0" HorizontalAlignment="Center" Margin="0, 10, 50, 10" IsChecked="True" Click="ToggleButton_Checked">彩色</RadioButton>
-        </Viewbox>
-        <Viewbox Height="40">
-            <RadioButton x:Name="bodyRadio" GroupName="type" Grid.Row="0" HorizontalAlignment="Center" Margin="50, 10, 0, 10" Click="ToggleButton_Checked">骨架</RadioButton>
-        </Viewbox>
         <ListBox Grid.Row="1" x:Name="CoachListBox" BorderBrush="Transparent" MouseDoubleClick="CoachListBox_MouseDoubleClick"/>
     </Grid>
 </Window>

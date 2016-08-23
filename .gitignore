@@ -306,3 +306,8 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+
+# Videos
+*.avi
+*.psd

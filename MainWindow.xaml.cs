@@ -18,27 +18,53 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
     using System.Windows.Media.Imaging;
 
     using System.Diagnostics;
-
-    /// <summary>
-    /// Interaction logic for the MainWindow
-    /// </summary>
+    using System.IO;
+    using Newtonsoft.Json;
+    using System.Collections.Generic;/// <summary>
+                                     /// Interaction logic for the MainWindow
+                                     /// </summary>
     public sealed partial class MainWindow : Window //, INotifyPropertyChanged, IDisposable
     {
         /// <summary> Indicates if a playback is currently in progress </summary>
         private bool isPlaying = false;
-
         private bool pausing = false;
 
-        //for whether to delete grid button
-        private bool teacherFirstTime = true;
-        private bool studentFirstTime = true;
+        private bool leftIsPlaying = false;
+        private bool leftPausing = false;
+
+        private bool rightIsPlaying = false;
+        private bool rightPausing = false;
 
         DispatcherTimer _timer = new DispatcherTimer();
 
-        private SmashMonitor smashMonitor;
-        private ServeMonitor serveMonitor;
+        private string cur = Environment.CurrentDirectory;
+        private string dataBasePath = $"\\..\\..\\..\\data";
+
+        private string student_color_or_body;
+        private string coach_color_or_body;
+        public string action_type;
         
-        private String type;
+        private string studentFileName;
+
+        public int coachVideoCount = 0;
+        public int studentVideoCount = 0;
+
+        public string StudentFileName
+        {
+            get
+            {
+                return this.studentFileName;
+            }
+            set
+            {
+                this.studentFileName = value;
+                // play right media
+                string path = cur + dataBasePath + $"\\student\\{action_type}\\{StudentFileName}\\{student_color_or_body}.avi";
+                MediaPlayer_left.Source = new Uri(path);
+                MediaPlayer_left.Stop();
+            }
+        }
+
         private string coachFileName;
         public string CoachFileName
         {
@@ -50,21 +76,28 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             {
                 this.coachFileName = value;
                 // play right media
-                MediaPlayer_right.Source = new Uri(this.coachFileName);
-                MediaPlayer_right.Play();
+                string path = cur + dataBasePath + $"\\coach\\{action_type}\\{CoachFileName}\\{coach_color_or_body}.avi";
+                MediaPlayer_right.Source = new Uri(path);
+                MediaPlayer_right.Stop();
             }
         }
 
         public MainWindow()
         {
-            InitializeComponent();        
-            _timer.Interval = TimeSpan.FromMilliseconds(1000);
+            InitializeComponent();
+#if DEBUG
+            Console.WriteLine("Debug mode");
+            this.DebugPanel.Visibility = Visibility.Visible;
+#else
+            Console.WriteLine("Release mode");
+            this.DebugPanel.Visibility = Visibility.Collapsed;
+#endif
+            _timer.Interval = TimeSpan.FromMilliseconds(16);
             _timer.Tick += new EventHandler(ticktock);
             _timer.Start();
+            
 
-            this.type = "serve";
-
-            if(string.Compare(this.type, "smash") == 0)
+            /*if(string.Compare(this.type, "smash") == 0)
             {
                 smashMonitor = new SmashMonitor();
                 smashMonitor.start();
@@ -73,14 +106,24 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             {
                 serveMonitor = new ServeMonitor();
                 serveMonitor.start();
-            }
+            }*/
+
+            this.action_type = "lob";
+            this.student_color_or_body = "color";
+            this.coach_color_or_body = "color";
         }
 
         void ticktock(object sender, EventArgs e)
         {
-            if (!TimelineSlider.IsMouseCaptureWithin)
+            if (!LeftTimelineSlider.IsMouseCaptureWithin)
             {
-                TimelineSlider.Value = MediaPlayer_left.Position.TotalSeconds;
+                LeftTimelineSlider.Value = MediaPlayer_left.Position.TotalMilliseconds;
+                LeftMediaLabel.Text = String.Format("{0:ss}:{0:fff}", MediaPlayer_left.Position);
+            }
+            if (!RightTimelineSlider.IsMouseCaptureWithin)
+            {
+                RightTimelineSlider.Value = MediaPlayer_right.Position.TotalMilliseconds;
+                RightMediaLabel.Text = String.Format("{0:ss}:{0:fff}", MediaPlayer_right.Position);
             }
         }
 
@@ -111,10 +154,55 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             }
         }
 
+        private void leftUpdateState()
+        {
+            if (this.leftIsPlaying && !this.leftPausing)
+            {
+                this.RecordButton.IsEnabled = false;
+                this.PlayLeftButton.IsEnabled = false;
+                this.PauseLeftButton.IsEnabled = true;
+            }
+            else if (this.leftPausing)
+            {
+                this.RecordButton.IsEnabled = false;
+                this.PlayLeftButton.IsEnabled = true;
+                this.PauseLeftButton.IsEnabled = false;
+            }
+            else
+            {
+                this.RecordButton.IsEnabled = true;
+                this.PlayLeftButton.IsEnabled = true;
+                this.PauseLeftButton.IsEnabled = false;
+            }
+        }
+
+        private void rightUpdateState()
+        {
+            if (this.rightIsPlaying && !this.rightPausing)
+            {
+                this.RecordButton.IsEnabled = false;
+                this.PlayRightButton.IsEnabled = false;
+                this.PauseRightButton.IsEnabled = true;
+            }
+            else if (this.rightPausing)
+            {
+                this.RecordButton.IsEnabled = false;
+                this.PlayRightButton.IsEnabled = true;
+                this.PauseRightButton.IsEnabled = false;
+            }
+            else
+            {
+                this.RecordButton.IsEnabled = true;
+                this.PlayRightButton.IsEnabled = true;
+                this.PauseRightButton.IsEnabled = false;
+            }
+        }
+
+
         private void RecordButton_Click(object sender, RoutedEventArgs e)
         {
             this.Hide();
-            kinectRecord w = new kinectRecord(this.type);
+            kinectRecord w = new kinectRecord();
             w.Owner = this;
             w.Show();
         }
@@ -139,26 +227,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 {
                     MediaPlayer_left.Source = new Uri(dialog.FileName);
                 }
-                /*
-                Microsoft.Win32.OpenFileDialog dialog2 = new Microsoft.Win32.OpenFileDialog();
-                dialog.FileName = "Videos"; // Default file name
-                dialog.DefaultExt = ".WMV"; // Default file extension
-                dialog.Filter = "AVI文件|*.avi|所有文件|*.*"; // Filter files by extension 
 
-                // Show open file dialog box
-                Nullable<bool> result2 = dialog.ShowDialog();
-
-                // Process open file dialog box results 
-                if (result2 == true)
-                {
-                    // Open document                    
-                    MediaPlayer_right.Source = new Uri(dialog.FileName);
-                }
-                */
-                // MediaPlayer_right.Source = new Uri(this.CoachFileName);
-
-                //OneArgDelegate playback = new OneArgDelegate(this.PlaybackClip);
-                //playback.BeginInvoke(filePath, null, null);
             }
             else
             {
@@ -179,14 +248,16 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private void MediaLeftOpened(object sender, RoutedEventArgs e)
         {
-            TimelineSlider.Minimum = 0;
-            TimelineSlider.Maximum = MediaPlayer_left.NaturalDuration.TimeSpan.TotalSeconds;
+            LeftTimelineSlider.Minimum = 0;
+            LeftTimelineSlider.Maximum = MediaPlayer_left.NaturalDuration.TimeSpan.TotalMilliseconds;
+            //LeftTimelineSlider.Ticks = 
         }
 
         private void MediaRightOpened(object sender, RoutedEventArgs e)
         {
-            TimelineSlider.Minimum = 0;
-            TimelineSlider.Maximum = MediaPlayer_right.NaturalDuration.TimeSpan.TotalSeconds;
+            RightTimelineSlider.Minimum = 0;
+            RightTimelineSlider.Maximum = MediaPlayer_right.NaturalDuration.TimeSpan.TotalMilliseconds;
+       
         }
 
 
@@ -209,55 +280,47 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             this.UpdateState();
         }
 
-        private void TimelineSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            if (TimelineSlider.IsMouseCaptureWithin)
-            {
-                MediaPlayer_left.Pause();
-                MediaPlayer_right.Pause();
-                int SliderValue = (int)TimelineSlider.Value;
-
-                // Overloaded constructor takes the arguments days, hours, minutes, seconds, miniseconds.
-                // Create a TimeSpan with miliseconds equal to the slider value.
-                TimeSpan ts = new TimeSpan(0, 0, 0, SliderValue, 0);
-                MediaPlayer_left.Position = ts;
-                MediaPlayer_right.Position = ts;
-
-            }
-            else
-            {
-                MediaPlayer_left.Play();
-                MediaPlayer_right.Play();
-            }
-
-        }
-
-        private void SpeedSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            MediaPlayer_left.SpeedRatio = (double)SpeedSlider.Value;
-            MediaPlayer_right.SpeedRatio = (double)SpeedSlider.Value;
-        }
-
         private void MediaPlayer_right_MouseRightButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            ChooseCoachWindow ccw = new ChooseCoachWindow();
+            ChooseCoachWindow ccw = new ChooseCoachWindow("coach", action_type);
             ccw.Owner = this;
             ccw.ShowDialog();
            
         }
 
-        void button_Click(object sender, RoutedEventArgs e)
+        void student_Button_Click(object sender, RoutedEventArgs e)
         {
-            Console.WriteLine(string.Format("You clicked on the {0}. button.", (sender as Button).Tag));
+            Console.WriteLine(string.Format("You clicked on the {0}. student_button.", (sender as Button).Tag));
+            if (leftIsPlaying)
+            {
+                int second = (int)(sender as Button).Tag;
+                MediaPlayer_left.Pause();
+                MediaPlayer_left.Position = new TimeSpan(0, 0, 0, second, 0);
+                if (!leftPausing)
+                {
+                    MediaPlayer_left.Play();
+                }
+            }
+        }
+
+        void teacher_Button_Click(object sender, RoutedEventArgs e)
+        {
+            Console.WriteLine(string.Format("You clicked on the {0}. teacher_button.", (sender as Button).Tag));
+            if (rightIsPlaying)
+            {
+                int second = (int)(sender as Button).Tag;
+                MediaPlayer_right.Pause();
+                MediaPlayer_right.Position = new TimeSpan(0, 0, 0, second, 0);
+                if (!rightPausing)
+                {
+                    MediaPlayer_right.Play();
+                }
+            }
         }
 
         private void student_Click(object sender, RoutedEventArgs e)
         {
-            if (studentFirstTime == true)
-            {
-                studentFirstTime = false;
-            }
-            else
+            if(grid1.Children.Count != 0)
             {
                 grid1.Children.Remove((Button)grid1.Children[0]);
                 grid2.Children.Remove((Button)grid2.Children[0]);
@@ -266,84 +329,107 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 grid5.Children.Remove((Button)grid5.Children[0]);
             }
             textBlock1.Text = "學員";
-            for (int i = 0; i < 6; ++i)
+            image1.Source = new BitmapImage(new Uri(@"Images\tick.png", UriKind.Relative));
+            image2.Source = new BitmapImage(new Uri(@"Images\tick.png", UriKind.Relative));
+            image3.Source = new BitmapImage(new Uri(@"Images\cross.png", UriKind.Relative));
+            image4.Source = new BitmapImage(new Uri(@"Images\cross.png", UriKind.Relative));
+            image5.Source = new BitmapImage(new Uri(@"Images\cross.png", UriKind.Relative));
+            for (int i = 0; i < 5; ++i)
             {
-                int a = i;
-                if (a == 1)
+                string[] content = { "手肘抬高", "側身", "手肘轉向前", "手腕發力", "收拍" };
+                Button button = new Button()
                 {
-                    image1.Source = new BitmapImage(new Uri(@"Images\tick.png", UriKind.Relative));
-                    Button button = new Button()
-                    {
-                        Content = string.Format("手肘抬高"),
-                        Tag = i,
-                        BorderThickness = new Thickness(0, 0, 0, 0),
-                        FontSize = 16,
-                        FontWeight = FontWeights.Heavy,
-                        HorizontalAlignment = HorizontalAlignment.Left,
-                        Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString("#001C70"),
-                        Background = (SolidColorBrush)new BrushConverter().ConvertFromString("#E5DDB8"),
-                    };
-                    button.Click += new RoutedEventHandler(button_Click);
+                    Content = string.Format(content[i]),
+                    Tag = i+1,
+                    BorderThickness = new Thickness(0, 0, 0, 0),
+                    FontSize = 16,
+                    FontWeight = FontWeights.Heavy,
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString("#001C70"),
+                    Background = (SolidColorBrush)new BrushConverter().ConvertFromString("#E5DDB8"),
+                };
+                button.Click += new RoutedEventHandler(student_Button_Click);
+
+                if (i == 0)
+                {
                     this.grid1.Children.Add(button);
                 }
-                else if (a == 2)
+                else if (i == 1)
                 {
-                    image2.Source = new BitmapImage(new Uri(@"Images\tick.png", UriKind.Relative));
-                    Button button = new Button()
-                    {
-                        Content = string.Format("側身"),
-                        Tag = i,
-                        BorderThickness = new Thickness(0, 0, 0, 0),
-                        FontSize = 16,
-                        FontWeight = FontWeights.Heavy,
-                        HorizontalAlignment = HorizontalAlignment.Left,
-                        Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString("#001C70"),
-                        Background = (SolidColorBrush)new BrushConverter().ConvertFromString("#E5DDB8"),
-                    };
-                    button.Click += new RoutedEventHandler(button_Click);
                     this.grid2.Children.Add(button);
                 }
-                else if (a == 3)
+                else if (i == 2)
                 {
-                    image3.Source = new BitmapImage(new Uri(@"Images\cross.png", UriKind.Relative));
-                    Button button = new Button()
-                    {
-                        Content = string.Format("手肘轉向前"),
-                        Tag = i,
-                        BorderThickness = new Thickness(0, 0, 0, 0),
-                        FontSize = 16,
-                        FontWeight = FontWeights.Heavy,
-                        HorizontalAlignment = HorizontalAlignment.Left,
-                        Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString("#001C70"),
-                        Background = (SolidColorBrush)new BrushConverter().ConvertFromString("#E5DDB8"),
-                    };
-                    button.Click += new RoutedEventHandler(button_Click);
                     this.grid3.Children.Add(button);
                 }
-                else if (a == 4)
+                else if (i == 3)
                 {
-                    image4.Source = new BitmapImage(new Uri(@"Images\cross.png", UriKind.Relative));
-                    Button button = new Button()
-                    {
-                        Content = string.Format("手腕發力"),
-                        Tag = i,
-                        BorderThickness = new Thickness(0, 0, 0, 0),
-                        FontSize = 16,
-                        FontWeight = FontWeights.Heavy,
-                        HorizontalAlignment = HorizontalAlignment.Left,
-                        Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString("#001C70"),
-                        Background = (SolidColorBrush)new BrushConverter().ConvertFromString("#E5DDB8"),
-                    };
-                    button.Click += new RoutedEventHandler(button_Click);
                     this.grid4.Children.Add(button);
                 }
-                else if (a == 5)
+                else if (i == 4)
                 {
-                    image5.Source = new BitmapImage(new Uri(@"Images\cross.png", UriKind.Relative));
+                    this.grid5.Children.Add(button);
+                }
+
+                
+            }
+        }
+
+        public void LoadJudgement(String name, String action_type, String person_type)
+        {
+            String judgementDir = "../../../data/" + person_type + "/" + action_type + "/" + name + "/judgement.json";
+            String rawJsonData = File.ReadAllText(judgementDir);
+            List<String> goals = new List<String>();
+            List<int> judgement = JsonConvert.DeserializeObject<List<int>>(rawJsonData);
+            
+            foreach (int i in judgement)
+            {
+                Console.WriteLine(i);
+            }
+
+            if(action_type == "smash")
+            {
+                goals.Add("手肘抬高");
+                goals.Add("側身");
+                goals.Add("手肘轉向前");
+                goals.Add("手腕發力");
+                goals.Add("收拍");
+            }
+            else if(action_type == "serve")
+            {
+                goals.Add("重心腳在右腳");
+                goals.Add("重心轉移到左腳");
+                goals.Add("左手放球");
+                goals.Add("轉腰");
+                goals.Add("手腕發力");
+                goals.Add("肩膀向前");
+            }
+            else if(action_type == "lob")
+            {
+                goals.Add("持拍立腕");
+                goals.Add("手腕轉動");
+                goals.Add("右腳跨步");
+                goals.Add("腳跟著地");
+                goals.Add("拇指發力上勾");
+            }
+
+            if(person_type == "coach")
+            {
+                if (grid11.Children.Count != 0)
+                {
+                    grid11.Children.Remove((Button)grid11.Children[0]);
+                    grid12.Children.Remove((Button)grid12.Children[0]);
+                    grid13.Children.Remove((Button)grid13.Children[0]);
+                    grid14.Children.Remove((Button)grid14.Children[0]);
+                    grid15.Children.Remove((Button)grid15.Children[0]);
+                }
+                textBlock2.Text = name;
+                for (int i = 0; i < goals.Count; ++i)
+                {
                     Button button = new Button()
                     {
-                        Content = string.Format("收拍"),
-                        Tag = i,
+                        Content = string.Format(goals[i]),
+                        Tag = i + 1,
                         BorderThickness = new Thickness(0, 0, 0, 0),
                         FontSize = 16,
                         FontWeight = FontWeights.Heavy,
@@ -351,114 +437,324 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                         Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString("#001C70"),
                         Background = (SolidColorBrush)new BrushConverter().ConvertFromString("#E5DDB8"),
                     };
-                    button.Click += new RoutedEventHandler(button_Click);
-                    this.grid5.Children.Add(button);
+                    button.Click += new RoutedEventHandler(teacher_Button_Click);
+
+                    if (i == 0)
+                        this.grid11.Children.Add(button);
+                    else if (i == 1)
+                        this.grid12.Children.Add(button);
+                    else if (i == 2)
+                        this.grid13.Children.Add(button);
+                    else if (i == 3)
+                        this.grid14.Children.Add(button);
+                    else if (i == 4)
+                        this.grid15.Children.Add(button);
+                }
+            }
+            else if(person_type == "student")
+            {
+                if (grid1.Children.Count != 0)
+                {
+                    grid1.Children.Remove((Button)grid1.Children[0]);
+                    grid2.Children.Remove((Button)grid2.Children[0]);
+                    grid3.Children.Remove((Button)grid3.Children[0]);
+                    grid4.Children.Remove((Button)grid4.Children[0]);
+                    grid5.Children.Remove((Button)grid5.Children[0]);
+                }
+                textBlock1.Text = "學員";
+                if(judgement.Count > 0)
+                    image1.Source = new BitmapImage(new Uri(@"Images\tick.png", UriKind.Relative));
+                else
+                    image1.Source = new BitmapImage(new Uri(@"Images\cross.png", UriKind.Relative));
+                if (judgement.Count > 1)
+                    image2.Source = new BitmapImage(new Uri(@"Images\tick.png", UriKind.Relative));
+                else
+                    image2.Source = new BitmapImage(new Uri(@"Images\cross.png", UriKind.Relative));
+                if (judgement.Count > 2)
+                    image3.Source = new BitmapImage(new Uri(@"Images\tick.png", UriKind.Relative));
+                else
+                    image3.Source = new BitmapImage(new Uri(@"Images\cross.png", UriKind.Relative));
+                if (judgement.Count > 3)
+                    image4.Source = new BitmapImage(new Uri(@"Images\tick.png", UriKind.Relative));
+                else
+                    image4.Source = new BitmapImage(new Uri(@"Images\cross.png", UriKind.Relative));
+                if (judgement.Count > 4)
+                    image5.Source = new BitmapImage(new Uri(@"Images\tick.png", UriKind.Relative));
+                else
+                    image5.Source = new BitmapImage(new Uri(@"Images\cross.png", UriKind.Relative));
+                for (int i = 0; i < goals.Count; ++i)
+                {
+                    Button button = new Button()
+                    {
+                        Content = string.Format(goals[i]),
+                        Tag = i + 1,
+                        BorderThickness = new Thickness(0, 0, 0, 0),
+                        FontSize = 16,
+                        FontWeight = FontWeights.Heavy,
+                        HorizontalAlignment = HorizontalAlignment.Left,
+                        Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString("#001C70"),
+                        Background = (SolidColorBrush)new BrushConverter().ConvertFromString("#E5DDB8"),
+                    };
+                    button.Click += new RoutedEventHandler(student_Button_Click);
+
+                    if (i == 0)
+                    {
+                        this.grid1.Children.Add(button);
+                    }
+                    else if (i == 1)
+                    {
+                        this.grid2.Children.Add(button);
+                    }
+                    else if (i == 2)
+                    {
+                        this.grid3.Children.Add(button);
+                    }
+                    else if (i == 3)
+                    {
+                        this.grid4.Children.Add(button);
+                    }
+                    else if (i == 4)
+                    {
+                        this.grid5.Children.Add(button);
+                    }
                 }
             }
         }
 
-        private void teacher_Click(object sender, RoutedEventArgs e)
+        private void StopLeftButton_Click(object sender, RoutedEventArgs e)
         {
-            if (teacherFirstTime == true)
+            MediaPlayer_left.Stop();
+            MediaPlayer_left.Close();
+            MediaPlayer_left.Position = new TimeSpan(0, 0, 0, 0, 0);
+            this.leftIsPlaying = false;
+            this.leftPausing = false;
+            this.leftUpdateState();
+        }
+
+        private void PlayLeftButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.leftIsPlaying = true;
+            if (!this.leftPausing)
             {
-                teacherFirstTime = false;
+                this.leftPausing = false; //useless
+                this.leftUpdateState();
+                //Microsoft.Win32.OpenFileDialog dialog = new Microsoft.Win32.OpenFileDialog();
+                //dialog.FileName = "Videos"; // Default file name
+                //dialog.DefaultExt = ".WMV"; // Default file extension
+                //dialog.Filter = "AVI文件|*.avi|所有文件|*.*"; // Filter files by extension 
+
+                //// Show open file dialog box
+                //Nullable<bool> result = dialog.ShowDialog();
+
+                //// Process open file dialog box results 
+                //if (result == true)
+                //{
+                //    MediaPlayer_left.Source = new Uri(dialog.FileName);
+                //}
             }
             else
             {
-                grid11.Children.Remove((Button)grid11.Children[0]);
-                grid12.Children.Remove((Button)grid12.Children[0]);
-                grid13.Children.Remove((Button)grid13.Children[0]);
-                grid14.Children.Remove((Button)grid14.Children[0]);
-                grid15.Children.Remove((Button)grid15.Children[0]);
+                this.leftPausing = false;
+                this.leftUpdateState();
             }
-            textBlock2.Text = "林輝耀";
-            for (int i = 0; i < 5; ++i)
+            MediaPlayer_left.Play();
+        }
+
+        private void PauseLeftButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.leftPausing = true;
+            this.leftUpdateState();
+            MediaPlayer_left.Pause();
+        }
+
+        private void StopRightButton_Click(object sender, RoutedEventArgs e)
+        {
+            MediaPlayer_right.Stop();
+            MediaPlayer_right.Close();
+            MediaPlayer_right.Position = new TimeSpan(0, 0, 0, 0, 0);
+            this.rightIsPlaying = false;
+            this.rightPausing = false;
+            this.rightUpdateState();
+        }
+
+        private void PlayRightButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.rightIsPlaying = true;
+            if (!this.rightPausing)
             {
-                int a = i;
-                if (a == 0)
+                this.rightPausing = false; //useless
+                this.rightUpdateState();
+                //Microsoft.Win32.OpenFileDialog dialog = new Microsoft.Win32.OpenFileDialog();
+                //dialog.FileName = "Videos"; // Default file name
+                //dialog.DefaultExt = ".WMV"; // Default file extension
+                //dialog.Filter = "AVI文件|*.avi|所有文件|*.*"; // Filter files by extension 
+
+                //// Show open file dialog box
+                //Nullable<bool> result = dialog.ShowDialog();
+
+                //// Process open file dialog box results 
+                //if (result == true)
+                //{
+                //    MediaPlayer_right.Source = new Uri(dialog.FileName);
+                //}
+            }
+            else
+            {
+                this.rightPausing = false;
+                this.rightUpdateState();
+            }
+            MediaPlayer_right.Play();
+        }
+
+        private void PauseRightButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.rightPausing = true;
+            this.rightUpdateState();
+            MediaPlayer_right.Pause();
+        }
+
+        private void RightTimelineSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (RightTimelineSlider.IsMouseCaptureWithin)
+            {
+                MediaPlayer_right.Pause();
+                int SliderValue = (int)RightTimelineSlider.Value;
+                // Overloaded constructor takes the arguments days, hours, minutes, seconds, miniseconds.
+                // Create a TimeSpan with miliseconds equal to the slider value.
+                TimeSpan ts = new TimeSpan(0, 0, 0, 0, SliderValue);
+                MediaPlayer_right.Position = ts;
+
+            }
+            else if(this.rightIsPlaying && !this.rightPausing)
+            {
+                MediaPlayer_right.Play();
+            }
+        }
+
+        private void LeftTimelineSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (LeftTimelineSlider.IsMouseCaptureWithin)
+            {
+                MediaPlayer_left.Pause();
+                int SliderValue = (int)LeftTimelineSlider.Value;
+                // Overloaded constructor takes the arguments days, hours, minutes, seconds, miniseconds.
+                // Create a TimeSpan with miliseconds equal to the slider value.
+                TimeSpan ts = new TimeSpan(0, 0, 0, 0, SliderValue);
+                MediaPlayer_left.Position = ts;
+            }
+            else if(this.leftIsPlaying && !this.leftPausing)
+            {
+                MediaPlayer_left.Play();
+            }
+        }
+
+        private void RightSpeedSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            MediaPlayer_right.SpeedRatio = (double)RightSpeedSlider.Value;
+        }
+
+        private void RightSpeedSlider_ValueChanged_1(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            MediaPlayer_left.SpeedRatio = (double)LeftSpeedSlider.Value;
+        }
+
+        private void MediaPlay_left_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            ChooseCoachWindow ccw = new ChooseCoachWindow("student", action_type);
+            ccw.Owner = this;
+            ccw.ShowDialog();
+        }
+
+        private void MenuLeftButton_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            ChooseCoachWindow ccw = new ChooseCoachWindow("student", action_type);
+            ccw.Owner = this;
+            ccw.ShowDialog();
+        }
+
+        private void MenuRightButton_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            ChooseCoachWindow ccw = new ChooseCoachWindow("coach", action_type);
+            ccw.Owner = this;
+            ccw.ShowDialog();
+        }
+
+        private void ToggleButton_Checked(object sender, RoutedEventArgs e)
+        {
+            if (leftColorRadio.IsChecked == true)
+            {
+                student_color_or_body = "color";
+                string path = cur + dataBasePath + $"\\student\\{action_type}\\{StudentFileName}\\{student_color_or_body}.avi";
+                resetUri(MediaPlayer_left, path);
+            }
+            else if (leftBodyRadio.IsChecked == true)
+            {
+                student_color_or_body = "body";
+                string path = cur + dataBasePath + $"\\student\\{action_type}\\{StudentFileName}\\{student_color_or_body}.avi";
+                resetUri(MediaPlayer_left, path);
+            }
+            if (rightBodyRadio.IsChecked == true)
+            {
+                coach_color_or_body = "body";
+                string path = cur + dataBasePath + $"\\coach\\{action_type}\\{CoachFileName}\\{coach_color_or_body}.avi";
+                resetUri(MediaPlayer_right, path);
+            }
+            else if (rightColorRadio.IsChecked == true)
+            {
+                coach_color_or_body = "color";
+                string path = cur + dataBasePath + $"\\coach\\{action_type}\\{CoachFileName}\\{coach_color_or_body}.avi";
+                resetUri(MediaPlayer_right, path);
+
+            }
+        }
+
+        private void ActionSwitch_Click(object sender, RoutedEventArgs e)
+        {
+            if (lobRadio.IsChecked == true)
+            {
+                action_type = "lob";
+                string path = cur + dataBasePath + $"\\student\\{action_type}\\{StudentFileName}\\{student_color_or_body}.avi";
+                if(File.Exists(path))
                 {
-                    Button button = new Button()
-                    {
-                        Content = string.Format("  手肘抬高"),
-                        Tag = i,
-                        BorderThickness = new Thickness(0, 0, 0, 0),
-                        FontSize = 16,
-                        FontWeight = FontWeights.Heavy,
-                        HorizontalAlignment = HorizontalAlignment.Left,
-                        Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString("#001C70"),
-                        Background = (SolidColorBrush)new BrushConverter().ConvertFromString("#E5DDB8"),
-                    };
-                    button.Click += new RoutedEventHandler(button_Click);
-                    this.grid11.Children.Add(button);
+                    Console.WriteLine("file exist");
+                } 
+                else
+                {
+                    Console.WriteLine("file not exist");
                 }
-                else if (a == 1)
+            }
+            else if (serveRadio.IsChecked == true)
+            {
+                action_type = "serve";
+                string path = cur + dataBasePath + $"\\student\\{action_type}\\{StudentFileName}\\{student_color_or_body}.avi";
+                if (File.Exists(path))
                 {
-                    Button button = new Button()
-                    {
-                        Content = string.Format("  側身"),
-                        Tag = i,
-                        BorderThickness = new Thickness(0, 0, 0, 0),
-                        FontSize = 16,
-                        FontWeight = FontWeights.Heavy,
-                        HorizontalAlignment = HorizontalAlignment.Left,
-                        Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString("#001C70"),
-                        Background = (SolidColorBrush)new BrushConverter().ConvertFromString("#E5DDB8"),
-                    };
-                    button.Click += new RoutedEventHandler(button_Click);
-                    this.grid12.Children.Add(button);
+                    Console.WriteLine("file exist");
                 }
-                else if (a == 2)
+                else
                 {
-                    Button button = new Button()
-                    {
-                        Content = string.Format("  手肘轉向前"),
-                        Tag = i,
-                        BorderThickness = new Thickness(0, 0, 0, 0),
-                        FontSize = 16,
-                        FontWeight = FontWeights.Heavy,
-                        HorizontalAlignment = HorizontalAlignment.Left,
-                        Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString("#001C70"),
-                        Background = (SolidColorBrush)new BrushConverter().ConvertFromString("#E5DDB8"),
-                    };
-                    button.Click += new RoutedEventHandler(button_Click);
-                    this.grid13.Children.Add(button);
+                    Console.WriteLine("file not exist");
                 }
-                else if (a == 3)
+            }
+            else if (smashRadio.IsChecked == true)
+            {
+                action_type = "smash";
+                string path = cur + dataBasePath + $"\\student\\{action_type}\\{StudentFileName}\\{student_color_or_body}.avi";
+                if (File.Exists(path))
                 {
-                    Button button = new Button()
-                    {
-                        Content = string.Format("  手腕發力"),
-                        Tag = i,
-                        BorderThickness = new Thickness(0, 0, 0, 0),
-                        FontSize = 16,
-                        FontWeight = FontWeights.Heavy,
-                        HorizontalAlignment = HorizontalAlignment.Left,
-                        Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString("#001C70"),
-                        Background = (SolidColorBrush)new BrushConverter().ConvertFromString("#E5DDB8"),
-                    };
-                    button.Click += new RoutedEventHandler(button_Click);
-                    this.grid14.Children.Add(button);
+                    Console.WriteLine("file exist");
                 }
-                else if (a == 4)
+                else
                 {
-                    Button button = new Button()
-                    {
-                        Content = string.Format("  收拍"),
-                        Tag = i,
-                        BorderThickness = new Thickness(0, 0, 0, 0),
-                        FontSize = 16,
-                        FontWeight = FontWeights.Heavy,
-                        HorizontalAlignment = HorizontalAlignment.Left,
-                        Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString("#001C70"),
-                        Background = (SolidColorBrush)new BrushConverter().ConvertFromString("#E5DDB8"),
-                    };
-                    button.Click += new RoutedEventHandler(button_Click);
-                    this.grid15.Children.Add(button);
+                    Console.WriteLine("file not exist");
                 }
             }
         }
 
-
-
+        private void resetUri(MediaElement me, string path)
+        {
+            me.Source = new Uri(path);
+            me.Stop();
+        }
     }
 }

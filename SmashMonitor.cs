@@ -15,11 +15,12 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private double initRightShoulderElbowDiff = 0;
         private double headNeckDiff = 0;
         private double elbowSpineMaxDiff = 0;
+        private List<int> result;
 
-        public SmashMonitor()
+        public SmashMonitor(List<Frames> frameList)
         {
-            String jsonString = File.ReadAllText("../../../data/smashdata.json");
-            FrameList = JsonConvert.DeserializeObject<List<Frames>>(jsonString);
+            this.FrameList = frameList;
+            this.result = new List<int>();
         }
 
         public void start()
@@ -31,6 +32,11 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             nowFrame = CheckElbowForward(nowFrame);
             nowFrame = CheckWristForward(nowFrame);
             nowFrame = CheckElbowEnded(nowFrame);
+        }
+
+        public List<int> GetResult()
+        {
+            return this.result;
         }
 
         private void GenerateCompareData()
@@ -101,6 +107,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 if (Math.Abs(hipRight - hipLeft) < hipMaxDiff * 0.7 && Math.Abs(hipRight - hipLeft) != 0)
                 {
                     Console.WriteLine(Frame.num + " Side");
+                    this.result.Add(Frame.num);
                     return Frame.num;
                 }
             }
@@ -122,6 +129,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 if (Math.Abs(elbowRight - shoulderRight) < initRightShoulderElbowDiff / 6)
                 {
                     Console.WriteLine(i + " Elbow up");
+                    this.result.Add(i);
                     return i;
                 }
             }
@@ -145,6 +153,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 if (nowRightElbowShoulderDiff * prevRightElbowShoulderDiff < 0)
                 {
                     Console.WriteLine(i + " Elbow forward");
+                    this.result.Add(i);
                     return i;
                 }
                 prevRightElbowShoulderDiff = nowRightElbowShoulderDiff;
@@ -169,6 +178,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 if (prevHandtipWristDiff - nowHandtipWristDiff > this.headNeckDiff / 3 && prevHandtipWristDiff != 0)
                 {
                     Console.WriteLine(i + " Wrist forward");
+                    this.result.Add(i);
                     return i;
                 }
                 prevHandtipWristDiff = nowHandtipWristDiff;
@@ -193,6 +203,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 if (elbowSpineDiff < elbowSpineMaxDiff / 6)
                 {
                     Console.WriteLine(i + " Elbow ended");
+                    this.result.Add(i);
                     return i;
                 }
 

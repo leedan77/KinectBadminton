@@ -25,33 +25,57 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         FileInfo[] fileInfo;
         ArrayList list;
         string cur = Environment.CurrentDirectory;
-        const string coachDataPath = "\\..\\..\\..\\..\\coach_data";
-
-        private string coachDataType;
-        public string CoachDataType
+        public string action_type;
+        private string menuType;
+        public string MenuType
         {
             get
             {
-                return coachDataType;
+                return $"\\..\\..\\..\\data\\{menuType}\\{action_type}";
             }
             set
             {
-                coachDataType = value;
-                dirInfo = new DirectoryInfo(cur + coachDataPath + coachDataType);
-                fileInfo = dirInfo.GetFiles("*.avi*");
+                menuType = value;
+                dirInfo = new DirectoryInfo(cur + this.MenuType);
                 list = new ArrayList();
-                foreach (FileInfo f in fileInfo)
+                DirectoryInfo[] subDir = dirInfo.GetDirectories();
+                foreach (DirectoryInfo d in subDir)
                 {
-                    list.Add(f.Name.Remove(f.Name.Length - 4));
+                    list.Add(d.Name);
                 }
                 CoachListBox.ItemsSource = list;
             }
         }
 
-        public ChooseCoachWindow()
+        private string dataType;
+        public string DataType
+        {
+            get
+            {
+                return dataType;
+            }
+            set
+            {
+                dataType = value;
+                //Console.WriteLine(MenuType);
+                ////dirInfo = new DirectoryInfo(cur + coachDataPath + coachDataType);
+                //dirInfo = new DirectoryInfo(cur + this.MenuType);
+                //fileInfo = dirInfo.GetFiles("*.avi*");
+                ////fileInfo = dirInfo.GetFiles("*.json*");
+                //list = new ArrayList();
+                //foreach (FileInfo f in fileInfo)
+                //{
+                //    list.Add(f.Name.Remove(f.Name.Length - ".json".Length));
+                //}
+                //CoachListBox.ItemsSource = list;
+            }
+        }
+
+        public ChooseCoachWindow(string type, string action_type)
         {
             InitializeComponent();
-            CoachDataType = "\\color";           
+            this.action_type = action_type;
+            this.MenuType = type;         
            
         }
 
@@ -60,23 +84,14 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private void CoachListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             var parent = this.Owner as MainWindow;
-            parent.CoachFileName = fileInfo[CoachListBox.SelectedIndex].FullName;
-            Console.WriteLine(fileInfo[CoachListBox.SelectedIndex].FullName);
+            string selectedItem = CoachListBox.SelectedItem.ToString();
+            if (this.menuType == "coach") 
+                parent.CoachFileName = selectedItem;
+            else if(this.menuType == "student")
+                parent.StudentFileName = selectedItem;
+            parent.LoadJudgement(selectedItem, action_type, menuType);
             this.Close();
         }
 
-        private void ToggleButton_Checked(object sender, RoutedEventArgs e)
-        {
-            if (colorRadio.IsChecked == true)
-            {
-                Console.WriteLine("color");
-                CoachDataType = "\\color";
-            }
-            else
-            {
-                Console.WriteLine("body");
-                CoachDataType = "\\body";
-            }
-        }
     }
 }

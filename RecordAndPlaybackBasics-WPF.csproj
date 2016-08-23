@@ -90,6 +90,7 @@
     <Compile Include="ChooseCoachWindow.xaml.cs">
       <DependentUpon>ChooseCoachWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="LobMonitor.cs" />
     <Compile Include="ServeMonitor.cs" />
     <Compile Include="SmashMonitor.cs" />
     <Compile Include="VideoConverter.cs" />
@@ -165,6 +166,15 @@
   <ItemGroup>
     <Resource Include="Images\cross.png" />
     <Resource Include="Images\tick.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\menu.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\slow.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\turtle-128.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
