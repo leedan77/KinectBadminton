@@ -208,16 +208,22 @@
                 <UniformGrid  Grid.Row="4" x:Name="grid14"></UniformGrid>
                 <UniformGrid  Grid.Row="5" x:Name="grid15"></UniformGrid>
             </Grid>
-            <StackPanel Grid.Row="2" Grid.ColumnSpan="4" Orientation="Horizontal" Background="White">
+           
+            <StackPanel x:Name="DebugPanel" Grid.Row="2" Grid.ColumnSpan="4" Orientation="Horizontal" Background="White" Visibility="Collapsed">
                 <Button x:Name="PlayButton" Content="Play" Width="90" Click="PlayButton_Click" Margin="10" Padding="5" />
                 <Button x:Name="PauseButton" Content="Pause" Width="90" Click="PauseButton_Click" Margin="10" Padding="5" IsEnabled="False"/>
                 <Button x:Name="StopButton" Content="Stop" Width="90" Click="StopButton_Click" Margin="10" Padding="5"/>
                 <Button x:Name="student" Content="student" Width="90" Click="student_Click" Margin="10" Padding="5" />
             </StackPanel>
+            <!--
             <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding RecordPlaybackStatusText}" HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="{StaticResource KinectBlueBrush}" FontFamily="Segoe UI" FontSize="18" Margin="10"/>
+            -->
         </Grid>
+        <!--
         <StatusBar Grid.Row="3" HorizontalAlignment="Stretch" Name="statusBar" VerticalAlignment="Bottom" Background="White" Foreground="{StaticResource MediumGreyBrush}">
             <StatusBarItem Content="{Binding KinectStatusText}" />
         </StatusBar>
+        -->
+        
     </Grid>
 </Window>
