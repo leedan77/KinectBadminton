@@ -202,9 +202,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 }
 
                 nowResult = CheckSide(wristRight, elbowRight, handTipRight);
-                //Console.WriteLine(nowResult);
-                //Console.WriteLine("Frame: " + i + ", " + (handTipRight.y - wristRight.y));
-                //Console.WriteLine("Frame: " + i + ", " + nowResult);
                 if (nowResult * prevResult < 0)
                 {
                     Console.WriteLine(i + " Wrist forward");

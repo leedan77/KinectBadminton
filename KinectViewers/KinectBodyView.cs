@@ -279,7 +279,10 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
             else if(this.type == "lob")
             {
-
+                LobMonitor lobMonitor = new LobMonitor(this.FrameList);
+                lobMonitor.start();
+                string judgeResult = JsonConvert.SerializeObject(lobMonitor.GetResult());
+                File.WriteAllText("../../../data/" + person_type + "/" + this.type + "/" + name + "/judgement.json", judgeResult);
             }
         }
 
