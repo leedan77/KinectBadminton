@@ -84,7 +84,14 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         public MainWindow()
         {
-            InitializeComponent();        
+            InitializeComponent();
+#if DEBUG
+            Console.WriteLine("Debug mode");
+            this.DebugPanel.Visibility = Visibility.Visible;
+#else
+            Console.WriteLine("Release mode");
+            this.DebugPanel.Visibility = Visibility.Collapsed;
+#endif
             _timer.Interval = TimeSpan.FromMilliseconds(16);
             _timer.Tick += new EventHandler(ticktock);
             _timer.Start();
