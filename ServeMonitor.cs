@@ -10,15 +10,39 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 {
     class ServeMonitor
     {
-        public struct Vector
+        public struct Vector2
         {
             public double x, y, d;
 
-            public Vector(double vx, double vy)
+            public Vector2(double vx, double vy)
             {
                 x = vx;
                 y = vy;
                 d = Math.Sqrt(Math.Pow(vx, 2) + Math.Pow(vy, 2));
+            }
+        }
+
+        public struct Vector3
+        {
+            public double x, y, z, d;
+
+            public Vector3(double vx, double vy, double vz)
+            {
+                x = vx;
+                y = vy;
+                z = vz;
+                d = Math.Sqrt(Math.Pow(vx, 2) + Math.Pow(vy, 2) + Math.Pow(vz, 2));
+            }
+        }
+
+        public struct JointCoord
+        {
+            public double x, y, z;
+            public JointCoord(double cx, double cy, double cz)
+            {
+                x = cx;
+                y = cy;
+                z = cz;
             }
         }
         
@@ -41,6 +65,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             nowFrame = CheckBalancePoint(nowFrame, "left");
             nowFrame = CheckWaistTwist(nowFrame);
             nowFrame = CheckWristForward(nowFrame);
+            nowFrame = CheckElbowEnded(nowFrame);
         }
         public List<int> GetResult()
         {
@@ -51,26 +76,26 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             int headNeckCount = 0;
             foreach (Frames Frame in FrameList)
             {
-                double headx = 0, heady = 0, headz = 0;
-                double neckx = 0, necky = 0, neckz = 0;
+                JointCoord head = new JointCoord(0, 0, 0);
+                JointCoord neck = new JointCoord(0, 0, 0);
                 foreach (Joints joint in Frame.jointList)
                 {
                     if (string.Compare(joint.jointType, "Head") == 0 && joint.x != 0)
                     {
-                        headx = joint.x;
-                        heady = joint.y;
-                        headz = joint.z;
+                        head.x = joint.x;
+                        head.y = joint.y;
+                        head.z = joint.z;
                         headNeckCount++;
                     }
                     else if (string.Compare(joint.jointType, "Neck") == 0 && joint.x != 0)
                     {
-                        neckx = joint.x;
-                        necky = joint.y;
-                        neckz = joint.z;
+                        neck.x = joint.x;
+                        neck.y = joint.y;
+                        neck.z = joint.z;
                     }
                 }
                 if (headNeckCount <= 10)
-                    headNeckDiff += Math.Sqrt(Math.Pow(headx - neckx, 2) + Math.Pow(heady - necky, 2) + Math.Pow(headz - neckz, 2));
+                    headNeckDiff += Math.Sqrt(Math.Pow(head.x - neck.x, 2) + Math.Pow(head.y - neck.y, 2) + Math.Pow(head.z - neck.z, 2));
             }
             headNeckDiff /= 10;
         }
@@ -78,47 +103,31 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         {
             for(int i = nowFrame; i < FrameList.Count; i++)
             {
-                double hipRightx = 0, kneeRightx = 0, ankleRightx = 0;
-                double hipRighty = 0, kneeRighty = 0, ankleRighty = 0;
-                double hipLeftx = 0, kneeLeftx = 0, ankleLeftx = 0;
-                double hipLefty = 0, kneeLefty = 0, ankleLefty = 0;
+                JointCoord hipRight = new JointCoord(0, 0, 0);
+                JointCoord kneeRight = new JointCoord(0, 0, 0);
+                JointCoord ankleRight = new JointCoord(0, 0, 0);
+                JointCoord hipLeft = new JointCoord(0, 0, 0);
+                JointCoord kneeLeft = new JointCoord(0, 0, 0);
+                JointCoord ankleLeft = new JointCoord(0, 0, 0);
                 foreach (Joints joint in FrameList[i].jointList)
                 {
                     if (string.Compare(joint.jointType, "HipRight") == 0)
-                    {
-                        hipRightx = joint.x;
-                        hipRighty = joint.y;
-                    }
+                        hipRight = new JointCoord(joint.x, joint.y, 0);
                     else if (string.Compare(joint.jointType, "KneeRight") == 0)
-                    {
-                        kneeRightx = joint.x;
-                        kneeRighty = joint.y;
-                    }
+                        kneeRight = new JointCoord(joint.x, joint.y, 0);
                     else if (string.Compare(joint.jointType, "AnkleRight") == 0)
-                    {
-                        ankleRightx = joint.x;
-                        ankleRighty = joint.y;
-                    }
+                        ankleRight = new JointCoord(joint.x, joint.y, 0);
                     else if (string.Compare(joint.jointType, "HipLeft") == 0)
-                    {
-                        hipLeftx = joint.x;
-                        hipLefty = joint.y;
-                    }
+                        hipLeft = new JointCoord(joint.x, joint.y, 0);
                     else if (string.Compare(joint.jointType, "KneeLeft") == 0)
-                    {
-                        kneeLeftx = joint.x;
-                        kneeLefty = joint.y;
-                    }
+                        kneeLeft = new JointCoord(joint.x, joint.y, 0);
                     else if (string.Compare(joint.jointType, "AnkleLeft") == 0)
-                    {
-                        ankleLeftx = joint.x;
-                        ankleLefty = joint.y;
-                    }
+                        ankleLeft = new JointCoord(joint.x, joint.y, 0);
                 }
 
-                Vector hipAngleRight = new Vector(ankleRightx - hipRightx, ankleRighty - hipRighty);
-                Vector hipAngleLeft = new Vector(ankleLeftx - hipLeftx, ankleLefty - hipLefty);
-                Vector horizentalLine = new Vector(10, 0);
+                Vector2 hipAngleRight = new Vector2(ankleRight.x - hipRight.x, ankleRight.y - hipRight.y);
+                Vector2 hipAngleLeft = new Vector2(ankleLeft.x - hipLeft.x, ankleLeft.y - hipLeft.y);
+                Vector2 horizentalLine = new Vector2(10, 0);
 
                 double hipAngleRightHorAngle = Math.Acos((hipAngleRight.x * horizentalLine.x + hipAngleRight.y + horizentalLine.y) / (hipAngleRight.d * horizentalLine.d)) * 180 / Math.PI;
                 double hipAngleLeftHorAngle = Math.Acos((hipAngleLeft.x * horizentalLine.x + hipAngleLeft.y + horizentalLine.y) / (hipAngleLeft.d * horizentalLine.d)) * 180 / Math.PI;
@@ -137,7 +146,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     if (Math.Abs(hipAngleRightHorAngle - 90) > Math.Abs(hipAngleLeftHorAngle - 90) + 5)
                     {
                         Console.WriteLine(i + " Balance left");
-                        this.hipWidthWhenBalanceChange = hipRightx - hipLeftx;
+                        this.hipWidthWhenBalanceChange = hipRight.x - hipLeft.x;
                         this.result.Add(i);
                         return i;
                     }
@@ -175,27 +184,74 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         }
         private int CheckWristForward(int nowFrame)
         {
-            double prevHandtipWristDiff = 0, nowHandtipWristDiff = 0;
+            double nowResult = 0;
+            double prevResult = 0;
             for (int i = nowFrame; i < this.FrameList.Count; i++)
             {
-                double handTipRight = 0, wristRight = 0;
+                JointCoord handTipRight = new JointCoord(0, 0, 0);
+                JointCoord wristRight = new JointCoord(0, 0, 0);
+                JointCoord elbowRight = new JointCoord(0, 0, 0);
                 foreach (Joints joint in this.FrameList[i].jointList)
                 {
-                    if (string.Compare(joint.jointType, "HandTipRight") == 0)
-                        handTipRight = joint.y;
-                    else if (string.Compare(joint.jointType, "WristRight") == 0)
-                        wristRight = joint.y;
+                    if (joint.jointType == "HandTipRight")
+                        handTipRight = new JointCoord(joint.x, joint.y, joint.z);
+                    else if (joint.jointType == "WristRight")
+                        wristRight = new JointCoord(joint.x, joint.y, joint.z);
+                    else if (joint.jointType == "ElbowRight")
+                        elbowRight = new JointCoord(joint.x, joint.y, joint.z);
                 }
-                nowHandtipWristDiff = wristRight - handTipRight;
-                Console.WriteLine("Frame " + i + ": " + nowHandtipWristDiff);
-                if (prevHandtipWristDiff - nowHandtipWristDiff > this.headNeckDiff / 3 && prevHandtipWristDiff != 0)
+
+                nowResult = CheckSide(wristRight, elbowRight, handTipRight);
+                //Console.WriteLine(nowResult);
+                //Console.WriteLine("Frame: " + i + ", " + (handTipRight.y - wristRight.y));
+                //Console.WriteLine("Frame: " + i + ", " + nowResult);
+                if (nowResult * prevResult < 0)
                 {
-                    //Console.WriteLine(i + " Wrist forward");
-                    //return i;
+                    Console.WriteLine(i + " Wrist forward");
+                    this.result.Add(i);
+                    return i;
                 }
-                prevHandtipWristDiff = nowHandtipWristDiff;
+                prevResult = nowResult;
             }
             return this.FrameList.Count;
+
+        }
+
+        private int CheckElbowEnded(int nowFrame)
+        {
+            for (int i = nowFrame; i < this.FrameList.Count; i++)
+            {
+                JointCoord shoulderRight = new JointCoord(0, 0, 0);
+                JointCoord spineShoulder = new JointCoord(0, 0, 0);
+                JointCoord handRight = new JointCoord(0, 0, 0);
+                foreach (Joints joint in this.FrameList[i].jointList)
+                {
+                    if (joint.jointType == "ShoulderRight")
+                        shoulderRight = new JointCoord(joint.x, joint.y, joint.z);
+                    else if (joint.jointType == "SpineShoulder")
+                        spineShoulder = new JointCoord(joint.x, joint.y, joint.z);
+                    else if(joint.jointType == "HandRight")
+                        handRight = new JointCoord(joint.x, joint.y, joint.z);
+                }
+                double handSpineZDiff = handRight.z - spineShoulder.z;
+                if(handSpineZDiff < 0)
+                {
+                    Console.WriteLine(i + " Elbow ended");
+                    this.result.Add(i);
+                    return i;
+                }
+            }
+            return this.FrameList.Count;
+        }
+
+        private double CheckSide(JointCoord lineCoord1, JointCoord lineCoord2, JointCoord checkPoint)
+        {
+            double a = (lineCoord2.y - lineCoord1.y) / (lineCoord2.x - lineCoord1.x);
+            double b = lineCoord1.y - a * lineCoord1.x;
+            double result = checkPoint.y - a * checkPoint.x - b;
+            if ((result < 0 && a > 0) || (result > 0 && a < 0))
+                return -1;
+            return 1;
         }
     }
 }
