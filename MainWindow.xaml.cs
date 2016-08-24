@@ -363,36 +363,11 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
             if(person_type == "coach")
             {
-                if (grid11.Children.Count != 0)
-                {
-                    //grid11.Children.Remove((Button)grid11.Children[0]);
-                    //grid12.Children.Remove((Button)grid12.Children[0]);
-                    //grid13.Children.Remove((Button)grid13.Children[0]);
-                    //grid14.Children.Remove((Button)grid14.Children[0]);
-                    //grid15.Children.Remove((Button)grid15.Children[0]);
-                    grid11.Children.Clear();
-                    grid12.Children.Clear();
-                    grid13.Children.Clear();
-                    grid14.Children.Clear();
-                    grid15.Children.Clear();
-
-                }
-                //if (grid12.Children.Count != 0)
-                //{
-
-                //}
-                //else if (grid11.Children.Count != 0)
-                //{
-
-                //}
-                //else if (grid11.Children.Count != 0)
-                //{
-
-                //}
-                //else if ()
-                   
-                    
-                
+                grid11.Children.Clear();
+                grid12.Children.Clear();
+                grid13.Children.Clear();
+                grid14.Children.Clear();
+                grid15.Children.Clear();
                 textBlock2.Text = name;
                 for (int i = 0; i < goals.Count; ++i)
                 {
@@ -691,13 +666,13 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     Console.WriteLine("file exist");
                     resetUri(MediaPlayer_right, path);
                     LoadJudgement(CoachFileName, action_type, "coach");
-                    MediaPlayer_left.Close();
+                    releaseMediaElement(MediaPlayer_left);
                 } 
                 else
                 {
                     Console.WriteLine("file not exist");
-                    MediaPlayer_right.Close();
-                    MediaPlayer_left.Close();
+                    releaseMediaElement(MediaPlayer_left);
+                    releaseMediaElement(MediaPlayer_right);
                 }
             }
             else if (serveRadio.IsChecked == true)
@@ -709,13 +684,13 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     Console.WriteLine("file exist");
                     resetUri(MediaPlayer_right, path);
                     LoadJudgement(CoachFileName, action_type, "coach");
-                    MediaPlayer_left.Close();
+                    releaseMediaElement(MediaPlayer_left);
                 }
                 else
                 {
                     Console.WriteLine("file not exist");
-                    MediaPlayer_right.Close();
-                    MediaPlayer_left.Close();
+                    releaseMediaElement(MediaPlayer_left);
+                    releaseMediaElement(MediaPlayer_right);
                 }
             }
             else if (smashRadio.IsChecked == true)
@@ -727,13 +702,13 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     Console.WriteLine("file exist");
                     resetUri(MediaPlayer_right, path);
                     LoadJudgement(CoachFileName, action_type, "coach");
-                    MediaPlayer_left.Close();
+                    releaseMediaElement(MediaPlayer_left);
                 }
                 else
                 {
                     Console.WriteLine("file not exist");
-                    MediaPlayer_right.Close();
-                    MediaPlayer_left.Close();
+                    releaseMediaElement(MediaPlayer_left);
+                    releaseMediaElement(MediaPlayer_right);
                 }
             }
         }
@@ -742,6 +717,12 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         {
             me.Source = new Uri(path);
             me.Stop();
+        }
+
+        private void releaseMediaElement(MediaElement me)
+        {
+            me.Close();
+            me.Source = null; 
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
