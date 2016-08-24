@@ -279,7 +279,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private void MediaPlayer_right_MouseRightButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            ChooseCoachWindow ccw = new ChooseCoachWindow("coach", action_type);
+            MenuWindow ccw = new MenuWindow("coach", action_type);
             ccw.Owner = this;
             ccw.ShowDialog();
            
@@ -636,21 +636,21 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private void MediaPlay_left_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            ChooseCoachWindow ccw = new ChooseCoachWindow("student", action_type);
+            MenuWindow ccw = new MenuWindow("student", action_type);
             ccw.Owner = this;
             ccw.ShowDialog();
         }
 
         private void MenuLeftButton_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            ChooseCoachWindow ccw = new ChooseCoachWindow("student", action_type);
+            MenuWindow ccw = new MenuWindow("student", action_type);
             ccw.Owner = this;
             ccw.ShowDialog();
         }
 
         private void MenuRightButton_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            ChooseCoachWindow ccw = new ChooseCoachWindow("coach", action_type);
+            MenuWindow ccw = new MenuWindow("coach", action_type);
             ccw.Owner = this;
             ccw.ShowDialog();
         }

@@ -87,14 +87,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="ChooseCoachWindow.xaml.cs">
-      <DependentUpon>ChooseCoachWindow.xaml</DependentUpon>
+    <Compile Include="MenuWindow.xaml.cs">
+      <DependentUpon>MenuWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="LobMonitor.cs" />
     <Compile Include="ServeMonitor.cs" />
     <Compile Include="SmashMonitor.cs" />
     <Compile Include="VideoConverter.cs" />
-    <Page Include="ChooseCoachWindow.xaml">
+    <Page Include="MenuWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

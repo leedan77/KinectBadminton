@@ -19,7 +19,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
     /// <summary>
     /// ChooseCoachWindow.xaml 的互動邏輯
     /// </summary>
-    public partial class ChooseCoachWindow : Window
+    public partial class MenuWindow : Window
     {
         DirectoryInfo dirInfo;
         FileInfo[] fileInfo;
@@ -43,7 +43,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 {
                     list.Add(d.Name);
                 }
-                CoachListBox.ItemsSource = list;
+                MenuListBox.ItemsSource = list;
             }
         }
 
@@ -60,7 +60,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             }
         }
 
-        public ChooseCoachWindow(string type, string action_type)
+        public MenuWindow(string type, string action_type)
         {
             InitializeComponent();
             this.action_type = action_type;
@@ -68,10 +68,10 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
            
         }
         
-        private void CoachListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        private void MenuListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             var parent = this.Owner as MainWindow;
-            string selectedItem = CoachListBox.SelectedItem.ToString();
+            string selectedItem = MenuListBox.SelectedItem.ToString();
             if (this.menuType == "coach") 
                 parent.RightVideoChoosen(selectedItem);
             else if(this.menuType == "student")
