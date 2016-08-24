@@ -29,10 +29,10 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private bool isPlaying = false;
         private bool pausing = false;
 
-        private bool leftIsPlaying = false;
+        private bool leftPlaying = false;
         private bool leftPausing = false;
 
-        private bool rightIsPlaying = false;
+        private bool rightPlaying = false;
         private bool rightPausing = false;
 
         DispatcherTimer _timer = new DispatcherTimer();
@@ -49,7 +49,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         public int coachVideoCount = 0;
         public int studentVideoCount = 0;
 
-        private List<double> judgement;
+        private List<double> studentJudgement;
+        private List<double> coachJudgement;
 
         private double rightVideoDuration = 0;
         private double leftVideoDuration = 0;
@@ -150,49 +151,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             }
         }
 
-        private void leftUpdateState()
-        {
-            if (this.leftIsPlaying && !this.leftPausing)
-            {
-                this.RecordButton.IsEnabled = false;
-                this.PlayLeftButton.IsEnabled = false;
-                this.PauseLeftButton.IsEnabled = true;
-            }
-            else if (this.leftPausing)
-            {
-                this.RecordButton.IsEnabled = false;
-                this.PlayLeftButton.IsEnabled = true;
-                this.PauseLeftButton.IsEnabled = false;
-            }
-            else
-            {
-                this.RecordButton.IsEnabled = true;
-                this.PlayLeftButton.IsEnabled = true;
-                this.PauseLeftButton.IsEnabled = false;
-            }
-        }
-
-        private void rightUpdateState()
-        {
-            if (this.rightIsPlaying && !this.rightPausing)
-            {
-                this.RecordButton.IsEnabled = false;
-                this.PlayRightButton.IsEnabled = false;
-                this.PauseRightButton.IsEnabled = true;
-            }
-            else if (this.rightPausing)
-            {
-                this.RecordButton.IsEnabled = false;
-                this.PlayRightButton.IsEnabled = true;
-                this.PauseRightButton.IsEnabled = false;
-            }
-            else
-            {
-                this.RecordButton.IsEnabled = true;
-                this.PlayRightButton.IsEnabled = true;
-                this.PauseRightButton.IsEnabled = false;
-            }
-        }
 
 
         private void RecordButton_Click(object sender, RoutedEventArgs e)
@@ -247,6 +205,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             LeftTimelineSlider.Minimum = 0;
             LeftTimelineSlider.Maximum = MediaPlayer_left.NaturalDuration.TimeSpan.TotalMilliseconds;
             this.leftVideoDuration = MediaPlayer_left.NaturalDuration.TimeSpan.TotalMilliseconds;
+            Console.WriteLine(leftVideoDuration);
             //LeftTimelineSlider.Ticks = 
         }
 
@@ -256,8 +215,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             RightTimelineSlider.Maximum = MediaPlayer_right.NaturalDuration.TimeSpan.TotalMilliseconds;
             this.rightVideoDuration = MediaPlayer_right.NaturalDuration.TimeSpan.TotalMilliseconds;
         }
-
-
+        
         private void MediaEnded(object sender, RoutedEventArgs e)
         {
             // MediaPlayer_left.Close();
@@ -285,26 +243,17 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
            
         }
 
-        void student_Button_Click(object sender, RoutedEventArgs e)
+        private void student_Button_Click(object sender, RoutedEventArgs e)
         {
-            Console.WriteLine(string.Format("You clicked on the {0}. student_button.", (sender as Button).Tag));
-            if (leftIsPlaying)
-            {
-                int second = (int)(sender as Button).Tag;
-                MediaPlayer_left.Pause();
-                MediaPlayer_left.Position = new TimeSpan(0, 0, 0, second, 0);
-                if (!leftPausing)
-                {
-                    MediaPlayer_left.Play();
-                }
-            }
+            MediaPlayer_left.Pause();
+            double positionInMillisecond = this.leftVideoDuration * this.studentJudgement[(int)(sender as Button).Tag - 1];
+            MediaPlayer_left.Position = new TimeSpan(0, 0, 0, 0, (int)positionInMillisecond);
         }
 
-        void teacher_Button_Click(object sender, RoutedEventArgs e)
+        private void teacher_Button_Click(object sender, RoutedEventArgs e)
         {
             MediaPlayer_right.Pause();
-            double positionInMillisecond = this.rightVideoDuration * this.judgement[(int)(sender as Button).Tag - 1];
-            Console.WriteLine(positionInMillisecond);
+            double positionInMillisecond = this.rightVideoDuration * this.coachJudgement[(int)(sender as Button).Tag - 1];
             MediaPlayer_right.Position = new TimeSpan(0, 0, 0, 0, (int)positionInMillisecond);
         }
 
@@ -367,13 +316,11 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         public void RightVideoChoosen(String selectedItem)
         {
-            //this.rightVideoDuration = MediaPlayer_right.NaturalDuration.TimeSpan.TotalMilliseconds;
             this.CoachFileName = selectedItem;
         }
 
         public void LeftVideoChoosen(String selectedItem)
         {
-            //this.leftVideoDuration = MediaPlayer_left.NaturalDuration.TimeSpan.TotalMilliseconds;
             this.StudentFileName = selectedItem;
         }
 
@@ -382,12 +329,11 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             String judgementDir = "../../../data/" + person_type + "/" + action_type + "/" + name + "/judgement.json";
             String rawJsonData = File.ReadAllText(judgementDir);
             List<String> goals = new List<String>();
-            this.judgement = JsonConvert.DeserializeObject<List<double>>(rawJsonData);
+            if(person_type == "coach")
+                this.coachJudgement = JsonConvert.DeserializeObject<List<double>>(rawJsonData);
+            else if (person_type == "student")
+                this.studentJudgement = JsonConvert.DeserializeObject<List<double>>(rawJsonData);
             
-            foreach (double i in judgement)
-            {
-                Console.WriteLine(i);
-            }
 
             if(action_type == "smash")
             {
@@ -464,23 +410,23 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     grid5.Children.Remove((Button)grid5.Children[0]);
                 }
                 textBlock1.Text = "學員";
-                if(judgement.Count > 0)
+                if(studentJudgement.Count > 0)
                     image1.Source = new BitmapImage(new Uri(@"Images\tick.png", UriKind.Relative));
                 else
                     image1.Source = new BitmapImage(new Uri(@"Images\cross.png", UriKind.Relative));
-                if (judgement.Count > 1)
+                if (studentJudgement.Count > 1)
                     image2.Source = new BitmapImage(new Uri(@"Images\tick.png", UriKind.Relative));
                 else
                     image2.Source = new BitmapImage(new Uri(@"Images\cross.png", UriKind.Relative));
-                if (judgement.Count > 2)
+                if (studentJudgement.Count > 2)
                     image3.Source = new BitmapImage(new Uri(@"Images\tick.png", UriKind.Relative));
                 else
                     image3.Source = new BitmapImage(new Uri(@"Images\cross.png", UriKind.Relative));
-                if (judgement.Count > 3)
+                if (studentJudgement.Count > 3)
                     image4.Source = new BitmapImage(new Uri(@"Images\tick.png", UriKind.Relative));
                 else
                     image4.Source = new BitmapImage(new Uri(@"Images\cross.png", UriKind.Relative));
-                if (judgement.Count > 4)
+                if (studentJudgement.Count > 4)
                     image5.Source = new BitmapImage(new Uri(@"Images\tick.png", UriKind.Relative));
                 else
                     image5.Source = new BitmapImage(new Uri(@"Images\cross.png", UriKind.Relative));
@@ -522,35 +468,78 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 }
             }
         }
-
-        private void StopLeftButton_Click(object sender, RoutedEventArgs e)
+    
+        private void leftUpdateState()
         {
-            MediaPlayer_left.Stop();
-            MediaPlayer_left.Close();
-            MediaPlayer_left.Position = new TimeSpan(0, 0, 0, 0, 0);
-            this.leftIsPlaying = false;
-            this.leftPausing = false;
-            this.leftUpdateState();
+            if (this.leftPlaying && !this.leftPausing)
+            {
+                this.RecordButton.IsEnabled = false;
+                this.PlayLeftButton.IsEnabled = false;
+                this.PauseLeftButton.IsEnabled = true;
+            }
+            else if (this.leftPausing)
+            {
+                this.RecordButton.IsEnabled = false;
+                this.PlayLeftButton.IsEnabled = true;
+                this.PauseLeftButton.IsEnabled = false;
+            }
+            else
+            {
+                this.RecordButton.IsEnabled = true;
+                this.PlayLeftButton.IsEnabled = true;
+                this.PauseLeftButton.IsEnabled = false;
+            }
+        }
+
+        private void rightUpdateState()
+        {
+            if (this.rightPlaying && !this.rightPausing)
+            {
+                this.RecordButton.IsEnabled = false;
+                this.PlayRightButton.IsEnabled = false;
+                this.PauseRightButton.IsEnabled = true;
+            }
+            else if (this.rightPausing)
+            {
+                this.RecordButton.IsEnabled = false;
+                this.PlayRightButton.IsEnabled = true;
+                this.PauseRightButton.IsEnabled = false;
+            }
+            else
+            {
+                this.RecordButton.IsEnabled = true;
+                this.PlayRightButton.IsEnabled = true;
+                this.PauseRightButton.IsEnabled = false;
+            }
+        }
+
+        private void PlayRightButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.rightPlaying = true;
+            this.rightPausing = false;
+            this.rightUpdateState();
+            MediaPlayer_right.Play();
         }
 
         private void PlayLeftButton_Click(object sender, RoutedEventArgs e)
         {
-            this.leftIsPlaying = true;
-            if (!this.leftPausing)
-            {
-                this.leftPausing = false; //useless
-                this.leftUpdateState();
-            }
-            else
-            {
-                this.leftPausing = false;
-                this.leftUpdateState();
-            }
+            this.leftPlaying = true;
+            this.leftPausing = false;
+            this.leftUpdateState();
             MediaPlayer_left.Play();
+        }
+
+        private void PauseRightButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.rightPlaying = false;
+            this.rightPausing = true;
+            this.rightUpdateState();
+            MediaPlayer_right.Pause();
         }
 
         private void PauseLeftButton_Click(object sender, RoutedEventArgs e)
         {
+            this.leftPlaying = false;
             this.leftPausing = true;
             this.leftUpdateState();
             MediaPlayer_left.Pause();
@@ -559,34 +548,19 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private void StopRightButton_Click(object sender, RoutedEventArgs e)
         {
             MediaPlayer_right.Stop();
-            //MediaPlayer_right.Close();
             MediaPlayer_right.Position = new TimeSpan(0, 0, 0, 0, 0);
-            this.rightIsPlaying = false;
+            this.rightPlaying = false;
             this.rightPausing = false;
             this.rightUpdateState();
         }
 
-        private void PlayRightButton_Click(object sender, RoutedEventArgs e)
+        private void StopLeftButton_Click(object sender, RoutedEventArgs e)
         {
-            this.rightIsPlaying = true;
-            if (!this.rightPausing)
-            {
-                this.rightPausing = false; //useless
-                this.rightUpdateState();
-            }
-            else
-            {
-                this.rightPausing = false;
-                this.rightUpdateState();
-            }
-            MediaPlayer_right.Play();
-        }
-
-        private void PauseRightButton_Click(object sender, RoutedEventArgs e)
-        {
-            this.rightPausing = true;
-            this.rightUpdateState();
-            MediaPlayer_right.Pause();
+            MediaPlayer_left.Stop();
+            MediaPlayer_left.Position = new TimeSpan(0, 0, 0, 0, 0);
+            this.leftPlaying = false;
+            this.leftPausing = false;
+            this.leftUpdateState();
         }
 
         private void RightTimelineSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -601,7 +575,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 MediaPlayer_right.Position = ts;
 
             }
-            else if(this.rightIsPlaying && !this.rightPausing)
+            else if(this.rightPlaying && !this.rightPausing)
             {
                 MediaPlayer_right.Play();
             }
@@ -618,7 +592,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 TimeSpan ts = new TimeSpan(0, 0, 0, 0, SliderValue);
                 MediaPlayer_left.Position = ts;
             }
-            else if(this.leftIsPlaying && !this.leftPausing)
+            else if(this.leftPlaying && !this.leftPausing)
             {
                 MediaPlayer_left.Play();
             }
