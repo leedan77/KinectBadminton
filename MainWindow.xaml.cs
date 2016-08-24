@@ -49,6 +49,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         public int coachVideoCount = 0;
         public int studentVideoCount = 0;
 
+        private List<double> judgement;
+
         public string StudentFileName
         {
             get
@@ -305,12 +307,13 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         void teacher_Button_Click(object sender, RoutedEventArgs e)
         {
+            double videoDuration = MediaPlayer_right.NaturalDuration.TimeSpan.TotalMilliseconds;
             Console.WriteLine(string.Format("You clicked on the {0}. teacher_button.", (sender as Button).Tag));
             if (rightIsPlaying)
             {
-                int second = (int)(sender as Button).Tag;
+                double positionInMillisecond = videoDuration * this.judgement[(int)(sender as Button).Tag-1];
                 MediaPlayer_right.Pause();
-                MediaPlayer_right.Position = new TimeSpan(0, 0, 0, second, 0);
+                MediaPlayer_right.Position = new TimeSpan(0, 0, 0, (int)positionInMillisecond);
                 if (!rightPausing)
                 {
                     MediaPlayer_right.Play();
@@ -380,17 +383,17 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             String judgementDir = "../../../data/" + person_type + "/" + action_type + "/" + name + "/judgement.json";
             String rawJsonData = File.ReadAllText(judgementDir);
             List<String> goals = new List<String>();
-            List<int> judgement = JsonConvert.DeserializeObject<List<int>>(rawJsonData);
+            this.judgement = JsonConvert.DeserializeObject<List<double>>(rawJsonData);
             
-            foreach (int i in judgement)
+            foreach (double i in judgement)
             {
                 Console.WriteLine(i);
             }
 
             if(action_type == "smash")
             {
-                goals.Add("手肘抬高");
                 goals.Add("側身");
+                goals.Add("手肘抬高");
                 goals.Add("手肘轉向前");
                 goals.Add("手腕發力");
                 goals.Add("收拍");
@@ -399,7 +402,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             {
                 goals.Add("重心腳在右腳");
                 goals.Add("重心轉移到左腳");
-                goals.Add("左手放球");
+                //goals.Add("左手放球");
                 goals.Add("轉腰");
                 goals.Add("手腕發力");
                 goals.Add("肩膀向前");
@@ -407,7 +410,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             else if(action_type == "lob")
             {
                 goals.Add("持拍立腕");
-                goals.Add("手腕轉動");
+                //goals.Add("手腕轉動");
                 goals.Add("右腳跨步");
                 goals.Add("腳跟著地");
                 goals.Add("拇指發力上勾");

@@ -50,12 +50,14 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private double hipWidthWhenBalanceChange = 0;
         
         private double headNeckDiff = 0;
-        private List<int> result;
+        private List<double> result;
+        private int videoCount = 0;
 
-        public ServeMonitor(List<Frames> frameList)
+        public ServeMonitor(List<Frames> frameList, int videoCount)
         {
             this.FrameList = frameList;
-            this.result = new List<int>();
+            this.result = new List<double>();
+            this.videoCount = videoCount;
         }
         public void start()
         {
@@ -67,7 +69,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             nowFrame = CheckWristForward(nowFrame);
             nowFrame = CheckElbowEnded(nowFrame);
         }
-        public List<int> GetResult()
+        public List<double> GetResult()
         {
             return this.result;
         }
@@ -137,7 +139,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     if(Math.Abs(hipAngleRightHorAngle - 90) < Math.Abs(hipAngleLeftHorAngle - 90) - 5)
                     {
                         Console.WriteLine(i + " Balance right");
-                        this.result.Add(i);
+                        this.result.Add(i / this.videoCount);
                         return i;
                     }
                 }
@@ -147,7 +149,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     {
                         Console.WriteLine(i + " Balance left");
                         this.hipWidthWhenBalanceChange = hipRight.x - hipLeft.x;
-                        this.result.Add(i);
+                        this.result.Add(i / this.videoCount);
                         return i;
                     }
                 }
@@ -176,7 +178,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 if(hipWidth < this.hipWidthWhenBalanceChange / 3 * 2)
                 {
                     Console.WriteLine(i + " Twist waist");
-                    this.result.Add(i);
+                    this.result.Add(i / this.videoCount);
                     return i;
                 }
             }
@@ -184,8 +186,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         }
         private int CheckWristForward(int nowFrame)
         {
-            double nowResult = 0;
-            double prevResult = 0;
+            int nowResult = 0;
+            int prevResult = 0;
             for (int i = nowFrame; i < this.FrameList.Count; i++)
             {
                 JointCoord handTipRight = new JointCoord(0, 0, 0);
@@ -205,7 +207,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 if (nowResult * prevResult < 0)
                 {
                     Console.WriteLine(i + " Wrist forward");
-                    this.result.Add(i);
+                    this.result.Add(i / this.videoCount);
                     return i;
                 }
                 prevResult = nowResult;
@@ -234,14 +236,14 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 if(handSpineZDiff < 0)
                 {
                     Console.WriteLine(i + " Elbow ended");
-                    this.result.Add(i);
+                    this.result.Add(i / this.videoCount);
                     return i;
                 }
             }
             return this.FrameList.Count;
         }
 
-        private double CheckSide(JointCoord lineCoord1, JointCoord lineCoord2, JointCoord checkPoint)
+        private int CheckSide(JointCoord lineCoord1, JointCoord lineCoord2, JointCoord checkPoint)
         {
             double a = (lineCoord2.y - lineCoord1.y) / (lineCoord2.x - lineCoord1.x);
             double b = lineCoord1.y - a * lineCoord1.x;

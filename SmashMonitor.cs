@@ -15,26 +15,28 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private double initRightShoulderElbowDiff = 0;
         private double headNeckDiff = 0;
         private double elbowSpineMaxDiff = 0;
-        private List<int> result;
+        private List<double> result;
+        private int videoCount = 0;
 
-        public SmashMonitor(List<Frames> frameList)
+        public SmashMonitor(List<Frames> frameList, int videoCount)
         {
             this.FrameList = frameList;
-            this.result = new List<int>();
+            this.result = new List<double>();
+            this.videoCount = videoCount;
         }
 
         public void start()
         {
             GenerateCompareData();
             int nowFrame = 0;
-            nowFrame = CheckSide();
+            nowFrame = CheckSide(nowFrame);
             nowFrame = CheckElbowUp(nowFrame);
             nowFrame = CheckElbowForward(nowFrame);
             nowFrame = CheckWristForward(nowFrame);
             nowFrame = CheckElbowEnded(nowFrame);
         }
 
-        public List<int> GetResult()
+        public List<double> GetResult()
         {
             return this.result;
         }
@@ -90,13 +92,13 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             headNeckDiff /= 10;
         }
 
-        private int CheckSide()
+        private int CheckSide(int nowFrame)
         {
-            foreach (Frames Frame in this.FrameList)
+            for (int i = nowFrame; i < this.FrameList.Count; i++)
             {
                 double hipRight = 0;
                 double hipLeft = 0;
-                foreach (Joints joint in Frame.jointList)
+                foreach (Joints joint in this.FrameList[i].jointList)
                 {
                     if (string.Compare(joint.jointType, "HipRight") == 0)
                         hipRight = joint.x;
@@ -106,9 +108,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 //Console.WriteLine(Frame.num + ": " + Math.Abs(hipRight - hipLeft));
                 if (Math.Abs(hipRight - hipLeft) < hipMaxDiff * 0.7 && Math.Abs(hipRight - hipLeft) != 0)
                 {
-                    Console.WriteLine(Frame.num + " Side");
-                    this.result.Add(Frame.num);
-                    return Frame.num;
+                    return Record(i, "Check side");
                 }
             }
             return this.FrameList.Count;
@@ -128,9 +128,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 }
                 if (Math.Abs(elbowRight - shoulderRight) < initRightShoulderElbowDiff / 6)
                 {
-                    Console.WriteLine(i + " Elbow up");
-                    this.result.Add(i);
-                    return i;
+                    return Record(i, "Elbow up");
                 }
             }
             return this.FrameList.Count;
@@ -152,9 +150,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 nowRightElbowShoulderDiff = elbowRight - shoulderRight;
                 if (nowRightElbowShoulderDiff * prevRightElbowShoulderDiff < 0)
                 {
-                    Console.WriteLine(i + " Elbow forward");
-                    this.result.Add(i);
-                    return i;
+                    return Record(i, "Elbow forward");
                 }
                 prevRightElbowShoulderDiff = nowRightElbowShoulderDiff;
             }
@@ -177,9 +173,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 nowHandtipWristDiff = handTipRight - wristRight;
                 if (prevHandtipWristDiff - nowHandtipWristDiff > this.headNeckDiff / 3 && prevHandtipWristDiff != 0)
                 {
-                    Console.WriteLine(i + " Wrist forward");
-                    this.result.Add(i);
-                    return i;
+                    return Record(i, "Wrist forward");
                 }
                 prevHandtipWristDiff = nowHandtipWristDiff;
             }
@@ -202,13 +196,18 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 double elbowSpineDiff = Math.Abs(elbowRight - spineMid);
                 if (elbowSpineDiff < elbowSpineMaxDiff / 6)
                 {
-                    Console.WriteLine(i + " Elbow ended");
-                    this.result.Add(i);
-                    return i;
+                    return Record(i, "Elbow ended");
                 }
 
             }
             return this.FrameList.Count;
+        }
+        
+        private int Record(int i, String criticalPoint)
+        {
+            Console.WriteLine(i + " " + criticalPoint);
+            this.result.Add((double)i / this.videoCount);
+            return i;
         }
     }
 }
