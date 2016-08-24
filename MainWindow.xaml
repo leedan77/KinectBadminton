@@ -86,7 +86,7 @@
                     <RowDefinition Height="50"/>
                     <RowDefinition Height="50"/>
                 </Grid.RowDefinitions>
-                <Button Style="{StaticResource MyButtonStyle}" Grid.Row="0" Margin="5, 0" Background="#001C70" MouseDown="MediaPlay_left_MouseDown">
+                <Button Style="{StaticResource MyButtonStyle}" Grid.Row="0" Margin="5, 0" Background="#001C70" MouseDown="MediaPlay_left_MouseDown" Click="Button_Click">
                     <MediaElement x:Name="MediaPlayer_left" Grid.Row="0" LoadedBehavior="Manual" HorizontalAlignment="Center" MediaOpened="MediaLeftOpened" MediaEnded="MediaEnded"/>
                 </Button>
                 <Viewbox Grid.Row="1" Height="40" HorizontalAlignment="Left">

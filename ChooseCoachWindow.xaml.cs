@@ -57,17 +57,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             set
             {
                 dataType = value;
-                //Console.WriteLine(MenuType);
-                ////dirInfo = new DirectoryInfo(cur + coachDataPath + coachDataType);
-                //dirInfo = new DirectoryInfo(cur + this.MenuType);
-                //fileInfo = dirInfo.GetFiles("*.avi*");
-                ////fileInfo = dirInfo.GetFiles("*.json*");
-                //list = new ArrayList();
-                //foreach (FileInfo f in fileInfo)
-                //{
-                //    list.Add(f.Name.Remove(f.Name.Length - ".json".Length));
-                //}
-                //CoachListBox.ItemsSource = list;
             }
         }
 
@@ -78,17 +67,15 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             this.MenuType = type;         
            
         }
-
-      
-
+        
         private void CoachListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             var parent = this.Owner as MainWindow;
             string selectedItem = CoachListBox.SelectedItem.ToString();
             if (this.menuType == "coach") 
-                parent.CoachFileName = selectedItem;
+                parent.RightVideoChoosen(selectedItem);
             else if(this.menuType == "student")
-                parent.StudentFileName = selectedItem;
+                parent.LeftVideoChoosen(selectedItem);
             parent.LoadJudgement(selectedItem, action_type, menuType);
             this.Close();
         }
