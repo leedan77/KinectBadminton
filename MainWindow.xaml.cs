@@ -51,7 +51,10 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private List<double> judgement;
 
-        public string StudentFileName
+        private double rightVideoDuration = 0;
+        private double leftVideoDuration = 0;
+
+        private string StudentFileName
         {
             get
             {
@@ -68,7 +71,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         }
 
         private string coachFileName;
-        public string CoachFileName
+        private string CoachFileName
         {
             get
             {
@@ -97,22 +100,13 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             _timer.Interval = TimeSpan.FromMilliseconds(16);
             _timer.Tick += new EventHandler(ticktock);
             _timer.Start();
-            
-
-            /*if(string.Compare(this.type, "smash") == 0)
-            {
-                smashMonitor = new SmashMonitor();
-                smashMonitor.start();
-            }
-            else if(string.Compare(this.type, "serve") == 0)
-            {
-                serveMonitor = new ServeMonitor();
-                serveMonitor.start();
-            }*/
 
             this.action_type = "lob";
             this.student_color_or_body = "color";
             this.coach_color_or_body = "color";
+
+            MediaPlayer_left.ScrubbingEnabled = true;
+            MediaPlayer_right.ScrubbingEnabled = true;
         }
 
         void ticktock(object sender, EventArgs e)
@@ -252,6 +246,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         {
             LeftTimelineSlider.Minimum = 0;
             LeftTimelineSlider.Maximum = MediaPlayer_left.NaturalDuration.TimeSpan.TotalMilliseconds;
+            this.leftVideoDuration = MediaPlayer_left.NaturalDuration.TimeSpan.TotalMilliseconds;
             //LeftTimelineSlider.Ticks = 
         }
 
@@ -259,7 +254,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         {
             RightTimelineSlider.Minimum = 0;
             RightTimelineSlider.Maximum = MediaPlayer_right.NaturalDuration.TimeSpan.TotalMilliseconds;
-       
+            this.rightVideoDuration = MediaPlayer_right.NaturalDuration.TimeSpan.TotalMilliseconds;
         }
 
 
@@ -307,18 +302,10 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         void teacher_Button_Click(object sender, RoutedEventArgs e)
         {
-            double videoDuration = MediaPlayer_right.NaturalDuration.TimeSpan.TotalMilliseconds;
-            Console.WriteLine(string.Format("You clicked on the {0}. teacher_button.", (sender as Button).Tag));
-            if (rightIsPlaying)
-            {
-                double positionInMillisecond = videoDuration * this.judgement[(int)(sender as Button).Tag-1];
-                MediaPlayer_right.Pause();
-                MediaPlayer_right.Position = new TimeSpan(0, 0, 0, (int)positionInMillisecond);
-                if (!rightPausing)
-                {
-                    MediaPlayer_right.Play();
-                }
-            }
+            MediaPlayer_right.Pause();
+            double positionInMillisecond = this.rightVideoDuration * this.judgement[(int)(sender as Button).Tag - 1];
+            Console.WriteLine(positionInMillisecond);
+            MediaPlayer_right.Position = new TimeSpan(0, 0, 0, 0, (int)positionInMillisecond);
         }
 
         private void student_Click(object sender, RoutedEventArgs e)
@@ -376,6 +363,18 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
                 
             }
+        }
+
+        public void RightVideoChoosen(String selectedItem)
+        {
+            //this.rightVideoDuration = MediaPlayer_right.NaturalDuration.TimeSpan.TotalMilliseconds;
+            this.CoachFileName = selectedItem;
+        }
+
+        public void LeftVideoChoosen(String selectedItem)
+        {
+            //this.leftVideoDuration = MediaPlayer_left.NaturalDuration.TimeSpan.TotalMilliseconds;
+            this.StudentFileName = selectedItem;
         }
 
         public void LoadJudgement(String name, String action_type, String person_type)
@@ -541,19 +540,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             {
                 this.leftPausing = false; //useless
                 this.leftUpdateState();
-                //Microsoft.Win32.OpenFileDialog dialog = new Microsoft.Win32.OpenFileDialog();
-                //dialog.FileName = "Videos"; // Default file name
-                //dialog.DefaultExt = ".WMV"; // Default file extension
-                //dialog.Filter = "AVI文件|*.avi|所有文件|*.*"; // Filter files by extension 
-
-                //// Show open file dialog box
-                //Nullable<bool> result = dialog.ShowDialog();
-
-                //// Process open file dialog box results 
-                //if (result == true)
-                //{
-                //    MediaPlayer_left.Source = new Uri(dialog.FileName);
-                //}
             }
             else
             {
@@ -573,7 +559,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private void StopRightButton_Click(object sender, RoutedEventArgs e)
         {
             MediaPlayer_right.Stop();
-            MediaPlayer_right.Close();
+            //MediaPlayer_right.Close();
             MediaPlayer_right.Position = new TimeSpan(0, 0, 0, 0, 0);
             this.rightIsPlaying = false;
             this.rightPausing = false;
@@ -587,19 +573,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             {
                 this.rightPausing = false; //useless
                 this.rightUpdateState();
-                //Microsoft.Win32.OpenFileDialog dialog = new Microsoft.Win32.OpenFileDialog();
-                //dialog.FileName = "Videos"; // Default file name
-                //dialog.DefaultExt = ".WMV"; // Default file extension
-                //dialog.Filter = "AVI文件|*.avi|所有文件|*.*"; // Filter files by extension 
-
-                //// Show open file dialog box
-                //Nullable<bool> result = dialog.ShowDialog();
-
-                //// Process open file dialog box results 
-                //if (result == true)
-                //{
-                //    MediaPlayer_right.Source = new Uri(dialog.FileName);
-                //}
             }
             else
             {
@@ -758,6 +731,11 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         {
             me.Source = new Uri(path);
             me.Stop();
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }
