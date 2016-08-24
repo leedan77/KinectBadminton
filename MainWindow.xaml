@@ -121,7 +121,7 @@
                                 TickPlacement="BottomRight"
                                 AutoToolTipPlacement="BottomRight"
                                 AutoToolTipPrecision="2"
-                                IsSnapToTickEnabled="True"/>
+                                />
                     </StackPanel>
                 </Grid>
                 <Grid Grid.Row="1" Grid.Column="1" Margin="30 0 30 0">
@@ -155,7 +155,7 @@
                                 TickPlacement="BottomRight"
                                 AutoToolTipPlacement="BottomRight"
                                 AutoToolTipPrecision="2"
-                                IsSnapToTickEnabled="True"/>
+                                />
                     </StackPanel>
                 </Grid>
                 <Border Grid.Row="0" Grid.RowSpan="2" Grid.Column="2" BorderBrush="#2a4357" BorderThickness="10, 0, 0, 0" Margin="-10, 0, 0, 0"></Border>

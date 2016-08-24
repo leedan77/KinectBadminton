@@ -657,6 +657,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private void ActionSwitch_Click(object sender, RoutedEventArgs e)
         {
+            clearUserBtns();
             if (lobRadio.IsChecked == true)
             {
                 action_type = "lob";
@@ -664,6 +665,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 if(File.Exists(path))
                 {
                     Console.WriteLine("file exist");
+                    Console.WriteLine(path);
                     resetUri(MediaPlayer_right, path);
                     LoadJudgement(CoachFileName, action_type, "coach");
                     releaseMediaElement(MediaPlayer_left);
@@ -673,6 +675,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     Console.WriteLine("file not exist");
                     releaseMediaElement(MediaPlayer_left);
                     releaseMediaElement(MediaPlayer_right);
+                    clearCoachBtns();
+                    
                 }
             }
             else if (serveRadio.IsChecked == true)
@@ -691,6 +695,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     Console.WriteLine("file not exist");
                     releaseMediaElement(MediaPlayer_left);
                     releaseMediaElement(MediaPlayer_right);
+                    clearCoachBtns();
+                   
                 }
             }
             else if (smashRadio.IsChecked == true)
@@ -709,6 +715,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     Console.WriteLine("file not exist");
                     releaseMediaElement(MediaPlayer_left);
                     releaseMediaElement(MediaPlayer_right);
+                    clearCoachBtns();
+                    
                 }
             }
         }
@@ -723,6 +731,29 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         {
             me.Close();
             me.Source = null; 
+        }
+        
+        private void clearCoachBtns()
+        {
+            grid11.Children.Clear();
+            grid12.Children.Clear();
+            grid13.Children.Clear();
+            grid14.Children.Clear();
+            grid15.Children.Clear();
+        }
+
+        private void clearUserBtns()
+        {
+            image1.Source = null;
+            image2.Source = null;
+            image3.Source = null;
+            image4.Source = null;
+            image5.Source = null;
+            grid1.Children.Clear();
+            grid2.Children.Clear();
+            grid3.Children.Clear();
+            grid4.Children.Clear();
+            grid5.Children.Clear();
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
