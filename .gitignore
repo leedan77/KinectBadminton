@@ -309,5 +309,5 @@ $RECYCLE.BIN/
 
 
 # Videos
-*.avi
+data/
 *.psd

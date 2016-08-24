@@ -440,11 +440,11 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             }
 
             // Update the UI after the convert playback task has completed
-            makeVideo("body", personName);
+            int videoCount = makeVideo("body", personName);
             this.converting = false;
             this.kinectBodyView.converting = false;
             //this.kinectBodyView.SaveData(personName);
-            this.kinectBodyView.Judge(personName, this.idenity);
+            this.kinectBodyView.Judge(personName, this.idenity, videoCount);
             this.kinectBodyView.Dispose();
             this.Dispatcher.BeginInvoke(new NoArgDelegate(UpdateState));
         }
@@ -503,9 +503,10 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             return fileName;
         }
 
-        private void makeVideo(string video_type, string personName)
+        private int makeVideo(string video_type, string personName)
         {
             List<Image<Bgr, byte>> Video = new List<Image<Bgr, byte>>();
+            int videoCount;
             if (string.Compare(video_type, "body") == 0)
             {
                 Video = this.kinectBodyView.Video;
@@ -513,6 +514,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             }
             else if(string.Compare(video_type, "color") == 0)
                 Video = this.kinectColorView.Video;
+            videoCount = Video.Count;
             Console.WriteLine(Video.Count);
             string path = @"..\..\..\data\" + this.idenity + @"\" + this.motion + @"\" + personName + @"\";
             Directory.CreateDirectory(path);
@@ -529,6 +531,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             else if (string.Compare(video_type, "color") == 0)
                 this.kinectColorView.Video.Clear();
             Video.Clear();
+            return videoCount;
         }
 
         private void Grid_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
