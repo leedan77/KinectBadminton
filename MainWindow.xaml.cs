@@ -365,12 +365,34 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             {
                 if (grid11.Children.Count != 0)
                 {
-                    grid11.Children.Remove((Button)grid11.Children[0]);
-                    grid12.Children.Remove((Button)grid12.Children[0]);
-                    grid13.Children.Remove((Button)grid13.Children[0]);
-                    grid14.Children.Remove((Button)grid14.Children[0]);
-                    grid15.Children.Remove((Button)grid15.Children[0]);
+                    //grid11.Children.Remove((Button)grid11.Children[0]);
+                    //grid12.Children.Remove((Button)grid12.Children[0]);
+                    //grid13.Children.Remove((Button)grid13.Children[0]);
+                    //grid14.Children.Remove((Button)grid14.Children[0]);
+                    //grid15.Children.Remove((Button)grid15.Children[0]);
+                    grid11.Children.Clear();
+                    grid12.Children.Clear();
+                    grid13.Children.Clear();
+                    grid14.Children.Clear();
+                    grid15.Children.Clear();
+
                 }
+                //if (grid12.Children.Count != 0)
+                //{
+
+                //}
+                //else if (grid11.Children.Count != 0)
+                //{
+
+                //}
+                //else if (grid11.Children.Count != 0)
+                //{
+
+                //}
+                //else if ()
+                   
+                    
+                
                 textBlock2.Text = name;
                 for (int i = 0; i < goals.Count; ++i)
                 {
@@ -663,40 +685,55 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             if (lobRadio.IsChecked == true)
             {
                 action_type = "lob";
-                string path = cur + dataBasePath + $"\\student\\{action_type}\\{StudentFileName}\\{student_color_or_body}.avi";
+                string path = cur + dataBasePath + $"\\coach\\{action_type}\\{CoachFileName}\\{coach_color_or_body}.avi";
                 if(File.Exists(path))
                 {
                     Console.WriteLine("file exist");
+                    resetUri(MediaPlayer_right, path);
+                    LoadJudgement(CoachFileName, action_type, "coach");
+                    MediaPlayer_left.Close();
                 } 
                 else
                 {
                     Console.WriteLine("file not exist");
+                    MediaPlayer_right.Close();
+                    MediaPlayer_left.Close();
                 }
             }
             else if (serveRadio.IsChecked == true)
             {
                 action_type = "serve";
-                string path = cur + dataBasePath + $"\\student\\{action_type}\\{StudentFileName}\\{student_color_or_body}.avi";
+                string path = cur + dataBasePath + $"\\coach\\{action_type}\\{CoachFileName}\\{coach_color_or_body}.avi";
                 if (File.Exists(path))
                 {
                     Console.WriteLine("file exist");
+                    resetUri(MediaPlayer_right, path);
+                    LoadJudgement(CoachFileName, action_type, "coach");
+                    MediaPlayer_left.Close();
                 }
                 else
                 {
                     Console.WriteLine("file not exist");
+                    MediaPlayer_right.Close();
+                    MediaPlayer_left.Close();
                 }
             }
             else if (smashRadio.IsChecked == true)
             {
                 action_type = "smash";
-                string path = cur + dataBasePath + $"\\student\\{action_type}\\{StudentFileName}\\{student_color_or_body}.avi";
+                string path = cur + dataBasePath + $"\\coach\\{action_type}\\{CoachFileName}\\{coach_color_or_body}.avi";
                 if (File.Exists(path))
                 {
                     Console.WriteLine("file exist");
+                    resetUri(MediaPlayer_right, path);
+                    LoadJudgement(CoachFileName, action_type, "coach");
+                    MediaPlayer_left.Close();
                 }
                 else
                 {
                     Console.WriteLine("file not exist");
+                    MediaPlayer_right.Close();
+                    MediaPlayer_left.Close();
                 }
             }
         }
