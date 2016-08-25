@@ -98,9 +98,9 @@
     <Compile Include="MenuWindow.xaml.cs">
       <DependentUpon>MenuWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="LobMonitor.cs" />
-    <Compile Include="ServeMonitor.cs" />
-    <Compile Include="SmashMonitor.cs" />
+    <Compile Include="Monitors\LobMonitor.cs" />
+    <Compile Include="Monitors\ServeMonitor.cs" />
+    <Compile Include="Monitors\SmashMonitor.cs" />
     <Compile Include="VideoConverter.cs" />
     <Page Include="MenuWindow.xaml">
       <SubType>Designer</SubType>
