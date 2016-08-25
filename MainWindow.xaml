@@ -87,7 +87,11 @@
                         <RowDefinition Height="50"/>
                     </Grid.RowDefinitions>
                     <Button Style="{StaticResource MyButtonStyle}" Grid.Row="0" Margin="5, 0" Background="#3a475b" MouseDown="MediaPlay_left_MouseDown" Click="Button_Click">
-                        <MediaElement x:Name="MediaPlayer_left" Grid.Row="0" LoadedBehavior="Manual" HorizontalAlignment="Center" MediaOpened="MediaLeftOpened" MediaEnded="MediaEnded"/>
+                        <MediaElement x:Name="MediaPlayer_left" Grid.Row="0" LoadedBehavior="Manual" HorizontalAlignment="Center" MediaOpened="MediaLeftOpened" MediaEnded="MediaEnded" RenderTransformOrigin="0.5,0.5">
+                            <MediaElement.RenderTransform>
+                                <ScaleTransform ScaleX="-1"/>
+                            </MediaElement.RenderTransform>
+                        </MediaElement>
                     </Button>
                     <Viewbox Grid.Row="1" Height="40" HorizontalAlignment="Left">
                         <RadioButton x:Name="lobRadio" GroupName="action" Grid.Row="0" HorizontalAlignment="Center" Margin="5, 10, 0, 10" IsChecked="True" Click="ActionSwitch_Click" Content="挑球"/>
@@ -130,7 +134,11 @@
                         <RowDefinition Height="50"/>
                     </Grid.RowDefinitions>
                     <Button Style="{StaticResource MyButtonStyle}" Grid.Row="0" Margin="5, 0" Background="#3a475b" MouseDown="MediaPlayer_right_MouseRightButtonDown" >
-                        <MediaElement x:Name="MediaPlayer_right" Grid.Row="0" LoadedBehavior="Manual" HorizontalAlignment="Center" MediaOpened="MediaRightOpened" MediaEnded="MediaEnded"/>
+                        <MediaElement x:Name="MediaPlayer_right" Grid.Row="0" LoadedBehavior="Manual" HorizontalAlignment="Center" MediaOpened="MediaRightOpened" MediaEnded="MediaEnded" RenderTransformOrigin="0.5,0.5">
+                            <MediaElement.RenderTransform>
+                                <ScaleTransform ScaleX="-1"/>
+                            </MediaElement.RenderTransform>
+                        </MediaElement>
                     </Button>
                     <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
                         <Image x:Name="MenuRightButton" Source="Images/menu.png" Height="30" MouseLeftButtonDown="MenuRightButton_MouseLeftButtonDown"></Image>

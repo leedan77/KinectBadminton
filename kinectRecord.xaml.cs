@@ -99,13 +99,14 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
             //new add
             // create the Color visualizer
-
+            this.kinectBodyView = new KinectBodyView(this.kinectSensor, this.motion);
             // set data context for display in UI
             //left
             this.DataContext = this;
             //this.kinectIRViewbox.DataContext = this.kinectIRView;
             //this.kinectDepthViewbox.DataContext = this.kinectDepthView;
             //this.kinectBodyIndexViewbox.DataContext = this.kinectBodyIndexView;
+            this.kinectViewbox.DataContext = this.kinectBodyView;
         }
 
         /// <summary>
@@ -276,7 +277,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 //streamCollection.Add(KStudioEventStreamDataTypeIds.BodyIndex);
 
                 //new add
-                streamCollection.Add(KStudioEventStreamDataTypeIds.CompressedColor);
+                streamCollection.Add(KStudioEventStreamDataTypeIds.UncompressedColor);
 
                 // Create the recording object
                 using (KStudioRecording recording = client.CreateRecording(filePath, streamCollection))
