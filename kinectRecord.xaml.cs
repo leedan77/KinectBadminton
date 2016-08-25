@@ -96,17 +96,18 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                                                             : Properties.Resources.NoSensorStatusText;
 
             // create the Body visualizer
-
+            this.kinectBodyView = new KinectBodyView(this.kinectSensor, this.motion);
             //new add
             // create the Color visualizer
-            this.kinectBodyView = new KinectBodyView(this.kinectSensor, this.motion);
+            this.kinectColorView = new KinectColorView(this.kinectSensor);
             // set data context for display in UI
             //left
             this.DataContext = this;
             //this.kinectIRViewbox.DataContext = this.kinectIRView;
             //this.kinectDepthViewbox.DataContext = this.kinectDepthView;
             //this.kinectBodyIndexViewbox.DataContext = this.kinectBodyIndexView;
-            this.kinectViewbox.DataContext = this.kinectBodyView;
+            this.kinectColorbox.DataContext = this.kinectColorView;
+            this.kinectBodybox.DataContext = this.kinectBodyView;
         }
 
         /// <summary>
@@ -372,7 +373,10 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     }
                     else
                     {
-                        Directory.CreateDirectory(filePath);
+                        //Directory.CreateDirectory(filePath);
+                        SaveFileDialog dlg = new SaveFileDialog();
+                        dlg.FileName = filePath+"\\"+folderName+".xef";
+                        fileName = dlg.FileName;
                     }
                 }
             }
@@ -382,6 +386,12 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private void BodyConvertButton_Click(object sender, RoutedEventArgs e)
         {
+            this.kinectBodyView.Dispose();
+            this.kinectColorView.Dispose();
+            this.kinectBodyView = null;
+            this.kinectColorView = null;
+            this.kinectBodybox.DataContext = null;
+            this.kinectColorbox.DataContext = null;
             this.kinectBodyView = new KinectBodyView(this.kinectSensor, this.motion);
             string filePath = this.OpenFileForConvert();
             ConvertFilePath = filePath;
@@ -391,7 +401,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 this.converting = true;
                 
                 this.kinectBodyView.converting = true;
-                this.kinectViewbox.DataContext = this.kinectBodyView;
+                this.kinectBodybox.DataContext = this.kinectBodyView;
                 TwoArgDelegate bodyConvert = new TwoArgDelegate(this.BodyConvertClip);
                 bodyConvert.BeginInvoke(filePath, nameBox.Text, null, null);
             }
@@ -399,6 +409,12 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private void ColorConvertButton_Click(object sender, RoutedEventArgs e)
         {
+            this.kinectBodyView.Dispose();
+            this.kinectColorView.Dispose();
+            this.kinectBodyView = null;
+            this.kinectColorView = null;
+            this.kinectBodybox.DataContext = null;
+            this.kinectColorbox.DataContext = null;
             this.kinectColorView = new KinectColorView(this.kinectSensor);
             string filePath = this.OpenFileForConvert();
             ConvertFilePath = filePath;
@@ -408,7 +424,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 this.converting = true;
                 
                 this.kinectColorView.converting = true;
-                this.kinectViewbox.DataContext = this.kinectColorView;
+                this.kinectColorbox.DataContext = this.kinectColorView;
                 TwoArgDelegate bodyConvert = new TwoArgDelegate(this.ColorConvertClip);
                 bodyConvert.BeginInvoke(filePath, nameBox.Text, null, null);
             }
