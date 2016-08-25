@@ -385,6 +385,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         {
             this.kinectBodyView.Dispose();
             this.kinectColorView.Dispose();
+            this.kinectBodyView = null;
+            this.kinectColorView = null;
             this.kinectBodybox.DataContext = null;
             this.kinectColorbox.DataContext = null;
             this.kinectBodyView = new KinectBodyView(this.kinectSensor, this.motion);
@@ -406,6 +408,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         {
             this.kinectBodyView.Dispose();
             this.kinectColorView.Dispose();
+            this.kinectBodyView = null;
+            this.kinectColorView = null;
             this.kinectBodybox.DataContext = null;
             this.kinectColorbox.DataContext = null;
             this.kinectColorView = new KinectColorView(this.kinectSensor);
