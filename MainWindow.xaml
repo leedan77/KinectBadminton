@@ -101,10 +101,8 @@
                     <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
 
                         <Image x:Name="MenuLeftButton" Source="Images/menu.png" Height="30" MouseLeftButtonDown="MenuLeftButton_MouseLeftButtonDown"></Image>
-
-                        <Button x:Name="PlayLeftButton" Content="Play" Width="70" Click="PlayLeftButton_Click" Margin="10" Padding="5" />
-                        <Button x:Name="PauseLeftButton" Content="Pause" Width="70" Click="PauseLeftButton_Click" Margin="10" Padding="5" IsEnabled="False"/>
-                        <Button x:Name="StopLeftButton" Content="Stop" Width="70" Click="StopLeftButton_Click" Margin="10" Padding="5"/>
+                        <Image x:Name="PlayPauseLeftButton" Source="Images/play-circle.png" Width="50" MouseLeftButtonDown="PlayPauseLeftButton_Click" Margin="8" />
+                        <Image x:Name="StopLeftButton" Source="Images/stop-circle.png"  MouseLeftButtonDown="StopLeftButton_Click" Margin="8" />
                     </StackPanel>
                     <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
                         <TextBlock x:Name="LeftMediaLabel" Text="00:000" Margin="0, 12, 0, 0"/>
@@ -136,9 +134,8 @@
                     </Button>
                     <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
                         <Image x:Name="MenuRightButton" Source="Images/menu.png" Height="30" MouseLeftButtonDown="MenuRightButton_MouseLeftButtonDown"></Image>
-                        <Button x:Name="PlayRightButton" Content="Play" Width="70" Click="PlayRightButton_Click" Margin="10" Padding="5" />
-                        <Button x:Name="PauseRightButton" Content="Pause" Width="70" Click="PauseRightButton_Click" Margin="10" Padding="5" IsEnabled="False"/>
-                        <Button x:Name="StopRightButton" Content="Stop" Width="70" Click="StopRightButton_Click" Margin="10" Padding="5"/>
+                        <Image x:Name="PlayPauseRightButton" Source="Images/play-circle.png" Width="50" MouseLeftButtonDown="PlayPauseRightButton_Click" Margin="8" />
+                        <Image x:Name="StopRightButton" Source="Images/stop-circle.png"  MouseLeftButtonDown="StopRightButton_Click" Margin="8" />
                     </StackPanel>
                     <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
                         <TextBlock x:Name="RightMediaLabel" Text="00:000" Margin="0,12,0, 0" />

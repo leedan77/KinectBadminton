@@ -184,6 +184,11 @@
   <ItemGroup>
     <Resource Include="Images\turtle-128.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\pause-circle.png" />
+    <Resource Include="Images\play-circle.png" />
+    <Resource Include="Images\stop-circle.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

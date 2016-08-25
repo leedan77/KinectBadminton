@@ -131,8 +131,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             LeftTimelineSlider.Minimum = 0;
             LeftTimelineSlider.Maximum = MediaPlayer_left.NaturalDuration.TimeSpan.TotalMilliseconds;
             this.leftVideoDuration = MediaPlayer_left.NaturalDuration.TimeSpan.TotalMilliseconds;
-            Console.WriteLine(leftVideoDuration);
-            //LeftTimelineSlider.Ticks = 
+            PlayPauseLeftButton.IsEnabled = true;
         }
 
         private void MediaRightOpened(object sender, RoutedEventArgs e)
@@ -140,6 +139,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             RightTimelineSlider.Minimum = 0;
             RightTimelineSlider.Maximum = MediaPlayer_right.NaturalDuration.TimeSpan.TotalMilliseconds;
             this.rightVideoDuration = MediaPlayer_right.NaturalDuration.TimeSpan.TotalMilliseconds;
+            PlayPauseRightButton.IsEnabled = true;
         }
         
         private void MediaEnded(object sender, RoutedEventArgs e)
@@ -294,20 +294,14 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             if (this.leftPlaying && !this.leftPausing)
             {
                 this.RecordButton.IsEnabled = false;
-                this.PlayLeftButton.IsEnabled = false;
-                this.PauseLeftButton.IsEnabled = true;
             }
             else if (this.leftPausing)
             {
                 this.RecordButton.IsEnabled = false;
-                this.PlayLeftButton.IsEnabled = true;
-                this.PauseLeftButton.IsEnabled = false;
             }
             else
             {
                 this.RecordButton.IsEnabled = true;
-                this.PlayLeftButton.IsEnabled = true;
-                this.PauseLeftButton.IsEnabled = false;
             }
         }
 
@@ -316,53 +310,34 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             if (this.rightPlaying && !this.rightPausing)
             {
                 this.RecordButton.IsEnabled = false;
-                this.PlayRightButton.IsEnabled = false;
-                this.PauseRightButton.IsEnabled = true;
             }
             else if (this.rightPausing)
             {
                 this.RecordButton.IsEnabled = false;
-                this.PlayRightButton.IsEnabled = true;
-                this.PauseRightButton.IsEnabled = false;
             }
             else
             {
                 this.RecordButton.IsEnabled = true;
-                this.PlayRightButton.IsEnabled = true;
-                this.PauseRightButton.IsEnabled = false;
             }
         }
-
-        private void PlayRightButton_Click(object sender, RoutedEventArgs e)
+        
+        private void PlayPauseRightButton_Click(object sender, RoutedEventArgs e)
         {
-            this.rightPlaying = true;
-            this.rightPausing = false;
+            if (!this.rightPlaying)
+            {
+                this.rightPlaying = true;
+                this.rightPausing = false;
+                MediaPlayer_right.Play();
+                PlayPauseRightButton.Source = new BitmapImage(new Uri(@"Images\pause-circle.png", UriKind.Relative));
+            }
+            else
+            {
+                this.rightPlaying = false;
+                this.rightPausing = true;
+                MediaPlayer_right.Pause();
+                PlayPauseRightButton.Source = new BitmapImage(new Uri(@"Images\play-circle.png", UriKind.Relative));
+            }
             this.rightUpdateState();
-            MediaPlayer_right.Play();
-        }
-
-        private void PlayLeftButton_Click(object sender, RoutedEventArgs e)
-        {
-            this.leftPlaying = true;
-            this.leftPausing = false;
-            this.leftUpdateState();
-            MediaPlayer_left.Play();
-        }
-
-        private void PauseRightButton_Click(object sender, RoutedEventArgs e)
-        {
-            this.rightPlaying = false;
-            this.rightPausing = true;
-            this.rightUpdateState();
-            MediaPlayer_right.Pause();
-        }
-
-        private void PauseLeftButton_Click(object sender, RoutedEventArgs e)
-        {
-            this.leftPlaying = false;
-            this.leftPausing = true;
-            this.leftUpdateState();
-            MediaPlayer_left.Pause();
         }
 
         private void StopRightButton_Click(object sender, RoutedEventArgs e)
@@ -372,6 +347,26 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             this.rightPlaying = false;
             this.rightPausing = false;
             this.rightUpdateState();
+        }
+
+
+        private void PlayPauseLeftButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (!this.leftPlaying)
+            {
+                this.leftPlaying = true;
+                this.leftPausing = false;
+                MediaPlayer_left.Play();
+                PlayPauseLeftButton.Source = new BitmapImage(new Uri(@"Images\pause-circle.png", UriKind.Relative));
+            }
+            else
+            {
+                this.leftPlaying = false;
+                this.leftPausing = true;
+                MediaPlayer_left.Pause();
+                PlayPauseLeftButton.Source = new BitmapImage(new Uri(@"Images\play-circle.png", UriKind.Relative));
+            }
+            this.leftUpdateState();
         }
 
         private void StopLeftButton_Click(object sender, RoutedEventArgs e)
