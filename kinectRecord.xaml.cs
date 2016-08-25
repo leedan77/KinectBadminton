@@ -373,7 +373,10 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     }
                     else
                     {
-                        Directory.CreateDirectory(filePath);
+                        //Directory.CreateDirectory(filePath);
+                        SaveFileDialog dlg = new SaveFileDialog();
+                        dlg.FileName = filePath+"\\"+folderName+".xef";
+                        fileName = dlg.FileName;
                     }
                 }
             }
