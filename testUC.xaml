@@ -1,0 +1,55 @@
+﻿<UserControl x:Class="Microsoft.Samples.Kinect.RecordAndPlaybackBasics.testUC"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Microsoft.Samples.Kinect.RecordAndPlaybackBasics"
+             mc:Ignorable="d" 
+             d:DesignHeight="700" d:DesignWidth="1000"
+            >
+    <Grid Margin="10 0 10 0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Horizontal">
+            <Button x:Name="RecordButton" Width="100" Height="35" Click="RecordButton_Click" Grid.Row="0" HorizontalAlignment="Left" Margin="0, 10, 0, 0">
+                <StackPanel Grid.Row="2" Grid.ColumnSpan="4" Orientation="Horizontal">
+                    <Image Source="Images/record.png" Width="20" Height="20"/>
+                    <TextBlock Text="Record" Padding="5" VerticalAlignment="Center" RenderTransformOrigin="1.755,0.645" />
+                </StackPanel>
+            </Button>
+            <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Horizontal" Margin="30, 10, 0, 0">
+                <RadioButton x:Name="studentRadio" GroupName="idenity" HorizontalAlignment="Center" Margin="0, 10, 50, 10" IsChecked="True" Click="IdentiyButton_Checked">學員</RadioButton>
+                <RadioButton x:Name="coachRadio" GroupName="idenity" HorizontalAlignment="Center" Margin="0, 10, 50, 10" Click="IdentiyButton_Checked">標準</RadioButton>
+            </StackPanel>
+            <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Horizontal" Margin="30, 10, 0, 0">
+                <RadioButton x:Name="serveRadio" GroupName="motion" HorizontalAlignment="Center" Margin="0, 10, 50, 10" IsChecked="True" Click="MotionRadio_Click" Content="發球"/>
+                <RadioButton x:Name="lobRadio" GroupName="motion" HorizontalAlignment="Center" Margin="0, 10, 50, 10" Click="MotionRadio_Click" Content="挑球"/>
+                <RadioButton x:Name="smashRadio" GroupName="motion" HorizontalAlignment="Center" Margin="0, 10, 50, 10" Click="MotionRadio_Click" Content="殺球"/>
+            </StackPanel>
+            <TextBox VerticalAlignment="Center" Margin="10,10,0,0" FontSize="20" Name="nameBox" Width="300">
+                please enter your name here !
+            </TextBox>
+        </StackPanel>
+        <Grid Grid.Row="1" Background="Black" MouseMove="Grid_MouseMove" Margin="0,10,-0.4,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Viewbox x:Name="kinectColorbox" Grid.Column="0" HorizontalAlignment="Center">
+                <Image Source="{Binding ImageSource}" Stretch="UniformToFill" />
+            </Viewbox>
+            <Viewbox x:Name="kinectBodybox" Grid.Column="1" HorizontalAlignment="Center">
+                <Image Source="{Binding ImageSource}" Stretch="UniformToFill" />
+            </Viewbox>
+        </Grid>
+        <StackPanel Grid.Row="2" Grid.ColumnSpan="4" Orientation="Horizontal" Background="White">
+            <Button x:Name="RecordStopButton" Content="Stop" Width="100" Click="RecordStopButton_Click" Margin="10" Padding="5" IsEnabled="False"/>
+            <Button x:Name="BodyConvertButton" Content="Convert body" Width="100" Click="BodyConvertButton_Click" Margin="10" Padding="5" />
+            <Button x:Name="ColorConvertButton" Content="Convert color" Width="100" Click="ColorConvertButton_Click" Margin="10" Padding="5" />
+            <Button x:Name="ResetButton" Content="Reset_angle" Width="100" Click="ResetButton_Click" Margin="10" Padding="5" />
+        </StackPanel>
+    </Grid>
+</UserControl>

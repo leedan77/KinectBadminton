@@ -45,6 +45,10 @@
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Dragablz, Version=0.0.3.169, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\Dragablz.0.0.3.169\lib\net45\Dragablz.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Emgu.CV, Version=2.2.1.1150, Culture=neutral, PublicKeyToken=7281126722ab4438, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>lib\Emgu.CV.dll</HintPath>
@@ -101,6 +105,9 @@
     <Compile Include="Monitors\LobMonitor.cs" />
     <Compile Include="Monitors\ServeMonitor.cs" />
     <Compile Include="Monitors\SmashMonitor.cs" />
+    <Compile Include="testUC.xaml.cs">
+      <DependentUpon>testUC.xaml</DependentUpon>
+    </Compile>
     <Compile Include="VideoConverter.cs" />
     <Page Include="MenuWindow.xaml">
       <SubType>Designer</SubType>
@@ -130,6 +137,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="testUC.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
