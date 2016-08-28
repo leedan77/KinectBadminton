@@ -291,34 +291,34 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
     
         private void leftUpdateState()
         {
-            if (this.leftPlaying && !this.leftPausing)
-            {
-                this.RecordButton.IsEnabled = false;
-            }
-            else if (this.leftPausing)
-            {
-                this.RecordButton.IsEnabled = false;
-            }
-            else
-            {
-                this.RecordButton.IsEnabled = true;
-            }
+            //if (this.leftPlaying && !this.leftPausing)
+            //{
+            //    this.RecordButton.IsEnabled = false;
+            //}
+            //else if (this.leftPausing)
+            //{
+            //    this.RecordButton.IsEnabled = false;
+            //}
+            //else
+            //{
+            //    this.RecordButton.IsEnabled = true;
+            //}
         }
 
         private void rightUpdateState()
         {
-            if (this.rightPlaying && !this.rightPausing)
-            {
-                this.RecordButton.IsEnabled = false;
-            }
-            else if (this.rightPausing)
-            {
-                this.RecordButton.IsEnabled = false;
-            }
-            else
-            {
-                this.RecordButton.IsEnabled = true;
-            }
+            //if (this.rightPlaying && !this.rightPausing)
+            //{
+            //    this.RecordButton.IsEnabled = false;
+            //}
+            //else if (this.rightPausing)
+            //{
+            //    this.RecordButton.IsEnabled = false;
+            //}
+            //else
+            //{
+            //    this.RecordButton.IsEnabled = true;
+            //}
         }
         
         private void PlayPauseRightButton_Click(object sender, RoutedEventArgs e)
@@ -337,7 +337,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 MediaPlayer_right.Pause();
                 PlayPauseRightButton.Source = new BitmapImage(new Uri(@"Images\play-circle.png", UriKind.Relative));
             }
-            this.rightUpdateState();
+            //this.rightUpdateState();
         }
 
         private void StopRightButton_Click(object sender, RoutedEventArgs e)
@@ -346,7 +346,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             MediaPlayer_right.Position = new TimeSpan(0, 0, 0, 0, 0);
             this.rightPlaying = false;
             this.rightPausing = false;
-            this.rightUpdateState();
+            //this.rightUpdateState();
         }
 
 
@@ -366,7 +366,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 MediaPlayer_left.Pause();
                 PlayPauseLeftButton.Source = new BitmapImage(new Uri(@"Images\play-circle.png", UriKind.Relative));
             }
-            this.leftUpdateState();
+            //this.leftUpdateState();
         }
 
         private void StopLeftButton_Click(object sender, RoutedEventArgs e)
@@ -375,7 +375,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             MediaPlayer_left.Position = new TimeSpan(0, 0, 0, 0, 0);
             this.leftPlaying = false;
             this.leftPausing = false;
-            this.leftUpdateState();
+            //this.leftUpdateState();
         }
 
         private void RightTimelineSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -562,6 +562,11 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void MenuUserControl_Loaded(object sender, RoutedEventArgs e)
         {
 
         }
