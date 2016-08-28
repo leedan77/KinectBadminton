@@ -26,7 +26,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
     /// <summary>
     /// testUC.xaml 的互動邏輯
     /// </summary>
-    public partial class MenuUserControl : UserControl
+    public partial class testUC : UserControl
     {
         private double curX;
 
@@ -88,7 +88,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         /// <summary>
         /// Initializes a new instance of the MainWindow class.
         /// </summary>
-        public MenuUserControl()
+        public testUC()
         {
             // initialize the components (controls) of the window
             this.InitializeComponent();

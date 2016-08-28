@@ -105,8 +105,8 @@
     <Compile Include="Monitors\LobMonitor.cs" />
     <Compile Include="Monitors\ServeMonitor.cs" />
     <Compile Include="Monitors\SmashMonitor.cs" />
-    <Compile Include="MenuUserControl.xaml.cs">
-      <DependentUpon>MenuUserControl.xaml</DependentUpon>
+    <Compile Include="testUC.xaml.cs">
+      <DependentUpon>testUC.xaml</DependentUpon>
     </Compile>
     <Compile Include="VideoConverter.cs" />
     <Page Include="MenuWindow.xaml">
@@ -137,7 +137,7 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="MenuUserControl.xaml">
+    <Page Include="testUC.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
