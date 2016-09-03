@@ -45,7 +45,7 @@
             <dragablz:InterTabController />
         </dragablz:TabablzControl.InterTabController>
         <TabItem Header="Record">
-            <local:MenuUserControl Loaded="MenuUserControl_Loaded" />
+            <local:MenuUserControl />
         </TabItem>
 
 

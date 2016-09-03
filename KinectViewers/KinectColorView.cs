@@ -83,7 +83,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         /// Handles the color frame data arriving from the sensor
         /// </summary>
         /// <param name="sender">object sending the event</param>
-        /// <param name="e">event arguments</param>
+        /// <param name="e">event arguments</param>      
         private void Reader_ColorFrameArrived(object sender, ColorFrameArrivedEventArgs e)
         {
             // ColorFrame is IDisposable
@@ -111,7 +111,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                         this.colorBitmap.Unlock();
 
                         if (converting)
-                        {
+                        {                            
                             video_converter.ColorViewToAVI(this.colorBitmap);
                         }
                     }

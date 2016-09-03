@@ -391,6 +391,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             this.kinectBodyView = new KinectBodyView(this.kinectSensor, this.motion);
             string filePath = this.OpenFileForConvert();
             ConvertFilePath = filePath;
+            Console.WriteLine(filePath + "gan");
             if (!string.IsNullOrEmpty(filePath))
             {
                 this.lastFile = filePath;
@@ -400,6 +401,11 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 this.kinectBodybox.DataContext = this.kinectBodyView;
                 TwoArgDelegate bodyConvert = new TwoArgDelegate(this.BodyConvertClip);
                 bodyConvert.BeginInvoke(filePath, nameBox.Text, null, null);
+            }
+            else
+            {
+                this.kinectBodybox.DataContext = this.kinectBodyView;
+                this.kinectColorbox.DataContext = this.kinectColorView;
             }
         }
 
@@ -419,6 +425,11 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 this.kinectColorbox.DataContext = this.kinectColorView;
                 TwoArgDelegate bodyConvert = new TwoArgDelegate(this.ColorConvertClip);
                 bodyConvert.BeginInvoke(filePath, nameBox.Text, null, null);
+            }
+            else
+            {
+                this.kinectBodybox.DataContext = this.kinectBodyView;
+                this.kinectColorbox.DataContext = this.kinectColorView;
             }
         }
 
@@ -455,6 +466,10 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             //this.kinectBodyView.SaveData(personName);
             this.kinectBodyView.Judge(personName, this.idenity, videoCount);
             this.kinectBodyView.Dispose();
+
+            this.kinectBodyView = new KinectBodyView(this.kinectSensor, this.motion);
+            this.kinectBodybox.DataContext = this.kinectBodyView;
+
             this.Dispatcher.BeginInvoke(new NoArgDelegate(UpdateState));
         }
 
@@ -507,6 +522,10 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             {
                 this.ConvertFileName = dlg.SafeFileName;
                 fileName = dlg.FileName;
+            }
+            else
+            {
+                Console.WriteLine("fuck");
             }
 
             return fileName;

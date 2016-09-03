@@ -566,9 +566,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         }
 
-        private void MenuUserControl_Loaded(object sender, RoutedEventArgs e)
-        {
-
-        }
+        
     }
 }
