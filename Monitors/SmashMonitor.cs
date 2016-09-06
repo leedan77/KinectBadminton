@@ -10,18 +10,28 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 {
     class SmashMonitor
     {
+        public struct CriticalPoint
+        {
+            public String name;
+            public double portion;
+            public CriticalPoint(String n, double p)
+            {
+                name = n;
+                portion = p;
+            }
+        }
         private List<Frames> FrameList;
         private double hipMaxDiff = 0;
         private double initRightShoulderElbowDiff = 0;
         private double headNeckDiff = 0;
         private double elbowSpineMaxDiff = 0;
-        private List<double> result;
+        private List<CriticalPoint> result;
         private int videoCount = 0;
 
         public SmashMonitor(List<Frames> frameList, int videoCount)
         {
             this.FrameList = frameList;
-            this.result = new List<double>();
+            this.result = new List<CriticalPoint>();
             this.videoCount = videoCount;
         }
 
@@ -36,7 +46,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             nowFrame = CheckElbowEnded(nowFrame);
         }
 
-        public List<double> GetResult()
+        public List<CriticalPoint> GetResult()
         {
             return this.result;
         }
@@ -108,7 +118,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 //Console.WriteLine(Frame.num + ": " + Math.Abs(hipRight - hipLeft));
                 if (Math.Abs(hipRight - hipLeft) < hipMaxDiff * 0.7 && Math.Abs(hipRight - hipLeft) != 0)
                 {
-                    return Record(i, "Check side");
+                    return Record(i, "側身");
                 }
             }
             return this.FrameList.Count;
@@ -128,7 +138,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 }
                 if (Math.Abs(elbowRight - shoulderRight) < initRightShoulderElbowDiff / 6)
                 {
-                    return Record(i, "Elbow up");
+                    return Record(i, "手肘抬高");
                 }
             }
             return this.FrameList.Count;
@@ -150,7 +160,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 nowRightElbowShoulderDiff = elbowRight - shoulderRight;
                 if (nowRightElbowShoulderDiff * prevRightElbowShoulderDiff < 0)
                 {
-                    return Record(i, "Elbow forward");
+                    return Record(i, "手肘轉向前");
                 }
                 prevRightElbowShoulderDiff = nowRightElbowShoulderDiff;
             }
@@ -173,7 +183,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 nowHandtipWristDiff = handTipRight - wristRight;
                 if (prevHandtipWristDiff - nowHandtipWristDiff > this.headNeckDiff / 3 && prevHandtipWristDiff != 0)
                 {
-                    return Record(i, "Wrist forward");
+                    return Record(i, "手腕發力");
                 }
                 prevHandtipWristDiff = nowHandtipWristDiff;
             }
@@ -196,7 +206,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 double elbowSpineDiff = Math.Abs(elbowRight - spineMid);
                 if (elbowSpineDiff < elbowSpineMaxDiff / 6)
                 {
-                    return Record(i, "Elbow ended");
+                    return Record(i, "收拍");
                 }
 
             }
@@ -206,7 +216,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private int Record(int i, String criticalPoint)
         {
             Console.WriteLine(i + " " + criticalPoint);
-            this.result.Add((double)i / this.videoCount);
+            this.result.Add(new CriticalPoint(criticalPoint, (double)i / this.videoCount));
             return i;
         }
     }

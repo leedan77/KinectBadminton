@@ -83,8 +83,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         /// Handles the color frame data arriving from the sensor
         /// </summary>
         /// <param name="sender">object sending the event</param>
-        /// <param name="e">event arguments</param>      
-        private int fc = 0;
+        /// <param name="e">event arguments</param>
         private void Reader_ColorFrameArrived(object sender, ColorFrameArrivedEventArgs e)
         {
             // ColorFrame is IDisposable

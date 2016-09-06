@@ -8,16 +8,26 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 {
     class LobMonitor
     {
+        public struct CriticalPoint
+        {
+            public String name;
+            public double portion;
+            public CriticalPoint(String n, double p)
+            {
+                name = n;
+                portion = p;
+            }
+        }
         public struct Vector3
         {
             public double x, y, z, d;
 
-            public Vector3(double vx, double vy, double vz)
+            public Vector3(JointCoord point1, JointCoord point2)
             {
-                x = vx;
-                y = vy;
-                z = vz;
-                d = Math.Sqrt(Math.Pow(vx, 2) + Math.Pow(vy, 2) + Math.Pow(vz, 2));
+                x = point1.x - point2.x;
+                y = point1.y - point2.y;
+                z = point1.z - point2.z;
+                d = Math.Sqrt(Math.Pow(x, 2) + Math.Pow(y, 2) + Math.Pow(z, 2));
             }
         }
         public struct JointCoord
@@ -31,7 +41,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             }
         }
         private List<Frames> FrameList;
-        private List<double> result;
+        private List<CriticalPoint> result;
         private double spineShoulderBaseDiff = 0;
         private double initAnkleRightZ = 0;
         private int videoCount = 0;
@@ -39,7 +49,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         public LobMonitor(List<Frames> frameList, int videoCount)
         {
             this.FrameList = frameList;
-            this.result = new List<double>();
+            this.result = new List<CriticalPoint>();
             this.videoCount = videoCount;
         }
 
@@ -50,11 +60,12 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             nowFrame = CheckWristUp(nowFrame);
             //nowFrame = CheckWristTurn(nowFrame);
             nowFrame = CheckStepForward(nowFrame);
-            nowFrame = CheckFootGround(nowFrame);
-            nowFrame = CheckWristForce(nowFrame);
+            //nowFrame = CheckFootGround(nowFrame);
+            //nowFrame = CheckWristForce(nowFrame);
+            nowFrame = CheckFootGroundAndWristForce(nowFrame);
         }
 
-        public List<double> GetResult()
+        public List<CriticalPoint> GetResult()
         {
             return this.result;
         }
@@ -77,7 +88,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     else if (joint.jointType == "AnkleRight")
                         ankleRight = new JointCoord(joint.x, joint.y, joint.z);
                 }
-                Vector3 spineShoulderBaseVec = new Vector3(spineShoulder.x - spineBase.x, spineShoulder.y - spineBase.y, spineShoulder.z - spineBase.z);
+                Vector3 spineShoulderBaseVec = new Vector3(spineShoulder, spineBase);
                 if (spineShoulder.x != 0)
                 {
                     spineShoulderBaseCount++;
@@ -104,7 +115,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 }
                 double thumbHandYDiff = thumbRight.y - handRight.y;
                 if (thumbHandYDiff > 0.01)
-                    return Record(i, "Wrist up");
+                    return Record(i, "持拍立腕");
             }
             return this.FrameList.Count;
         }
@@ -125,15 +136,12 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                         handRight = new JointCoord(joint.x, joint.y, joint.z);
                 }
                 nowThumbHandXDiff = handTipRight.x - handRight.x;
-                Debug(i, nowThumbHandXDiff);
                 if(prevThumbHandXDiff < 0 && nowThumbHandXDiff > 0)
-                    return Record(i, "Wrist turn");
+                    return Record(i, "手腕轉動");
                 prevThumbHandXDiff = nowThumbHandXDiff;
             }
             return this.FrameList.Count;
         }
-
-
 
         private int CheckStepForward(int nowFrame)
         {
@@ -152,59 +160,60 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                         spineBase = new JointCoord(joint.x, joint.y, joint.z);
                 }
                 double stepSpineRatio = (this.initAnkleRightZ - ankleRight.z) / this.spineShoulderBaseDiff;
-                if (stepSpineRatio > 1.5)
-                    return Record(i, "Step forward");
-                //Debug(i, ankleRight.z);
+                if (stepSpineRatio > 1.2)
+                    return Record(i, "右腳跨步");
             }
             return this.FrameList.Count;
         }
 
-        private int CheckFootGround(int nowFrame)
+        private int CheckFootGroundAndWristForce(int nowFrame)
         {
             int steadyCount = 0;
-            double prevFootRightY = 0;
+            JointCoord prevAnkleRight = new JointCoord(0, 0, 0);
+
+            int nowResult = 0;
+            int prevResult = 0;
+
+            bool FootGrounded = false;
+            bool WristForced = false;
             for (int i = nowFrame; i < this.FrameList.Count; i++)
             {
                 JointCoord footRight = new JointCoord(0, 0, 0);
-                foreach (Joints joint in this.FrameList[i].jointList)
-                {
-                    if (joint.jointType == "FootRight")
-                        footRight = new JointCoord(joint.x, joint.y, joint.z);
-                }
-                if (Math.Abs(footRight.y - prevFootRightY) < 0.005)
-                    steadyCount++;
-                else
-                    steadyCount = 0;
-                if (steadyCount >= 10)
-                    return Record(i - 10, "Foot ground");
-                prevFootRightY = footRight.y;
-                //Debug(i, footRight.y);
-            }
-            return this.FrameList.Count;
-        }
-
-        private int CheckWristForce(int nowFrame)
-        {
-            int nowResult = 0;
-            int prevResult = 0;
-            for (int i = nowFrame; i < this.FrameList.Count; i++)
-            {
+                JointCoord ankleRight = new JointCoord(0, 0, 0);
                 JointCoord elbowRight = new JointCoord(0, 0, 0);
                 JointCoord wristRight = new JointCoord(0, 0, 0);
                 JointCoord handTipRight = new JointCoord(0, 0, 0);
                 foreach (Joints joint in this.FrameList[i].jointList)
                 {
-                    if (joint.jointType == "ElbowRight")
+                    if (joint.jointType == "FootRight")
+                        footRight = new JointCoord(joint.x, joint.y, joint.z);
+                    else if (joint.jointType == "AnkleRight")
+                        ankleRight = new JointCoord(joint.x, joint.y, joint.z);
+                    else if (joint.jointType == "ElbowRight")
                         elbowRight = new JointCoord(joint.x, joint.y, joint.z);
                     else if (joint.jointType == "WristRight")
                         wristRight = new JointCoord(joint.x, joint.y, joint.z);
                     else if (joint.jointType == "HandTipRight")
                         handTipRight = new JointCoord(joint.x, joint.y, joint.z);
                 }
+                Vector3 ankleMovement = new Vector3(ankleRight, prevAnkleRight);
+                if (Math.Abs(ankleMovement.d) < 0.01)
+                    steadyCount++;
+                else
+                    steadyCount = 0;
+                if (steadyCount >= 5 && !FootGrounded)
+                {
+                    Record(i - 5, "腳跟著地");
+                    FootGrounded = true;
+                }
+                prevAnkleRight = ankleRight;
+
                 nowResult = CheckSide(wristRight, elbowRight, handTipRight);
-                //Debug(i, nowResult);
-                if (nowResult < 0 && prevResult > 0)
-                    return Record(i, "Wrist force");
+                if (nowResult < 0 && prevResult > 0 && !WristForced)
+                {
+                    Record(i, "手腕發力");
+                    WristForced = true;
+                }
                 prevResult = nowResult;
             }
             return this.FrameList.Count;
@@ -218,7 +227,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private int Record(int i, String criticalPoint)
         {
             Console.WriteLine(i + " " + criticalPoint);
-            this.result.Add((double)i / this.videoCount);
+            this.result.Add(new CriticalPoint(criticalPoint, (double)i / this.videoCount));
             return i;
         }
 

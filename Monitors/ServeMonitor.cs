@@ -10,6 +10,16 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 {
     class ServeMonitor
     {
+        public struct CriticalPoint
+        {
+            public String name;
+            public double portion;
+            public CriticalPoint(String n, double p)
+            {
+                name = n;
+                portion = p;
+            }
+        }
         public struct Vector2
         {
             public double x, y, d;
@@ -50,13 +60,13 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private double hipWidthWhenBalanceChange = 0;
         
         private double headNeckDiff = 0;
-        private List<double> result;
+        private List<CriticalPoint> result;
         private int videoCount = 0;
 
         public ServeMonitor(List<Frames> frameList, int videoCount)
         {
             this.FrameList = frameList;
-            this.result = new List<double>();
+            this.result = new List<CriticalPoint>();
             this.videoCount = videoCount;
         }
         public void start()
@@ -69,7 +79,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             nowFrame = CheckWristForward(nowFrame);
             nowFrame = CheckElbowEnded(nowFrame);
         }
-        public List<double> GetResult()
+        public List<CriticalPoint> GetResult()
         {
             return this.result;
         }
@@ -137,14 +147,14 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 if(string.Compare(side, "right") == 0)
                 {
                     if(Math.Abs(hipAngleRightHorAngle - 90) < Math.Abs(hipAngleLeftHorAngle - 90) - 5)
-                        return Record(i, "Balance right");
+                        return Record(i, "重心腳在右腳");
                 }
                 else if(string.Compare(side, "left") == 0)
                 {
                     if (Math.Abs(hipAngleRightHorAngle - 90) > Math.Abs(hipAngleLeftHorAngle - 90) + 5)
                     {
                         this.hipWidthWhenBalanceChange = hipRight.x - hipLeft.x;
-                        return Record(i, "Balance left");
+                        return Record(i, "重心轉移到左腳");
                     }
                 }
             }
@@ -167,7 +177,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 }
                 hipWidth = hipRight.x - hipLeft.x;
                 if (hipRight.z < hipLeft.z)
-                    return Record(i, "Twist waist");
+                    return Record(i, "轉腰");
             }
             return this.FrameList.Count;
         }
@@ -199,7 +209,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 nowResult = CheckSide(wristRight, elbowRight, handTipRight);
                 double wristSpineAngle = CheckVec2Angle(spineShoulder, spineBase, wristRight);
                 if (nowResult * prevResult < 0 && (wristSpineAngle < 20 || handTipRight.x < spineBase.x))
-                    return Record(i, "Wrist forward");
+                    return Record(i, "手腕發力");
                 prevResult = nowResult;
             }
             return this.FrameList.Count;
@@ -226,7 +236,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                         elbowRight = new JointCoord(joint.x, joint.y, joint.z);
                 }
                 if (elbowRight.y > shoulderRight.y)
-                    return Record(i, "elbow ended");
+                    return Record(i, "手肘向前");
             }
             return this.FrameList.Count;
         }
@@ -252,7 +262,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private int Record(int i, String criticalPoint)
         {
             Console.WriteLine(i + " " + criticalPoint);
-            this.result.Add((double)i / this.videoCount);
+            this.result.Add(new CriticalPoint(criticalPoint, (double)i / this.videoCount));
             return i;
         }
         

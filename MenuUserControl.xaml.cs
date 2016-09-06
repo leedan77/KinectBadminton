@@ -521,7 +521,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                             playback.Pause();
                             Thread.Sleep(100);
                             playback.Resume();
-                            Console.WriteLine(nowFrame);
+                            Console.WriteLine(nowFrame); 
                         }
                         prevFrame = nowFrame;
                     }
@@ -638,17 +638,14 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             if (smashRadio.IsChecked == true)
             {
                 motion = "smash";
-                //Console.WriteLine(motion);
             }
             else if (lobRadio.IsChecked == true)
             {
                 motion = "lob";
-                //Console.WriteLine(motion);
             }
             else
             {
                 motion = "serve";
-                //Console.WriteLine(motion);
             }
         }
     }

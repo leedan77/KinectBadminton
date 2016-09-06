@@ -25,9 +25,16 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                                      /// </summary>
     public sealed partial class MainWindow : Window //, INotifyPropertyChanged, IDisposable
     {
-        /// <summary> Indicates if a playback is currently in progress </summary>
-        private bool isPlaying = false;
-        private bool pausing = false;
+        public struct CriticalPoint
+        {
+            public String name;
+            public double portion;
+            public CriticalPoint(String n, double p)
+            {
+                name = n;
+                portion = p;
+            }
+        }
 
         private bool leftPlaying = false;
         private bool leftPausing = false;
@@ -49,8 +56,11 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         public int coachVideoCount = 0;
         public int studentVideoCount = 0;
 
-        private List<double> studentJudgement;
-        private List<double> coachJudgement;
+        private List<CriticalPoint> studentJudgement;
+        private List<CriticalPoint> coachJudgement;
+        private String[] smashGoals = {"側身", "手肘抬高", "手肘轉向前", "手腕發力", "收拍"};
+        private String[] serveGoals = { "重心腳在左腳", "重心腳移到右腳", "轉腰", "手腕發力", "肩膀向前" };
+        private String[] lobGoals = { "持拍立腕", "右腳跨步", "腳跟著地", "手腕發力" };
 
         private double rightVideoDuration = 0;
         private double leftVideoDuration = 0;
@@ -144,9 +154,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         
         private void MediaEnded(object sender, RoutedEventArgs e)
         {
-            // MediaPlayer_left.Close();
-            // MediaPlayer_right.Close();
-            this.isPlaying = false;
+
         }
 
         private void MediaPlayer_right_MouseRightButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -160,14 +168,14 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private void student_Button_Click(object sender, RoutedEventArgs e)
         {
             MediaPlayer_left.Pause();
-            double positionInMillisecond = this.leftVideoDuration * this.studentJudgement[(int)(sender as Button).Tag - 1];
+            double positionInMillisecond = this.leftVideoDuration * this.studentJudgement[(int)(sender as Button).Tag - 1].portion;
             MediaPlayer_left.Position = new TimeSpan(0, 0, 0, 0, (int)positionInMillisecond);
         }
 
         private void teacher_Button_Click(object sender, RoutedEventArgs e)
         {
             MediaPlayer_right.Pause();
-            double positionInMillisecond = this.rightVideoDuration * this.coachJudgement[(int)(sender as Button).Tag - 1];
+            double positionInMillisecond = this.rightVideoDuration * this.coachJudgement[(int)(sender as Button).Tag - 1].portion;
             MediaPlayer_right.Position = new TimeSpan(0, 0, 0, 0, (int)positionInMillisecond);
         }
 
@@ -185,52 +193,24 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         {
             String judgementDir = "../../../data/" + person_type + "/" + action_type + "/" + name + "/judgement.json";
             String rawJsonData = File.ReadAllText(judgementDir);
-            List<String> goals = new List<String>();
             if(person_type == "coach")
-                this.coachJudgement = JsonConvert.DeserializeObject<List<double>>(rawJsonData);
+                this.coachJudgement = JsonConvert.DeserializeObject<List<CriticalPoint>>(rawJsonData);
             else if (person_type == "student")
-                this.studentJudgement = JsonConvert.DeserializeObject<List<double>>(rawJsonData);
+                this.studentJudgement = JsonConvert.DeserializeObject<List<CriticalPoint>>(rawJsonData);
             
-
-            if(action_type == "smash")
-            {
-                goals.Add("側身");
-                goals.Add("手肘抬高");
-                goals.Add("手肘轉向前");
-                goals.Add("手腕發力");
-                goals.Add("收拍");
-            }
-            else if(action_type == "serve")
-            {
-                goals.Add("重心腳在右腳");
-                goals.Add("重心轉移到左腳");
-                //goals.Add("左手放球");
-                goals.Add("轉腰");
-                goals.Add("手腕發力");
-                goals.Add("肩膀向前");
-            }
-            else if(action_type == "lob")
-            {
-                goals.Add("持拍立腕");
-                //goals.Add("手腕轉動");
-                goals.Add("右腳跨步");
-                goals.Add("腳跟著地");
-                goals.Add("拇指發力上勾");
-            }
 
             if(person_type == "coach")
             {
                 textBlock2.Text = name;
                 
-                for (int i = 0; i < goals.Count; ++i)
+                for (int i = 0; i < this.coachJudgement.Count; ++i)
                 {
-                    Console.WriteLine(goals[i]);
                     Grid grid = new Grid();
                     Grid.SetRow(grid, i);
                     Grid.SetColumn(grid, 1);
                     Button button = new Button()
                     {
-                        Content = string.Format(goals[i]),
+                        Content = string.Format(this.coachJudgement[i].name),
                         Tag = i + 1,
                         BorderThickness = new Thickness(0, 0, 0, 0),
                         FontSize = 16,
@@ -250,7 +230,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             {
                 textBlock1.Text = name;
 
-                for (int i = 0; i < goals.Count; i++)
+                for (int i = 0; i < this.coachJudgement.Count; i++)
                 {
                     Image image = new Image();
                     if(i < studentJudgement.Count)
@@ -265,14 +245,14 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     stuGrid.Children.Add(image);
                 }
                 
-                for (int i = 0; i < goals.Count; ++i)
+                for (int i = 0; i < this.coachJudgement.Count; ++i)
                 {
                     Grid grid = new Grid();
                     Grid.SetRow(grid, i);
                     Grid.SetColumn(grid, 1);
                     Button button = new Button()
                     {
-                        Content = string.Format(goals[i]),
+                        Content = string.Format(this.coachJudgement[i].name),
                         Tag = i + 1,
                         BorderThickness = new Thickness(0, 0, 0, 0),
                         FontSize = 16,
