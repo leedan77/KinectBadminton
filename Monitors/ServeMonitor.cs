@@ -49,8 +49,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         
         private List<Frames> FrameList;
         private double hipWidthWhenBalanceChange = 0;
-        
-        private double headNeckDiff = 0;
         private List<CriticalPoint> result;
         private int videoCount = 0;
 
@@ -62,8 +60,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         }
         public void start()
         {
-            GenerateCompareData();
             int nowFrame = 0;
+            nowFrame = FromKeyExist();
             nowFrame = CheckBalancePoint(nowFrame, "right");
             nowFrame = CheckBalancePoint(nowFrame, "left");
             nowFrame = CheckWaistTwist(nowFrame);
@@ -74,9 +72,16 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         {
             return this.result;
         }
-        private void GenerateCompareData()
+        private int FromKeyExist()
         {
-
+            for (int i = 0; i < this.FrameList.Count; i++)
+            {
+                if (this.FrameList[i].jointDict.Count != 0)
+                {
+                    return i;
+                }
+            }
+            return this.FrameList.Count;
         }
         private int CheckBalancePoint(int nowFrame, String side)
         {

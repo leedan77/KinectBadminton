@@ -39,8 +39,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         public void start()
         {
-            GenerateCompareData();
             int nowFrame = 0;
+            nowFrame = FromKeyExist();
+            GenerateCompareData(nowFrame);
             nowFrame = CheckSide(nowFrame);
             nowFrame = CheckElbowUp(nowFrame);
             nowFrame = CheckElbowForward(nowFrame);
@@ -53,18 +54,30 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             return this.result;
         }
 
-        private void GenerateCompareData()
+        private int FromKeyExist()
+        {
+            for (int i = 0; i < this.FrameList.Count; i++)
+            {
+                if (this.FrameList[i].jointDict.Count != 0)
+                {
+                    return i;
+                }
+            }
+            return this.FrameList.Count;
+        }
+
+        private void GenerateCompareData(int nowFrame)
         {
             int headNeckCount = 0;
-            foreach (Frames frame in FrameList)
+            for (int i = nowFrame; i < this.FrameList.Count; i++)
             {
-                Point3D hipRight = frame.jointDict[JointType.HipRight];
-                Point3D hipLeft = frame.jointDict[JointType.HipLeft];
-                Point3D elbowRight = frame.jointDict[JointType.ElbowRight];
-                Point3D shoulderRight = frame.jointDict[JointType.ShoulderRight];
-                Point3D head = frame.jointDict[JointType.Head];
-                Point3D neck = frame.jointDict[JointType.Neck];
-                Point3D spineMid = frame.jointDict[JointType.SpineMid];
+                Point3D hipRight = this.FrameList[i].jointDict[JointType.HipRight];
+                Point3D hipLeft = this.FrameList[i].jointDict[JointType.HipLeft];
+                Point3D elbowRight = this.FrameList[i].jointDict[JointType.ElbowRight];
+                Point3D shoulderRight = this.FrameList[i].jointDict[JointType.ShoulderRight];
+                Point3D head = this.FrameList[i].jointDict[JointType.Head];
+                Point3D neck = this.FrameList[i].jointDict[JointType.Neck];
+                Point3D spineMid = this.FrameList[i].jointDict[JointType.SpineMid];
                 if (Math.Abs(hipRight.X - hipLeft.X) > hipMaxDiff)
                     hipMaxDiff = Math.Abs(hipRight.X - hipLeft.X);
                 if (Math.Abs(elbowRight.Y - shoulderRight.Y) != 0 && initRightShoulderElbowDiff == 0)

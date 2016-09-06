@@ -15,20 +15,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
     using Emgu.CV;
     using Emgu.CV.Structure;
     using Newtonsoft.Json;
-
-    class Point3D
-    {
-        public double X;
-        public double Y;
-        public double Z;
-        public Point3D(double x, double y, double z)
-        {
-            X = x;
-            Y = y;
-            Z = z;
-        }
-    }
-
+    using System.Windows.Media.Media3D;
     class Joints
     {
         public string jointType;
@@ -341,14 +328,13 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         /// <param name="bodies">Array of bodies to update</param>
         public void UpdateBodyFrame(Body[] bodies)
         {
-            List<Joints> JointList = new List<Joints>();
             Dictionary<JointType, Point3D> jointDict = new Dictionary<JointType, Point3D>();
 
             if (bodies != null)
             {
                 using (DrawingContext dc = this.drawingGroup.Open())
                 {
-                    //frameNum++;
+                    frameNum++;
 
                     // Draw a transparent background to set the render size
                     dc.DrawRectangle(Brushes.Black, null, new Rect(0.0, 0.0, this.displayWidth, this.displayHeight));
@@ -360,7 +346,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
                         if (body.IsTracked)
                         {
-                            Console.WriteLine(frameNum++);
                             IReadOnlyDictionary<JointType, Joint> joints = body.Joints;
 
                             // convert the joint points to depth (display) space
@@ -388,14 +373,12 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                                 position.X += spineMid.X;
                                 position.Y += spineMid.Y;
                                 position.Z += spineMid.Z;
-                                JointList.Add(new Joints(jointType.ToString(), position.X, position.Y, position.Z));
                                 jointDict[jointType] = new Point3D(position.X, position.Y, position.Z);
 
                                 DepthSpacePoint depthSpacePoint = this.coordinateMapper.MapCameraPointToDepthSpace(position);
                                 jointPoints[jointType] = new Point(depthSpacePoint.X, depthSpacePoint.Y);
 
                             }
-                            Console.WriteLine(jointDict[JointType.HandRight].X);
                             this.DrawBody(joints, jointPoints, dc, drawPen);
                             this.DrawHand(body.HandLeftState, jointPoints[JointType.HandLeft], dc);
                             this.DrawHand(body.HandRightState, jointPoints[JointType.HandRight], dc);

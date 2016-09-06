@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media.Media3D;
 
 namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 {
@@ -46,8 +47,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         public void start()
         {
-            GenerateCompareData();
             int nowFrame = 0;
+            nowFrame = FromKeyExist();
+            GenerateCompareData(nowFrame);
             nowFrame = CheckWristUp(nowFrame);
             //nowFrame = CheckWristTurn(nowFrame);
             nowFrame = CheckStepForward(nowFrame);
@@ -59,16 +61,26 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             return this.result;
         }
 
+        private int FromKeyExist()
+        {
+            for(int i = 0; i < this.FrameList.Count; i++)
+            {
+                if(this.FrameList[i].jointDict.Count != 0)
+                {
+                    return i;
+                }
+            }
+            return this.FrameList.Count;
+        }
 
-        private void GenerateCompareData()
+        private void GenerateCompareData(int nowFrame)
         {
             int spineShoulderBaseCount = 0;
-            foreach (Frames frame in this.FrameList)
+            for (int i = nowFrame; i < this.FrameList.Count; i++)
             {
-                Point3D spineShoulder = frame.jointDict[JointType.SpineShoulder];
-                Point3D spineBase = frame.jointDict[JointType.SpineBase];
-                Point3D ankleRight = frame.jointDict[JointType.AnkleRight];
-                Console.WriteLine(spineShoulder.X);
+                Point3D spineShoulder = this.FrameList[i].jointDict[JointType.SpineShoulder];
+                Point3D spineBase = this.FrameList[i].jointDict[JointType.SpineBase];
+                Point3D ankleRight = this.FrameList[i].jointDict[JointType.AnkleRight];
                 Vector3 spineShoulderBaseVec = new Vector3(spineShoulder, spineBase);
                 if (spineShoulder.X != 0)
                 {
@@ -83,13 +95,11 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private int CheckWristUp(int nowFrame)
         {
-            Console.WriteLine("Checking wrist up");
             for(int i = nowFrame; i < this.FrameList.Count; i++)
             {
                 Point3D thumbRight = this.FrameList[i].jointDict[JointType.ThumbRight];
                 Point3D handRight = this.FrameList[i].jointDict[JointType.HandRight];
                 double thumbHandYDiff = thumbRight.Y - handRight.Y;
-                Debug(i, thumbHandYDiff);
                 if (thumbHandYDiff > 0.01)
                     return Record(i, "持拍立腕");
             }
@@ -166,7 +176,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     Record(i, "手腕發力");
                     WristForced = true;
                 }
-                Debug(i, nowResult);
                 prevResult = nowResult;
             }
             return this.FrameList.Count;
@@ -189,8 +198,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             double a = (lineCoord2.Y - lineCoord1.Y) / (lineCoord2.X - lineCoord1.X);
             double b = lineCoord1.Y - a * lineCoord1.X;
             double result = checkPoint.Y - a * checkPoint.X - b;
-            Console.WriteLine(a);
-            Console.WriteLine(result);
             if (result * a < 0)
                 return -1;
             return 1;
