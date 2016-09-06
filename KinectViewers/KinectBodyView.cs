@@ -15,10 +15,19 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
     using Emgu.CV;
     using Emgu.CV.Structure;
     using Newtonsoft.Json;
-    /// <summary>
-    /// Visualizes the Kinect Body stream for display in the UI
-    /// </summary>
-    /// 
+
+    class Point3D
+    {
+        public double X;
+        public double Y;
+        public double Z;
+        public Point3D(double x, double y, double z)
+        {
+            X = x;
+            Y = y;
+            Z = z;
+        }
+    }
 
     class Joints
     {
@@ -38,11 +47,13 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
     class Frames
     {
         public int num;
-        public List<Joints> jointList;
-        public Frames(int num, List<Joints> jointList)
+        //public List<Joints> jointList;
+        public Dictionary<JointType, Point3D> jointDict = new Dictionary<JointType, Point3D>();
+        public Frames(int num, Dictionary<JointType, Point3D> jointDict)
         {
             this.num = num;
-            this.jointList = jointList;
+            //this.jointList = jointList;
+            this.jointDict = jointDict;
         }
     }
 
@@ -51,7 +62,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private int frameNum = 0;
 
-        private List<Frames> FrameList = new List<Frames>();
+        private List<Frames> frameList = new List<Frames>();
         //test angle
         public double angle = 0;
 
@@ -263,15 +274,15 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         {
             if (this.type == "smash")
             {
-                SmashMonitor smashMonitor = new SmashMonitor(this.FrameList, videoCount);
-                smashMonitor.start();
-                string judgeResult = JsonConvert.SerializeObject(smashMonitor.GetResult());
-                File.WriteAllText("../../../data/" + person_type + "/" + this.type + "/" + name + "/judgement.json", judgeResult);
+                //SmashMonitor smashMonitor = new SmashMonitor(this.frameList, videoCount);
+                //smashMonitor.start();
+                //string judgeResult = JsonConvert.SerializeObject(smashMonitor.GetResult());
+                //File.WriteAllText("../../../data/" + person_type + "/" + this.type + "/" + name + "/judgement.json", judgeResult);
             }
 
             else if(this.type == "serve")
             {
-                ServeMonitor serveMonitor = new ServeMonitor(this.FrameList, videoCount);
+                ServeMonitor serveMonitor = new ServeMonitor(this.frameList, videoCount);
                 serveMonitor.start();
                 string judgeResult = JsonConvert.SerializeObject(serveMonitor.GetResult());
                 File.WriteAllText("../../../data/" + person_type + "/" + this.type + "/" + name + "/judgement.json", judgeResult);
@@ -279,7 +290,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
             else if(this.type == "lob")
             {
-                LobMonitor lobMonitor = new LobMonitor(this.FrameList, videoCount);
+                LobMonitor lobMonitor = new LobMonitor(this.frameList, videoCount);
                 lobMonitor.start();
                 string judgeResult = JsonConvert.SerializeObject(lobMonitor.GetResult());
                 File.WriteAllText("../../../data/" + person_type + "/" + this.type + "/" + name + "/judgement.json", judgeResult);
@@ -331,12 +342,13 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         public void UpdateBodyFrame(Body[] bodies)
         {
             List<Joints> JointList = new List<Joints>();
+            Dictionary<JointType, Point3D> jointDict = new Dictionary<JointType, Point3D>();
 
             if (bodies != null)
             {
                 using (DrawingContext dc = this.drawingGroup.Open())
                 {
-                    frameNum++;
+                    //frameNum++;
 
                     // Draw a transparent background to set the render size
                     dc.DrawRectangle(Brushes.Black, null, new Rect(0.0, 0.0, this.displayWidth, this.displayHeight));
@@ -348,6 +360,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
                         if (body.IsTracked)
                         {
+                            Console.WriteLine(frameNum++);
                             IReadOnlyDictionary<JointType, Joint> joints = body.Joints;
 
                             // convert the joint points to depth (display) space
@@ -376,12 +389,14 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                                 position.Y += spineMid.Y;
                                 position.Z += spineMid.Z;
                                 JointList.Add(new Joints(jointType.ToString(), position.X, position.Y, position.Z));
+                                jointDict[jointType] = new Point3D(position.X, position.Y, position.Z);
+
                                 DepthSpacePoint depthSpacePoint = this.coordinateMapper.MapCameraPointToDepthSpace(position);
                                 jointPoints[jointType] = new Point(depthSpacePoint.X, depthSpacePoint.Y);
+
                             }
-
+                            Console.WriteLine(jointDict[JointType.HandRight].X);
                             this.DrawBody(joints, jointPoints, dc, drawPen);
-
                             this.DrawHand(body.HandLeftState, jointPoints[JointType.HandLeft], dc);
                             this.DrawHand(body.HandRightState, jointPoints[JointType.HandRight], dc);
                         }
@@ -391,7 +406,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     this.drawingGroup.ClipGeometry = new RectangleGeometry(new Rect(0.0, 0.0, this.displayWidth, this.displayHeight));
                 }
             }
-            FrameList.Add(new Frames(frameNum, JointList));
+            frameList.Add(new Frames(frameNum, jointDict));
         }
 
         /// <summary>

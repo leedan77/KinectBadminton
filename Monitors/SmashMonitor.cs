@@ -1,10 +1,12 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Kinect;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media.Media3D;
 
 namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 {
@@ -54,50 +56,23 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private void GenerateCompareData()
         {
             int headNeckCount = 0;
-            foreach (Frames Frame in FrameList)
+            foreach (Frames frame in FrameList)
             {
-                double hipRight = 0, hipLeft = 0;
-                double elbowRighty = 0, shoulderRight = 0;
-                double headx = 0, heady = 0, headz = 0;
-                double neckx = 0, necky = 0, neckz = 0;
-                double elbowRightx = 0, spineMid = 0;
-                foreach (Joints joint in Frame.jointList)
-                {
-                    if (string.Compare(joint.jointType, "HipRight") == 0)
-                        hipRight = joint.x;
-                    else if (string.Compare(joint.jointType, "HipLeft") == 0)
-                        hipLeft = joint.x;
-                    else if (string.Compare(joint.jointType, "ShoulderRight") == 0)
-                        shoulderRight = joint.y;
-                    else if (string.Compare(joint.jointType, "ElbowRight") == 0)
-                    {
-                        elbowRighty = joint.y;
-                        elbowRightx = joint.x;
-                    }
-                    else if (string.Compare(joint.jointType, "Head") == 0 && joint.x != 0)
-                    {
-                        headx = joint.x;
-                        heady = joint.y;
-                        headz = joint.z;
-                        headNeckCount++;
-                    }
-                    else if (string.Compare(joint.jointType, "Neck") == 0 && joint.x != 0)
-                    {
-                        neckx = joint.x;
-                        necky = joint.y;
-                        neckz = joint.z;
-                    }
-                    else if (string.Compare(joint.jointType, "SpineMid") == 0)
-                        spineMid = joint.x;
-                }
-                if (Math.Abs(hipRight - hipLeft) > hipMaxDiff)
-                    hipMaxDiff = Math.Abs(hipRight - hipLeft);
-                if (Math.Abs(elbowRighty - shoulderRight) != 0 && initRightShoulderElbowDiff == 0)
-                    initRightShoulderElbowDiff = Math.Abs(elbowRighty - shoulderRight);
+                Point3D hipRight = frame.jointDict[JointType.HipRight];
+                Point3D hipLeft = frame.jointDict[JointType.HipLeft];
+                Point3D elbowRight = frame.jointDict[JointType.ElbowRight];
+                Point3D shoulderRight = frame.jointDict[JointType.ShoulderRight];
+                Point3D head = frame.jointDict[JointType.Head];
+                Point3D neck = frame.jointDict[JointType.Neck];
+                Point3D spineMid = frame.jointDict[JointType.SpineMid];
+                if (Math.Abs(hipRight.X - hipLeft.X) > hipMaxDiff)
+                    hipMaxDiff = Math.Abs(hipRight.X - hipLeft.X);
+                if (Math.Abs(elbowRight.Y - shoulderRight.Y) != 0 && initRightShoulderElbowDiff == 0)
+                    initRightShoulderElbowDiff = Math.Abs(elbowRight.Y - shoulderRight.Y);
                 if (headNeckCount <= 10)
-                    headNeckDiff += Math.Sqrt(Math.Pow(headx - neckx, 2) + Math.Pow(heady - necky, 2) + Math.Pow(headz - neckz, 2));
-                if (Math.Abs(elbowRightx - spineMid) > elbowSpineMaxDiff)
-                    elbowSpineMaxDiff = Math.Abs(elbowRightx - spineMid);
+                    headNeckDiff += Math.Sqrt(Math.Pow(head.X - neck.X, 2) + Math.Pow(head.Y - neck.Y, 2) + Math.Pow(head.Z- neck.Z, 2));
+                if (Math.Abs(elbowRight.X - spineMid.X) > elbowSpineMaxDiff)
+                    elbowSpineMaxDiff = Math.Abs(elbowRight.X - spineMid.X);
             }
             headNeckDiff /= 10;
         }
@@ -106,17 +81,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         {
             for (int i = nowFrame; i < this.FrameList.Count; i++)
             {
-                double hipRight = 0;
-                double hipLeft = 0;
-                foreach (Joints joint in this.FrameList[i].jointList)
-                {
-                    if (string.Compare(joint.jointType, "HipRight") == 0)
-                        hipRight = joint.x;
-                    else if (string.Compare(joint.jointType, "HipLeft") == 0)
-                        hipLeft = joint.x;
-                }
-                //Console.WriteLine(Frame.num + ": " + Math.Abs(hipRight - hipLeft));
-                if (Math.Abs(hipRight - hipLeft) < hipMaxDiff * 0.7 && Math.Abs(hipRight - hipLeft) != 0)
+                Point3D hipRight = this.FrameList[i].jointDict[JointType.HipRight];
+                Point3D hipLeft = this.FrameList[i].jointDict[JointType.HipLeft];
+                if (Math.Abs(hipRight.X - hipLeft.X) < hipMaxDiff * 0.7 && Math.Abs(hipRight.X - hipLeft.X) != 0)
                 {
                     return Record(i, "側身");
                 }
@@ -128,15 +95,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         {
             for (int i = nowFrame; i < this.FrameList.Count; i++)
             {
-                double shoulderRight = 0, elbowRight = 0;
-                foreach (Joints joint in this.FrameList[i].jointList)
-                {
-                    if (string.Compare(joint.jointType, "ShoulderRight") == 0)
-                        shoulderRight = joint.y;
-                    else if (string.Compare(joint.jointType, "ElbowRight") == 0)
-                        elbowRight = joint.y;
-                }
-                if (Math.Abs(elbowRight - shoulderRight) < initRightShoulderElbowDiff / 6)
+                Point3D shoulderRight = this.FrameList[i].jointDict[JointType.ShoulderRight];
+                Point3D elbowRight = this.FrameList[i].jointDict[JointType.ElbowRight];
+                if (Math.Abs(elbowRight.Y - shoulderRight.Y) < initRightShoulderElbowDiff / 6)
                 {
                     return Record(i, "手肘抬高");
                 }
@@ -149,15 +110,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             double prevRightElbowShoulderDiff = 0, nowRightElbowShoulderDiff = 0;
             for (int i = nowFrame; i < this.FrameList.Count; i++)
             {
-                double elbowRight = 0, shoulderRight = 0;
-                foreach (Joints joint in this.FrameList[i].jointList)
-                {
-                    if (string.Compare(joint.jointType, "ElbowRight") == 0)
-                        elbowRight = joint.z;
-                    else if (string.Compare(joint.jointType, "ShoulderRight") == 0)
-                        shoulderRight = joint.z;
-                }
-                nowRightElbowShoulderDiff = elbowRight - shoulderRight;
+                Point3D elbowRight = this.FrameList[i].jointDict[JointType.ElbowRight];
+                Point3D shoulderRight = this.FrameList[i].jointDict[JointType.ShoulderRight];
+                nowRightElbowShoulderDiff = elbowRight.Z - shoulderRight.Z;
                 if (nowRightElbowShoulderDiff * prevRightElbowShoulderDiff < 0)
                 {
                     return Record(i, "手肘轉向前");
@@ -172,15 +127,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             double prevHandtipWristDiff = 0, nowHandtipWristDiff = 0;
             for (int i = nowFrame; i < this.FrameList.Count; i++)
             {
-                double handTipRight = 0, wristRight = 0;
-                foreach (Joints joint in this.FrameList[i].jointList)
-                {
-                    if (string.Compare(joint.jointType, "HandTipRight") == 0)
-                        handTipRight = joint.y;
-                    else if (string.Compare(joint.jointType, "WristRight") == 0)
-                        wristRight = joint.y;
-                }
-                nowHandtipWristDiff = handTipRight - wristRight;
+                Point3D handTipRight = this.FrameList[i].jointDict[JointType.HandTipRight];
+                Point3D wristRight = this.FrameList[i].jointDict[JointType.WristRight];
+                nowHandtipWristDiff = handTipRight.Y - wristRight.Y;
                 if (prevHandtipWristDiff - nowHandtipWristDiff > this.headNeckDiff / 3 && prevHandtipWristDiff != 0)
                 {
                     return Record(i, "手腕發力");
@@ -191,19 +140,11 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         }
         private int CheckElbowEnded(int nowFrame)
         {
-            double elbowRight = 0, spineMid = 0;
             for (int i = nowFrame; i < this.FrameList.Count; i++)
             {
-                foreach (Joints joint in this.FrameList[i].jointList)
-                {
-                    if (string.Compare(joint.jointType, "ElbowRight") == 0)
-                    {
-                        elbowRight = joint.x;
-                    }
-                    else if (string.Compare(joint.jointType, "SpineMid") == 0)
-                        spineMid = joint.x;
-                }
-                double elbowSpineDiff = Math.Abs(elbowRight - spineMid);
+                Point3D elbowRight = this.FrameList[i].jointDict[JointType.ElbowRight];
+                Point3D spineMid = this.FrameList[i].jointDict[JointType.SpineMid];
+                double elbowSpineDiff = Math.Abs(elbowRight.X - spineMid.X);
                 if (elbowSpineDiff < elbowSpineMaxDiff / 6)
                 {
                     return Record(i, "收拍");

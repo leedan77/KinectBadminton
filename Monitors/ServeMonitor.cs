@@ -1,10 +1,12 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Kinect;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media.Media3D;
 
 namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 {
@@ -44,17 +46,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 d = Math.Sqrt(Math.Pow(vx, 2) + Math.Pow(vy, 2) + Math.Pow(vz, 2));
             }
         }
-
-        public struct JointCoord
-        {
-            public double x, y, z;
-            public JointCoord(double cx, double cy, double cz)
-            {
-                x = cx;
-                y = cy;
-                z = cz;
-            }
-        }
         
         private List<Frames> FrameList;
         private double hipWidthWhenBalanceChange = 0;
@@ -85,60 +76,21 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         }
         private void GenerateCompareData()
         {
-            int headNeckCount = 0;
-            foreach (Frames Frame in FrameList)
-            {
-                JointCoord head = new JointCoord(0, 0, 0);
-                JointCoord neck = new JointCoord(0, 0, 0);
-                foreach (Joints joint in Frame.jointList)
-                {
-                    if (string.Compare(joint.jointType, "Head") == 0 && joint.x != 0)
-                    {
-                        head.x = joint.x;
-                        head.y = joint.y;
-                        head.z = joint.z;
-                        headNeckCount++;
-                    }
-                    else if (string.Compare(joint.jointType, "Neck") == 0 && joint.x != 0)
-                    {
-                        neck.x = joint.x;
-                        neck.y = joint.y;
-                        neck.z = joint.z;
-                    }
-                }
-                if (headNeckCount <= 10)
-                    headNeckDiff += Math.Sqrt(Math.Pow(head.x - neck.x, 2) + Math.Pow(head.y - neck.y, 2) + Math.Pow(head.z - neck.z, 2));
-            }
-            headNeckDiff /= 10;
+
         }
         private int CheckBalancePoint(int nowFrame, String side)
         {
             for(int i = nowFrame; i < FrameList.Count; i++)
             {
-                JointCoord hipRight = new JointCoord(0, 0, 0);
-                JointCoord kneeRight = new JointCoord(0, 0, 0);
-                JointCoord ankleRight = new JointCoord(0, 0, 0);
-                JointCoord hipLeft = new JointCoord(0, 0, 0);
-                JointCoord kneeLeft = new JointCoord(0, 0, 0);
-                JointCoord ankleLeft = new JointCoord(0, 0, 0);
-                foreach (Joints joint in FrameList[i].jointList)
-                {
-                    if (string.Compare(joint.jointType, "HipRight") == 0)
-                        hipRight = new JointCoord(joint.x, joint.y, 0);
-                    else if (string.Compare(joint.jointType, "KneeRight") == 0)
-                        kneeRight = new JointCoord(joint.x, joint.y, 0);
-                    else if (string.Compare(joint.jointType, "AnkleRight") == 0)
-                        ankleRight = new JointCoord(joint.x, joint.y, 0);
-                    else if (string.Compare(joint.jointType, "HipLeft") == 0)
-                        hipLeft = new JointCoord(joint.x, joint.y, 0);
-                    else if (string.Compare(joint.jointType, "KneeLeft") == 0)
-                        kneeLeft = new JointCoord(joint.x, joint.y, 0);
-                    else if (string.Compare(joint.jointType, "AnkleLeft") == 0)
-                        ankleLeft = new JointCoord(joint.x, joint.y, 0);
-                }
+                Point3D hipRight = this.FrameList[i].jointDict[JointType.HipRight];
+                Point3D kneeRight = this.FrameList[i].jointDict[JointType.KneeRight];
+                Point3D ankleRight = this.FrameList[i].jointDict[JointType.AnkleRight];
+                Point3D hipLeft = this.FrameList[i].jointDict[JointType.HipLeft];
+                Point3D kneeLeft = this.FrameList[i].jointDict[JointType.KneeLeft];
+                Point3D ankleLeft = this.FrameList[i].jointDict[JointType.AnkleLeft];
 
-                Vector2 hipAngleRight = new Vector2(ankleRight.x - hipRight.x, ankleRight.y - hipRight.y);
-                Vector2 hipAngleLeft = new Vector2(ankleLeft.x - hipLeft.x, ankleLeft.y - hipLeft.y);
+                Vector2 hipAngleRight = new Vector2(ankleRight.X - hipRight.X, ankleRight.Y - hipRight.Y);
+                Vector2 hipAngleLeft = new Vector2(ankleLeft.X - hipLeft.X, ankleLeft.Y - hipLeft.Y);
                 Vector2 horizentalLine = new Vector2(10, 0);
 
                 double hipAngleRightHorAngle = Math.Acos((hipAngleRight.x * horizentalLine.x + hipAngleRight.y + horizentalLine.y) / (hipAngleRight.d * horizentalLine.d)) * 180 / Math.PI;
@@ -153,7 +105,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 {
                     if (Math.Abs(hipAngleRightHorAngle - 90) > Math.Abs(hipAngleLeftHorAngle - 90) + 5)
                     {
-                        this.hipWidthWhenBalanceChange = hipRight.x - hipLeft.x;
+                        this.hipWidthWhenBalanceChange = hipRight.X - hipLeft.X;
                         return Record(i, "重心轉移到左腳");
                     }
                 }
@@ -166,17 +118,10 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             double hipWidth = 0;
             for(int i = nowFrame; i < this.FrameList.Count; i++)
             {
-                JointCoord hipRight = new JointCoord(0, 0, 0);
-                JointCoord hipLeft = new JointCoord(0, 0, 0);
-                foreach (Joints joint in FrameList[i].jointList)
-                {
-                    if (joint.jointType == "HipRight")
-                        hipRight = new JointCoord(joint.x, joint.y, joint.z);
-                    else if (string.Compare(joint.jointType, "HipLeft") == 0)
-                        hipLeft = new JointCoord(joint.x, joint.y, joint.z);
-                }
-                hipWidth = hipRight.x - hipLeft.x;
-                if (hipRight.z < hipLeft.z)
+                Point3D hipRight = this.FrameList[i].jointDict[JointType.HipRight];
+                Point3D hipLeft = this.FrameList[i].jointDict[JointType.HipLeft];
+                hipWidth = hipRight.X - hipLeft.X;
+                if (hipRight.Z < hipLeft.Z)
                     return Record(i, "轉腰");
             }
             return this.FrameList.Count;
@@ -187,28 +132,15 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             int prevResult = 0;
             for (int i = nowFrame; i < this.FrameList.Count; i++)
             {
-                JointCoord handTipRight = new JointCoord(0, 0, 0);
-                JointCoord wristRight = new JointCoord(0, 0, 0);
-                JointCoord elbowRight = new JointCoord(0, 0, 0);
-                JointCoord spineBase = new JointCoord(0, 0, 0);
-                JointCoord spineShoulder = new JointCoord(0, 0, 0);
-                foreach (Joints joint in this.FrameList[i].jointList)
-                {
-                    if (joint.jointType == "HandTipRight")
-                        handTipRight = new JointCoord(joint.x, joint.y, joint.z);
-                    else if (joint.jointType == "WristRight")
-                        wristRight = new JointCoord(joint.x, joint.y, joint.z);
-                    else if (joint.jointType == "ElbowRight")
-                        elbowRight = new JointCoord(joint.x, joint.y, joint.z);
-                    else if (joint.jointType == "SpineBase")
-                        spineBase = new JointCoord(joint.x, joint.y, joint.z);
-                    else if (joint.jointType == "SpineShoulder")
-                        spineShoulder = new JointCoord(joint.x, joint.y, joint.z);
-                }
+                Point3D handTipRight = this.FrameList[i].jointDict[JointType.HandTipRight];
+                Point3D wristRight = this.FrameList[i].jointDict[JointType.WristRight];
+                Point3D elbowRight = this.FrameList[i].jointDict[JointType.ElbowRight];
+                Point3D spineBase = this.FrameList[i].jointDict[JointType.SpineBase];
+                Point3D spineShoulder = this.FrameList[i].jointDict[JointType.SpineShoulder];
 
                 nowResult = CheckSide(wristRight, elbowRight, handTipRight);
                 double wristSpineAngle = CheckVec2Angle(spineShoulder, spineBase, wristRight);
-                if (nowResult * prevResult < 0 && (wristSpineAngle < 20 || handTipRight.x < spineBase.x))
+                if (nowResult * prevResult < 0 && (wristSpineAngle < 20 || handTipRight.X < spineBase.X))
                     return Record(i, "手腕發力");
                 prevResult = nowResult;
             }
@@ -220,41 +152,30 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         {
             for (int i = nowFrame; i < this.FrameList.Count; i++)
             {
-                JointCoord shoulderRight = new JointCoord(0, 0, 0);
-                JointCoord spineShoulder = new JointCoord(0, 0, 0);
-                JointCoord handRight = new JointCoord(0, 0, 0);
-                JointCoord elbowRight = new JointCoord(0, 0, 0);
-                foreach (Joints joint in this.FrameList[i].jointList)
-                {
-                    if (joint.jointType == "ShoulderRight")
-                        shoulderRight = new JointCoord(joint.x, joint.y, joint.z);
-                    else if (joint.jointType == "SpineShoulder")
-                        spineShoulder = new JointCoord(joint.x, joint.y, joint.z);
-                    else if(joint.jointType == "HandRight")
-                        handRight = new JointCoord(joint.x, joint.y, joint.z);
-                    else if (joint.jointType == "ElbowRight")
-                        elbowRight = new JointCoord(joint.x, joint.y, joint.z);
-                }
-                if (elbowRight.y > shoulderRight.y)
+                Point3D shoulderRight = this.FrameList[i].jointDict[JointType.ShoulderRight];
+                Point3D spineShoulder = this.FrameList[i].jointDict[JointType.SpineShoulder];
+                Point3D handRight = this.FrameList[i].jointDict[JointType.HandRight];
+                Point3D elbowRight = this.FrameList[i].jointDict[JointType.ElbowRight];
+                if (elbowRight.Y > shoulderRight.Y)
                     return Record(i, "手肘向前");
             }
             return this.FrameList.Count;
         }
 
-        private int CheckSide(JointCoord lineCoord1, JointCoord lineCoord2, JointCoord checkPoint)
+        private int CheckSide(Point3D lineCoord1, Point3D lineCoord2, Point3D checkPoint)
         {
-            double a = (lineCoord2.y - lineCoord1.y) / (lineCoord2.x - lineCoord1.x);
-            double b = lineCoord1.y - a * lineCoord1.x;
-            double result = checkPoint.y - a * checkPoint.x - b;
+            double a = (lineCoord2.Y - lineCoord1.Y) / (lineCoord2.X - lineCoord1.X);
+            double b = lineCoord1.Y - a * lineCoord1.X;
+            double result = checkPoint.Y - a * checkPoint.X - b;
             if ((result < 0 && a > 0) || (result > 0 && a < 0))
                 return -1;
             return 1;
         }
 
-        private double CheckVec2Angle(JointCoord vertex, JointCoord otherPoint1, JointCoord otherPoint2)
+        private double CheckVec2Angle(Point3D vertex, Point3D otherPoint1, Point3D otherPoint2)
         {
-            Vector2 vector1 = new Vector2(otherPoint1.x - vertex.x, otherPoint1.y - vertex.y);
-            Vector2 vector2 = new Vector2(otherPoint2.x - vertex.x, otherPoint2.y - vertex.y);
+            Vector2 vector1 = new Vector2(otherPoint1.X - vertex.X, otherPoint1.Y - vertex.Y);
+            Vector2 vector2 = new Vector2(otherPoint2.X - vertex.X, otherPoint2.Y - vertex.Y);
             double angle = Math.Acos((vector1.x * vector2.x + vector1.y * vector2.y) / (vector1.d * vector2.d)) * 180 / Math.PI;
             return angle;
         }
