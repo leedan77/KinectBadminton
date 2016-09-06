@@ -459,7 +459,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             
             using (KStudioClient client = KStudio.CreateClient())
             {
-              
+
+                int nowFrame = 0;
+                int prevFrame = 0;
                 client.ConnectToService();
 
                 // Create the playback object
@@ -471,6 +473,15 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     
                     while (playback.State == KStudioPlaybackState.Playing)
                     {
+                        nowFrame = (int)(playback.CurrentRelativeTime.TotalMilliseconds / 33.33);
+                        if (nowFrame > prevFrame)
+                        {
+                            playback.Pause();
+                            Thread.Sleep(20);
+                            playback.Resume();
+                            Console.WriteLine(nowFrame);
+                        }
+                        prevFrame = nowFrame;
                         this.kinectBodyView.converting = true;
                     }
                     playback.Dispose();
@@ -488,14 +499,14 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 
             this.Dispatcher.BeginInvoke(new NoArgDelegate(UpdateState));
         }
-
         private void ColorConvertClip(string filePath, string personName)
         {
             
             using (KStudioClient client = KStudio.CreateClient())
             {
                 client.ConnectToService();
-
+                int nowFrame = 0;
+                int prevFrame = 0;
                 // Create the playback object
                 using (KStudioPlayback playback = client.CreatePlayback(filePath))
                 {                   
@@ -504,7 +515,15 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     this.kinectColorView.converting = true;
                     while (playback.State == KStudioPlaybackState.Playing)
                     {
-
+                        nowFrame = (int)(playback.CurrentRelativeTime.TotalMilliseconds / 33.33);
+                        if(nowFrame > prevFrame)
+                        {
+                            playback.Pause();
+                            Thread.Sleep(100);
+                            playback.Resume();
+                            Console.WriteLine(nowFrame);
+                        }
+                        prevFrame = nowFrame;
                     }
                     playback.Dispose();
                 }
