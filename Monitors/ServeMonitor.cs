@@ -153,23 +153,20 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private int CheckWaistTwist(int nowFrame)
         {
-            double hipRightx = 0, hipLeftx = 0;
             double hipWidth = 0;
             for(int i = nowFrame; i < this.FrameList.Count; i++)
             {
+                JointCoord hipRight = new JointCoord(0, 0, 0);
+                JointCoord hipLeft = new JointCoord(0, 0, 0);
                 foreach (Joints joint in FrameList[i].jointList)
                 {
-                    if (string.Compare(joint.jointType, "HipRight") == 0)
-                    {
-                        hipRightx = joint.x;
-                    }
-                    else if(string.Compare(joint.jointType, "HipLeft") == 0)
-                    {
-                        hipLeftx = joint.x;
-                    }
+                    if (joint.jointType == "HipRight")
+                        hipRight = new JointCoord(joint.x, joint.y, joint.z);
+                    else if (string.Compare(joint.jointType, "HipLeft") == 0)
+                        hipLeft = new JointCoord(joint.x, joint.y, joint.z);
                 }
-                hipWidth = hipRightx - hipLeftx;
-                if(hipWidth < this.hipWidthWhenBalanceChange / 3 * 2)
+                hipWidth = hipRight.x - hipLeft.x;
+                if (hipRight.z < hipLeft.z)
                     return Record(i, "Twist waist");
             }
             return this.FrameList.Count;
@@ -183,6 +180,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 JointCoord handTipRight = new JointCoord(0, 0, 0);
                 JointCoord wristRight = new JointCoord(0, 0, 0);
                 JointCoord elbowRight = new JointCoord(0, 0, 0);
+                JointCoord spineBase = new JointCoord(0, 0, 0);
+                JointCoord spineShoulder = new JointCoord(0, 0, 0);
                 foreach (Joints joint in this.FrameList[i].jointList)
                 {
                     if (joint.jointType == "HandTipRight")
@@ -191,10 +190,15 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                         wristRight = new JointCoord(joint.x, joint.y, joint.z);
                     else if (joint.jointType == "ElbowRight")
                         elbowRight = new JointCoord(joint.x, joint.y, joint.z);
+                    else if (joint.jointType == "SpineBase")
+                        spineBase = new JointCoord(joint.x, joint.y, joint.z);
+                    else if (joint.jointType == "SpineShoulder")
+                        spineShoulder = new JointCoord(joint.x, joint.y, joint.z);
                 }
 
                 nowResult = CheckSide(wristRight, elbowRight, handTipRight);
-                if (nowResult * prevResult < 0)
+                double wristSpineAngle = CheckVec2Angle(spineShoulder, spineBase, wristRight);
+                if (nowResult * prevResult < 0 && (wristSpineAngle < 20 || handTipRight.x < spineBase.x))
                     return Record(i, "Wrist forward");
                 prevResult = nowResult;
             }
@@ -209,6 +213,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 JointCoord shoulderRight = new JointCoord(0, 0, 0);
                 JointCoord spineShoulder = new JointCoord(0, 0, 0);
                 JointCoord handRight = new JointCoord(0, 0, 0);
+                JointCoord elbowRight = new JointCoord(0, 0, 0);
                 foreach (Joints joint in this.FrameList[i].jointList)
                 {
                     if (joint.jointType == "ShoulderRight")
@@ -217,10 +222,11 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                         spineShoulder = new JointCoord(joint.x, joint.y, joint.z);
                     else if(joint.jointType == "HandRight")
                         handRight = new JointCoord(joint.x, joint.y, joint.z);
+                    else if (joint.jointType == "ElbowRight")
+                        elbowRight = new JointCoord(joint.x, joint.y, joint.z);
                 }
-                double handSpineZDiff = handRight.z - spineShoulder.z;
-                if (handSpineZDiff < 0)
-                    return Record(i, "Elbow ended");
+                if (elbowRight.y > shoulderRight.y)
+                    return Record(i, "elbow ended");
             }
             return this.FrameList.Count;
         }
@@ -235,11 +241,24 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             return 1;
         }
 
+        private double CheckVec2Angle(JointCoord vertex, JointCoord otherPoint1, JointCoord otherPoint2)
+        {
+            Vector2 vector1 = new Vector2(otherPoint1.x - vertex.x, otherPoint1.y - vertex.y);
+            Vector2 vector2 = new Vector2(otherPoint2.x - vertex.x, otherPoint2.y - vertex.y);
+            double angle = Math.Acos((vector1.x * vector2.x + vector1.y * vector2.y) / (vector1.d * vector2.d)) * 180 / Math.PI;
+            return angle;
+        }
+
         private int Record(int i, String criticalPoint)
         {
             Console.WriteLine(i + " " + criticalPoint);
             this.result.Add((double)i / this.videoCount);
             return i;
+        }
+        
+        private void Debug(int i, double value)
+        {
+            Console.WriteLine("Frame: " + i + ", " + value);
         }
     }
 }
