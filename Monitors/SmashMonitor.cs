@@ -8,27 +8,14 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media.Media3D;
 
-namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
+namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
 {
-    class SmashMonitor
+    class SmashMonitor:Monitor
     {
-        public struct CriticalPoint
-        {
-            public String name;
-            public double portion;
-            public CriticalPoint(String n, double p)
-            {
-                name = n;
-                portion = p;
-            }
-        }
-        private List<Frames> FrameList;
         private double hipMaxDiff = 0;
         private double initRightShoulderElbowDiff = 0;
         private double headNeckDiff = 0;
         private double elbowSpineMaxDiff = 0;
-        private List<CriticalPoint> result;
-        private int videoCount = 0;
 
         public SmashMonitor(List<Frames> frameList, int videoCount)
         {
@@ -37,7 +24,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             this.videoCount = videoCount;
         }
 
-        public void start()
+        public override void Start()
         {
             int nowFrame = 0;
             nowFrame = FromKeyExist();
@@ -49,24 +36,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             nowFrame = CheckElbowEnded(nowFrame);
         }
 
-        public List<CriticalPoint> GetResult()
-        {
-            return this.result;
-        }
-
-        private int FromKeyExist()
-        {
-            for (int i = 0; i < this.FrameList.Count; i++)
-            {
-                if (this.FrameList[i].jointDict.Count != 0)
-                {
-                    return i;
-                }
-            }
-            return this.FrameList.Count;
-        }
-
-        private void GenerateCompareData(int nowFrame)
+        public override void GenerateCompareData(int nowFrame)
         {
             int headNeckCount = 0;
             for (int i = nowFrame; i < this.FrameList.Count; i++)
@@ -165,13 +135,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
             }
             return this.FrameList.Count;
-        }
-        
-        private int Record(int i, String criticalPoint)
-        {
-            Console.WriteLine(i + " " + criticalPoint);
-            this.result.Add(new CriticalPoint(criticalPoint, (double)i / this.videoCount));
-            return i;
         }
     }
 }

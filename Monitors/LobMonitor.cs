@@ -6,37 +6,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media.Media3D;
 
-namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
+namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
 {
-    class LobMonitor
+    class LobMonitor:Monitor
     {
-        public struct CriticalPoint
-        {
-            public String name;
-            public double portion;
-            public CriticalPoint(String n, double p)
-            {
-                name = n;
-                portion = p;
-            }
-        }
-        public struct Vector3
-        {
-            public double x, y, z, d;
-
-            public Vector3(Point3D point1, Point3D point2)
-            {
-                x = point1.X - point2.X;
-                y = point1.Y - point2.Y;
-                z = point1.Z - point2.Z;
-                d = Math.Sqrt(Math.Pow(x, 2) + Math.Pow(y, 2) + Math.Pow(z, 2));
-            }
-        }
-        private List<Frames> FrameList;
-        private List<CriticalPoint> result;
         private double spineShoulderBaseDiff = 0;
         private double initAnkleRightZ = 0;
-        private int videoCount = 0;
 
         public LobMonitor(List<Frames> frameList, int videoCount)
         {
@@ -45,7 +20,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             this.videoCount = videoCount;
         }
 
-        public void start()
+        public override void Start()
         {
             int nowFrame = 0;
             nowFrame = FromKeyExist();
@@ -56,24 +31,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             nowFrame = CheckFootGroundAndWristForce(nowFrame);
         }
 
-        public List<CriticalPoint> GetResult()
-        {
-            return this.result;
-        }
-
-        private int FromKeyExist()
-        {
-            for(int i = 0; i < this.FrameList.Count; i++)
-            {
-                if(this.FrameList[i].jointDict.Count != 0)
-                {
-                    return i;
-                }
-            }
-            return this.FrameList.Count;
-        }
-
-        private void GenerateCompareData(int nowFrame)
+        public override void GenerateCompareData(int nowFrame)
         {
             int spineShoulderBaseCount = 0;
             for (int i = nowFrame; i < this.FrameList.Count; i++)
@@ -147,6 +105,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
             bool FootGrounded = false;
             bool WristForced = false;
+            int recordFrame = 0;
             for (int i = nowFrame; i < this.FrameList.Count; i++)
             {
                 Point3D footRight = this.FrameList[i].jointDict[JointType.FootRight];
@@ -165,42 +124,24 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 }
                 if (steadyCount >= 5 && !FootGrounded)
                 {
-                    Record(i - 5, "腳跟著地");
+                    recordFrame = Record(i - 5, "腳跟著地");
                     FootGrounded = true;
                 }
                 prevAnkleRight = ankleRight;
 
-                nowResult = CheckSide(wristRight, elbowRight, handRight);
+                nowResult = CheckSide(elbowRight, wristRight, handTipRight);
                 if (nowResult < 0 && prevResult > 0 && !WristForced)
                 {
-                    Record(i, "手腕發力");
+                    recordFrame = Record(i, "手腕發力");
                     WristForced = true;
+                }
+                if(FootGrounded && WristForced)
+                {
+                    return recordFrame;
                 }
                 prevResult = nowResult;
             }
             return this.FrameList.Count;
-        }
-
-        private void Debug(int i, double value)
-        {
-            Console.WriteLine("Frame: "+ i + ", " + value);
-        }
-
-        private int Record(int i, String criticalPoint)
-        {
-            Console.WriteLine(i + " " + criticalPoint);
-            this.result.Add(new CriticalPoint(criticalPoint, (double)i / this.videoCount));
-            return i;
-        }
-
-        private int CheckSide(Point3D lineCoord1, Point3D lineCoord2, Point3D checkPoint)
-        {
-            double a = (lineCoord2.Y - lineCoord1.Y) / (lineCoord2.X - lineCoord1.X);
-            double b = lineCoord1.Y - a * lineCoord1.X;
-            double result = checkPoint.Y - a * checkPoint.X - b;
-            if (result * a < 0)
-                return -1;
-            return 1;
         }
     }
 }

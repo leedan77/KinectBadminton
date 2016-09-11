@@ -119,6 +119,7 @@
       <DependentUpon>MenuWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Monitors\LobMonitor.cs" />
+    <Compile Include="Monitors\Monitor.cs" />
     <Compile Include="Monitors\ServeMonitor.cs" />
     <Compile Include="Monitors\SmashMonitor.cs" />
     <Compile Include="MenuUserControl.xaml.cs">

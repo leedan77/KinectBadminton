@@ -16,6 +16,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
     using Emgu.CV.Structure;
     using Newtonsoft.Json;
     using System.Windows.Media.Media3D;
+    using Monitors;
     class Joints
     {
         public string jointType;
@@ -261,16 +262,16 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         {
             if (this.type == "smash")
             {
-                //SmashMonitor smashMonitor = new SmashMonitor(this.frameList, videoCount);
-                //smashMonitor.start();
-                //string judgeResult = JsonConvert.SerializeObject(smashMonitor.GetResult());
-                //File.WriteAllText("../../../data/" + person_type + "/" + this.type + "/" + name + "/judgement.json", judgeResult);
+                SmashMonitor smashMonitor = new SmashMonitor(this.frameList, videoCount);
+                smashMonitor.Start();
+                string judgeResult = JsonConvert.SerializeObject(smashMonitor.GetResult());
+                File.WriteAllText("../../../data/" + person_type + "/" + this.type + "/" + name + "/judgement.json", judgeResult);
             }
 
             else if(this.type == "serve")
             {
                 ServeMonitor serveMonitor = new ServeMonitor(this.frameList, videoCount);
-                serveMonitor.start();
+                serveMonitor.Start();
                 string judgeResult = JsonConvert.SerializeObject(serveMonitor.GetResult());
                 File.WriteAllText("../../../data/" + person_type + "/" + this.type + "/" + name + "/judgement.json", judgeResult);
             }
@@ -278,7 +279,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             else if(this.type == "lob")
             {
                 LobMonitor lobMonitor = new LobMonitor(this.frameList, videoCount);
-                lobMonitor.start();
+                lobMonitor.Start();
                 string judgeResult = JsonConvert.SerializeObject(lobMonitor.GetResult());
                 File.WriteAllText("../../../data/" + person_type + "/" + this.type + "/" + name + "/judgement.json", judgeResult);
             }

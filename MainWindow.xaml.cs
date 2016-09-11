@@ -25,16 +25,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                                      /// </summary>
     public sealed partial class MainWindow : Window //, INotifyPropertyChanged, IDisposable
     {
-        public struct CriticalPoint
-        {
-            public String name;
-            public double portion;
-            public CriticalPoint(String n, double p)
-            {
-                name = n;
-                portion = p;
-            }
-        }
 
         private bool leftPlaying = false;
         private bool leftPausing = false;
@@ -56,8 +46,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         public int coachVideoCount = 0;
         public int studentVideoCount = 0;
 
-        private List<CriticalPoint> studentJudgement;
-        private List<CriticalPoint> coachJudgement;
+        private List<Monitors.Monitor.CriticalPoint> studentJudgement;
+        private List<Monitors.Monitor.CriticalPoint> coachJudgement;
         private String[] smashGoals = {"側身", "手肘抬高", "手肘轉向前", "手腕發力", "收拍"};
         private String[] serveGoals = { "重心腳在左腳", "重心腳移到右腳", "轉腰", "手腕發力", "肩膀向前" };
         private String[] lobGoals = { "持拍立腕", "右腳跨步", "腳跟著地", "手腕發力" };
@@ -194,9 +184,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             String judgementDir = "../../../data/" + person_type + "/" + action_type + "/" + name + "/judgement.json";
             String rawJsonData = File.ReadAllText(judgementDir);
             if(person_type == "coach")
-                this.coachJudgement = JsonConvert.DeserializeObject<List<CriticalPoint>>(rawJsonData);
+                this.coachJudgement = JsonConvert.DeserializeObject<List<Monitors.Monitor.CriticalPoint>>(rawJsonData);
             else if (person_type == "student")
-                this.studentJudgement = JsonConvert.DeserializeObject<List<CriticalPoint>>(rawJsonData);
+                this.studentJudgement = JsonConvert.DeserializeObject<List<Monitors.Monitor.CriticalPoint>>(rawJsonData);
             
 
             if(person_type == "coach")
@@ -462,15 +452,15 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 string path = cur + dataBasePath + $"\\coach\\{action_type}\\{CoachFileName}\\{coach_color_or_body}.avi";
                 if(File.Exists(path))
                 {
-                    Console.WriteLine("file exist");
-                    Console.WriteLine(path);
+                    //Console.WriteLine("file exist");
+                    //Console.WriteLine(path);
                     resetUri(MediaPlayer_right, path);
                     LoadJudgement(CoachFileName, action_type, "coach");
                     releaseMediaElement(MediaPlayer_left);
                 } 
                 else
                 {
-                    Console.WriteLine("file not exist");
+                    //Console.WriteLine("file not exist");
                     releaseMediaElement(MediaPlayer_left);
                     releaseMediaElement(MediaPlayer_right);
                     clearCoachBtns();
@@ -483,14 +473,14 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 string path = cur + dataBasePath + $"\\coach\\{action_type}\\{CoachFileName}\\{coach_color_or_body}.avi";
                 if (File.Exists(path))
                 {
-                    Console.WriteLine("file exist");
+                    //Console.WriteLine("file exist");
                     resetUri(MediaPlayer_right, path);
                     LoadJudgement(CoachFileName, action_type, "coach");
                     releaseMediaElement(MediaPlayer_left);
                 }
                 else
                 {
-                    Console.WriteLine("file not exist");
+                    //Console.WriteLine("file not exist");
                     releaseMediaElement(MediaPlayer_left);
                     releaseMediaElement(MediaPlayer_right);
                     clearCoachBtns();
@@ -503,14 +493,14 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 string path = cur + dataBasePath + $"\\coach\\{action_type}\\{CoachFileName}\\{coach_color_or_body}.avi";
                 if (File.Exists(path))
                 {
-                    Console.WriteLine("file exist");
+                    //Console.WriteLine("file exist");
                     resetUri(MediaPlayer_right, path);
                     LoadJudgement(CoachFileName, action_type, "coach");
                     releaseMediaElement(MediaPlayer_left);
                 }
                 else
                 {
-                    Console.WriteLine("file not exist");
+                    //Console.WriteLine("file not exist");
                     releaseMediaElement(MediaPlayer_left);
                     releaseMediaElement(MediaPlayer_right);
                     clearCoachBtns();
