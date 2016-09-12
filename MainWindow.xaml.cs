@@ -162,7 +162,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             MediaPlayer_left.Position = new TimeSpan(0, 0, 0, 0, (int)positionInMillisecond);
         }
 
-        private void teacher_Button_Click(object sender, RoutedEventArgs e)
+        private void coach_Button_Click(object sender, RoutedEventArgs e)
         {
             MediaPlayer_right.Pause();
             double positionInMillisecond = this.rightVideoDuration * this.coachJudgement[(int)(sender as Button).Tag - 1].portion;
@@ -209,7 +209,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                         Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString("#001C70"),
                         Background = (SolidColorBrush)new BrushConverter().ConvertFromString("#E5DDB8"),
                     };
-                    button.Click += new RoutedEventHandler(teacher_Button_Click);
+                    button.Click += new RoutedEventHandler(coach_Button_Click);
 
                     grid.Children.Add(button);
                     coachGrid.Children.Add(grid);
