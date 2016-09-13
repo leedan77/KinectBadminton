@@ -39,13 +39,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private bool converting = false;
 
-        private string lastFile = string.Empty;
-
         private string idenity = "student";
         private string motion = "serve";
-
-        /// <summary> Number of playback iterations </summary>
-        private uint loopCount = 0;
 
         /// <summary> Delegate to use for placing a job with no arguments onto the Dispatcher </summary>
         private delegate void NoArgDelegate();
@@ -57,8 +52,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private delegate void OneArgDelegate(string arg);
 
         private delegate void TwoArgDelegate(string arg1, string arg2);
-
-        private delegate int MakeVideoDelegate(string arg1, string arg2);
 
         /// <summary> Active Kinect sensor </summary>
         private KinectSensor kinectSensor = null;
@@ -81,10 +74,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         /// Color visualizer
         /// </summary>
         private KinectColorView kinectColorView = null;
-
-        private string ConvertFilePath;
-
-        private string ConvertFileName;
 
 
         /// <summary>
@@ -252,7 +241,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
             if (!string.IsNullOrEmpty(filePath))
             {
-                this.lastFile = filePath;
                 this.isRecording = true;
                 this.RecordPlaybackStatusText = Properties.Resources.RecordingInProgressText;
                 this.UpdateState();
@@ -323,23 +311,20 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             {
                 this.RecordButton.IsEnabled = false;
                 this.RecordStopButton.IsEnabled = true;
-                this.BodyConvertButton.IsEnabled = false;
-                this.ColorConvertButton.IsEnabled = false;
+                this.ConvertButton.IsEnabled = false;
             }
             else if (this.converting)
             {
                 this.RecordButton.IsEnabled = false;
                 this.RecordStopButton.IsEnabled = false;
-                this.BodyConvertButton.IsEnabled = false;
-                this.ColorConvertButton.IsEnabled = false;
+                this.ConvertButton.IsEnabled = false;
             }
             else
             {
                 this.RecordPlaybackStatusText = string.Empty;
                 this.RecordButton.IsEnabled = true;
                 this.RecordStopButton.IsEnabled = false;
-                this.BodyConvertButton.IsEnabled = true;
-                this.ColorConvertButton.IsEnabled = true;
+                this.ConvertButton.IsEnabled = true;
 
                 // after converting resume the view
                 this.kinectColorbox.DataContext = this.kinectColorView;
@@ -401,59 +386,42 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             return fileName;
         }
 
-        private void BodyConvertButton_Click(object sender, RoutedEventArgs e)
+        private void ConvertButton_Click(object sender, RoutedEventArgs e)
         {
-       
-            this.kinectBodybox.DataContext = null;
-            this.kinectColorbox.DataContext = null;
-              
-            this.kinectBodyView = new KinectBodyView(this.kinectSensor, this.motion);
             string filePath = this.OpenFileForConvert();
-            ConvertFilePath = filePath;
             if (!string.IsNullOrEmpty(filePath))
             {
-                this.lastFile = filePath;
-                this.converting = true;
-             
-                this.kinectBodybox.DataContext = this.kinectBodyView;
-                TwoArgDelegate bodyConvert = new TwoArgDelegate(this.BodyConvertClip);
-                bodyConvert.BeginInvoke(filePath, nameBox.Text, null, null);
-            }
-            else
-            {
-                this.kinectBodybox.DataContext = this.kinectBodyView;
-                this.kinectColorbox.DataContext = this.kinectColorView;
+                ConvertBody(filePath);
             }
         }
 
-        private void ColorConvertButton_Click(object sender, RoutedEventArgs e)
+        private void ConvertBody(String filePath)
+        {
+            this.kinectBodybox.DataContext = null;
+            this.kinectColorbox.DataContext = null;
+            this.kinectBodyView = new KinectBodyView(this.kinectSensor, this.motion);
+
+            this.converting = true;
+            this.kinectBodybox.DataContext = this.kinectBodyView;
+            TwoArgDelegate bodyConvert = new TwoArgDelegate(this.BodyConvertClip);
+            bodyConvert.BeginInvoke(filePath, nameBox.Text, null, null);
+        }
+
+        private void ConvertColor(String filePath)
         {
             this.kinectBodybox.DataContext = null;
             this.kinectColorbox.DataContext = null;
             this.kinectColorView = new KinectColorView(this.kinectSensor);
-            
-            string filePath = this.OpenFileForConvert();
-            ConvertFilePath = filePath;
 
-            if (!string.IsNullOrEmpty(filePath))
-            {
-                this.lastFile = filePath;
-                this.converting = true;               
-                this.kinectColorbox.DataContext = this.kinectColorView;
-                TwoArgDelegate bodyConvert = new TwoArgDelegate(this.ColorConvertClip);
-                bodyConvert.BeginInvoke(filePath, nameBox.Text, null, null);
-            }
-            else
-            {
-                this.kinectBodybox.DataContext = this.kinectBodyView;
-                this.kinectColorbox.DataContext = this.kinectColorView;
-            }
+            this.converting = true;
+            this.kinectColorbox.DataContext = this.kinectColorView;
+            TwoArgDelegate colorConvert = new TwoArgDelegate(this.ColorConvertClip);
+            colorConvert.BeginInvoke(filePath, nameBox.Text, null, null);
         }
 
-        /// <summary>
-        /// Plays back a .xef file to the Kinect sensor
-        /// </summary>
-        /// <param name="filePath">Full path to the .xef file that should be played back to the sensor</param>
+        /// <summary>Plays back a .xef file to the Kinect sensor</summary>
+        /// <param name="filePath">Full path to the .xef file that should be played back to the sensor</param
+        /// <param name="personName">The name of tester in the video</param>
         private void BodyConvertClip(string filePath, string personName)
         {
             
@@ -463,21 +431,17 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 int nowFrame = 0;
                 int prevFrame = 0;
                 client.ConnectToService();
-
-                // Create the playback object
                 using (KStudioPlayback playback = client.CreatePlayback(filePath))
                 {
-                    
-                    playback.LoopCount = this.loopCount;
-                    playback.Start();                  
-                    
+                    playback.LoopCount = 0;
+                    playback.Start();
                     while (playback.State == KStudioPlaybackState.Playing)
                     {
                         nowFrame = (int)(playback.CurrentRelativeTime.TotalMilliseconds / 33.33);
                         if (nowFrame > prevFrame)
                         {
                             playback.Pause();
-                            Thread.Sleep(20);
+                            Thread.Sleep(40);
                             playback.Resume();
                             Console.WriteLine(nowFrame);
                         }
@@ -489,14 +453,12 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
                 client.DisconnectFromService();
             }
-
-            // Update the UI after the convert playback task has completed
             int videoCount = makeVideo("body", personName);
             this.converting = false;
             this.kinectBodyView.converting = false;
-            //this.kinectBodyView.SaveData(personName);
             this.kinectBodyView.Judge(personName, this.idenity, videoCount);
-                
+            this.kinectBodyView.Dispose();
+            //this.Dispatcher.BeginInvoke(new OneArgDelegate(ConvertColor), filePath);
             this.Dispatcher.BeginInvoke(new NoArgDelegate(UpdateState));
         }
         private void ColorConvertClip(string filePath, string personName)
@@ -510,7 +472,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 // Create the playback object
                 using (KStudioPlayback playback = client.CreatePlayback(filePath))
                 {                   
-                    playback.LoopCount = this.loopCount;
+                    playback.LoopCount = 0;
                     playback.Start();
                     this.kinectColorView.converting = true;
                     while (playback.State == KStudioPlaybackState.Playing)
@@ -532,9 +494,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             }
 
             // Update the UI after the convert playback task has completed
-            MakeVideoDelegate mv = new MakeVideoDelegate(makeVideo);
-            mv.BeginInvoke("color", personName, null, null);
-            //makeVideo("color", personName);
+            makeVideo("color", personName);
             this.converting = false;
             this.kinectColorView.converting = false;
             //this.kinectColorView.Dispose();
@@ -551,14 +511,11 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             string fileName = string.Empty;
 
             OpenFileDialog dlg = new OpenFileDialog();
-            dlg.FileName = this.lastFile;
-            dlg.DefaultExt = Properties.Resources.XefExtension; // Default file extension
             dlg.Filter = Properties.Resources.EventFileDescription + " " + Properties.Resources.EventFileFilter; // Filter files by extension 
             bool? result = dlg.ShowDialog();
 
             if (result == true)
             {
-                this.ConvertFileName = dlg.SafeFileName;
                 fileName = dlg.FileName;
             }
 
