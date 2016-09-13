@@ -311,3 +311,7 @@ $RECYCLE.BIN/
 # Videos
 data/
 *.psd
+
+# .xef
+xefs/
+
