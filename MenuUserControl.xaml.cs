@@ -41,6 +41,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private string idenity = "student";
         private string motion = "serve";
+        private bool handedness = true;
 
         /// <summary> Delegate to use for placing a job with no arguments onto the Dispatcher </summary>
         private delegate void NoArgDelegate();
@@ -456,10 +457,12 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             int videoCount = makeVideo("body", personName);
             this.converting = false;
             this.kinectBodyView.converting = false;
-            this.kinectBodyView.Judge(personName, this.idenity, videoCount);
+            this.kinectBodyView.Judge(personName, this.idenity, this.handedness, videoCount);
             this.kinectBodyView.Dispose();
-            //this.Dispatcher.BeginInvoke(new OneArgDelegate(ConvertColor), filePath);
-            this.Dispatcher.BeginInvoke(new NoArgDelegate(UpdateState));
+            if (File.Exists(@"..\..\..\data\" + this.idenity + @"\" + this.motion + @"\" + personName + @"\color.avi"))
+                this.Dispatcher.BeginInvoke(new NoArgDelegate(UpdateState));
+            else
+                this.Dispatcher.BeginInvoke(new OneArgDelegate(ConvertColor), filePath);
         }
         private void ColorConvertClip(string filePath, string personName)
         {
@@ -497,7 +500,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             makeVideo("color", personName);
             this.converting = false;
             this.kinectColorView.converting = false;
-            //this.kinectColorView.Dispose();
+            this.kinectColorView.Dispose();
             this.Dispatcher.BeginInvoke(new NoArgDelegate(UpdateState));
         }
 
@@ -579,31 +582,27 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private void IdentiyButton_Checked(object sender, RoutedEventArgs e)
         {
             if (coachRadio.IsChecked == true)
-            {
-                idenity = "coach";
-                //Console.WriteLine(idenity);
-            }
+                this.idenity = "coach";
             else
-            {
-                idenity = "student";
-                //Console.WriteLine(idenity);
-            }
+                this.idenity = "student";
         }
 
         private void MotionRadio_Click(object sender, RoutedEventArgs e)
         {
             if (smashRadio.IsChecked == true)
-            {
-                motion = "smash";
-            }
+                this.motion = "smash";
             else if (lobRadio.IsChecked == true)
-            {
-                motion = "lob";
-            }
+                this.motion = "lob";
             else
-            {
-                motion = "serve";
-            }
+                this.motion = "serve";
+        }
+
+        private void HandednessRadio_Click(object sender, RoutedEventArgs e)
+        {
+            if (lefthandedRadio.IsChecked == true)
+                this.handedness = false;
+            else
+                this.handedness = true;
         }
     }
 

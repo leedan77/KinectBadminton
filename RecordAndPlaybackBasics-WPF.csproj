@@ -130,10 +130,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="kinectRecord.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -142,14 +138,8 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="kinectRecord.xaml.cs">
-      <DependentUpon>kinectRecord.xaml</DependentUpon>
-    </Compile>
     <Compile Include="KinectViewers\KinectColorView.cs" />
-    <Compile Include="KinectViewers\KinectBodyIndexView.cs" />
     <Compile Include="KinectViewers\KinectBodyView.cs" />
-    <Compile Include="KinectViewers\KinectDepthView.cs" />
-    <Compile Include="KinectViewers\KinectIRView.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

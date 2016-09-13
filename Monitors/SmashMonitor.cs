@@ -17,11 +17,12 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
         private double headNeckDiff = 0;
         private double elbowSpineMaxDiff = 0;
 
-        public SmashMonitor(List<Frames> frameList, int videoCount)
+        public SmashMonitor(List<Frames> frameList, bool handedness, int videoCount)
         {
             this.FrameList = frameList;
             this.result = new List<CriticalPoint>();
             this.videoCount = videoCount;
+            this.handedness = handedness;
         }
 
         public override void Start()

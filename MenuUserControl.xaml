@@ -29,6 +29,10 @@
                 <RadioButton x:Name="lobRadio" GroupName="motion" HorizontalAlignment="Center" Margin="0, 10, 50, 10" Click="MotionRadio_Click" Content="挑球"/>
                 <RadioButton x:Name="smashRadio" GroupName="motion" HorizontalAlignment="Center" Margin="0, 10, 50, 10" Click="MotionRadio_Click" Content="殺球"/>
             </StackPanel>
+            <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Horizontal" Margin="30, 10, 0, 0">
+                <RadioButton x:Name="lefthandedRadio" GroupName="handedness" HorizontalAlignment="Center" Margin="0, 10, 50, 10" Click="HandednessRadio_Click" Content="左"/>
+                <RadioButton x:Name="righthandedRadio" GroupName="handedness" HorizontalAlignment="Center" Margin="0, 10, 50, 10" IsChecked="True" Click="HandednessRadio_Click" Content="右"/>
+            </StackPanel>
             <TextBox VerticalAlignment="Center" Margin="10,10,0,0" FontSize="20" Name="nameBox" Width="300">
                 林國欽
             </TextBox>

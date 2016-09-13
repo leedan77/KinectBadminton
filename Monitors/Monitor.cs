@@ -49,6 +49,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
         public List<Frames> FrameList;
         public List<CriticalPoint> result;
         public int videoCount = 0;
+        public bool handedness;
 
         public virtual void Start()
         {
@@ -60,16 +61,29 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
 
         }
 
+        public void initCriticalPoints(String[] cp)
+        {
+            for(int i = 0; i < cp.Length; i++)
+            {
+                this.result.Add(new CriticalPoint(cp[i], 100));
+            }
+        }
+
         public void Debug(int i, double value)
         {
             Console.WriteLine("Frame: " + i + ", " + value);
         }
 
-        public int Record(int i, String criticalPoint)
+        public int Record(int frame, String criticalPoint)
         {
-            Console.WriteLine(i + " " + criticalPoint);
-            result.Add(new CriticalPoint(criticalPoint, (double)i / videoCount));
-            return i;
+            Console.WriteLine(frame + " " + criticalPoint);
+            for (int i = 0; i < this.result.Count; i++)
+            {
+                if (this.result[i].name == criticalPoint)
+                    this.result[i] = new CriticalPoint(criticalPoint, (double)frame / videoCount);
+            }
+            //this.result.Add(new CriticalPoint(criticalPoint, (double)frame / videoCount));
+            return frame;
         }
 
         public int CheckSide(Point3D lineCoord1, Point3D lineCoord2, Point3D checkPoint)

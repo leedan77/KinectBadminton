@@ -55,6 +55,20 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private double rightVideoDuration = 0;
         private double leftVideoDuration = 0;
 
+        public struct Goals
+        {
+            public String[] smashGoals;
+            public String[] serveGoals;
+            public String[] lobGoals;
+            public Goals(String[] smash, String[] serve, String[] lob)
+            {
+                smashGoals = smash;
+                serveGoals = serve;
+                lobGoals = lob;
+            }
+        }
+        private Goals goals;
+
         private string StudentFileName
         {
             get
@@ -98,6 +112,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             this.action_type = "lob";
             this.student_color_or_body = "color";
             this.coach_color_or_body = "color";
+            this.goals = new Goals(this.smashGoals, this.serveGoals, this.lobGoals);
 
             MediaPlayer_left.ScrubbingEnabled = true;
             MediaPlayer_right.ScrubbingEnabled = true;
@@ -115,15 +130,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 RightTimelineSlider.Value = MediaPlayer_right.Position.TotalMilliseconds;
                 RightMediaLabel.Text = String.Format("{0:ss}:{0:fff}", MediaPlayer_right.Position);
             }
-        }
-        
-
-        private void RecordButton_Click(object sender, RoutedEventArgs e)
-        {
-            this.Hide();
-            kinectRecord w = new kinectRecord();
-            w.Owner = this;
-            w.Show();
         }
 
         private void MediaLeftOpened(object sender, RoutedEventArgs e)
@@ -152,7 +158,13 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             MenuWindow ccw = new MenuWindow("coach", action_type);
             ccw.Owner = this;
             ccw.ShowDialog();
-           
+        }
+
+        private void MediaPlayer_left_MouseRightButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            MenuWindow ccw = new MenuWindow("student", action_type);
+            ccw.Owner = this;
+            ccw.ShowDialog();
         }
 
         private void student_Button_Click(object sender, RoutedEventArgs e)
@@ -220,10 +232,10 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             {
                 textBlock1.Text = name;
 
-                for (int i = 0; i < this.coachJudgement.Count; i++)
+                for (int i = 0; i < this.studentJudgement.Count; i++)
                 {
                     Image image = new Image();
-                    if(i < studentJudgement.Count)
+                    if(this.studentJudgement[i].portion <= 1)
                         image.Source = new BitmapImage(new Uri(@"Images\tick.png", UriKind.Relative));
                     else
                         image.Source = new BitmapImage(new Uri(@"Images\cross.png", UriKind.Relative));
@@ -234,15 +246,14 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     Grid.SetColumn(image, 0);
                     stuGrid.Children.Add(image);
                 }
-                
-                for (int i = 0; i < this.coachJudgement.Count; ++i)
+                for (int i = 0; i < this.studentJudgement.Count; ++i)
                 {
                     Grid grid = new Grid();
                     Grid.SetRow(grid, i);
                     Grid.SetColumn(grid, 1);
                     Button button = new Button()
                     {
-                        Content = string.Format(this.coachJudgement[i].name),
+                        Content = string.Format(this.studentJudgement[i].name),
                         Tag = i + 1,
                         BorderThickness = new Thickness(0, 0, 0, 0),
                         FontSize = 16,
@@ -259,38 +270,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             }
         }
     
-        private void leftUpdateState()
-        {
-            //if (this.leftPlaying && !this.leftPausing)
-            //{
-            //    this.RecordButton.IsEnabled = false;
-            //}
-            //else if (this.leftPausing)
-            //{
-            //    this.RecordButton.IsEnabled = false;
-            //}
-            //else
-            //{
-            //    this.RecordButton.IsEnabled = true;
-            //}
-        }
-
-        private void rightUpdateState()
-        {
-            //if (this.rightPlaying && !this.rightPausing)
-            //{
-            //    this.RecordButton.IsEnabled = false;
-            //}
-            //else if (this.rightPausing)
-            //{
-            //    this.RecordButton.IsEnabled = false;
-            //}
-            //else
-            //{
-            //    this.RecordButton.IsEnabled = true;
-            //}
-        }
-        
         private void PlayPauseRightButton_Click(object sender, RoutedEventArgs e)
         {
             if (!this.rightPlaying)
@@ -307,7 +286,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 MediaPlayer_right.Pause();
                 PlayPauseRightButton.Source = new BitmapImage(new Uri(@"Images\play-circle.png", UriKind.Relative));
             }
-            //this.rightUpdateState();
         }
 
         private void StopRightButton_Click(object sender, RoutedEventArgs e)
@@ -316,7 +294,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             MediaPlayer_right.Position = new TimeSpan(0, 0, 0, 0, 0);
             this.rightPlaying = false;
             this.rightPausing = false;
-            //this.rightUpdateState();
         }
 
 
@@ -336,7 +313,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 MediaPlayer_left.Pause();
                 PlayPauseLeftButton.Source = new BitmapImage(new Uri(@"Images\play-circle.png", UriKind.Relative));
             }
-            //this.leftUpdateState();
         }
 
         private void StopLeftButton_Click(object sender, RoutedEventArgs e)
@@ -345,7 +321,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             MediaPlayer_left.Position = new TimeSpan(0, 0, 0, 0, 0);
             this.leftPlaying = false;
             this.leftPausing = false;
-            //this.leftUpdateState();
         }
 
         private void RightTimelineSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -354,8 +329,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             {
                 MediaPlayer_right.Pause();
                 int SliderValue = (int)RightTimelineSlider.Value;
-                // Overloaded constructor takes the arguments days, hours, minutes, seconds, miniseconds.
-                // Create a TimeSpan with miliseconds equal to the slider value.
                 TimeSpan ts = new TimeSpan(0, 0, 0, 0, SliderValue);
                 MediaPlayer_right.Position = ts;
 
@@ -372,8 +345,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             {
                 MediaPlayer_left.Pause();
                 int SliderValue = (int)LeftTimelineSlider.Value;
-                // Overloaded constructor takes the arguments days, hours, minutes, seconds, miniseconds.
-                // Create a TimeSpan with miliseconds equal to the slider value.
                 TimeSpan ts = new TimeSpan(0, 0, 0, 0, SliderValue);
                 MediaPlayer_left.Position = ts;
             }
@@ -391,13 +362,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private void RightSpeedSlider_ValueChanged_1(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             MediaPlayer_left.SpeedRatio = (double)LeftSpeedSlider.Value;
-        }
-
-        private void MediaPlay_left_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            MenuWindow ccw = new MenuWindow("student", action_type);
-            ccw.Owner = this;
-            ccw.ShowDialog();
         }
 
         private void MenuLeftButton_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)

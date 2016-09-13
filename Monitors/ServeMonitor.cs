@@ -13,12 +13,15 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
     class ServeMonitor:Monitor
     {
         private double hipWidthWhenBalanceChange = 0;
+        private String[] goals = { "重心腳在右腳" , "重心轉移到左腳", "轉腰" , "手腕發力" , "手肘向前" };
 
-        public ServeMonitor(List<Frames> frameList, int videoCount)
+        public ServeMonitor(List<Frames> frameList, bool handedness, int videoCount)
         {
             this.FrameList = frameList;
             this.result = new List<CriticalPoint>();
             this.videoCount = videoCount;
+            this.handedness = handedness;
+            initCriticalPoints(goals);
         }
         public override void Start()
         {

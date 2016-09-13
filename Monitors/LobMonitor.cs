@@ -12,12 +12,15 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
     {
         private double spineShoulderBaseDiff = 0;
         private double initAnkleRightZ = 0;
+        private String[] goals = { "持拍立腕", "右腳跨步", "腳跟著地", "手腕發力" };
 
-        public LobMonitor(List<Frames> frameList, int videoCount)
+        public LobMonitor(List<Frames> frameList, bool handedness, int videoCount)
         {
             this.FrameList = frameList;
             this.result = new List<CriticalPoint>();
             this.videoCount = videoCount;
+            this.handedness = handedness;
+            initCriticalPoints(goals);
         }
 
         public override void Start()

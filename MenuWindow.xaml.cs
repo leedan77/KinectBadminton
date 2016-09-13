@@ -22,7 +22,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
     public partial class MenuWindow : Window
     {
         DirectoryInfo dirInfo;
-        FileInfo[] fileInfo;
         ArrayList list;
         string cur = Environment.CurrentDirectory;
         public string action_type;
