@@ -258,7 +258,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             }
         }
 
-        public void Judge(String name, String person_type, bool handedness, int videoCount)
+        public void Judge(String name, String person_type, String handedness, int videoCount)
         {
             if (this.type == "smash")
             {

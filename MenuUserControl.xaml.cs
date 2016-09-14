@@ -41,7 +41,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private string idenity = "student";
         private string motion = "serve";
-        private bool handedness = true;
+        private String handedness = "right";
 
         /// <summary> Delegate to use for placing a job with no arguments onto the Dispatcher </summary>
         private delegate void NoArgDelegate();
@@ -460,7 +460,10 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             this.kinectBodyView.Judge(personName, this.idenity, this.handedness, videoCount);
             this.kinectBodyView.Dispose();
             if (File.Exists(@"..\..\..\data\" + this.idenity + @"\" + this.motion + @"\" + personName + @"\color.avi"))
+            {
+                Thread.Sleep(1000);
                 this.Dispatcher.BeginInvoke(new NoArgDelegate(UpdateState));
+            }
             else
                 this.Dispatcher.BeginInvoke(new OneArgDelegate(ConvertColor), filePath);
         }
@@ -600,9 +603,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private void HandednessRadio_Click(object sender, RoutedEventArgs e)
         {
             if (lefthandedRadio.IsChecked == true)
-                this.handedness = false;
+                this.handedness = "left";
             else
-                this.handedness = true;
+                this.handedness = "right";
         }
     }
 

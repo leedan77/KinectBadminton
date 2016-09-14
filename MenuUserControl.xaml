@@ -34,7 +34,7 @@
                 <RadioButton x:Name="righthandedRadio" GroupName="handedness" HorizontalAlignment="Center" Margin="0, 10, 50, 10" IsChecked="True" Click="HandednessRadio_Click" Content="右"/>
             </StackPanel>
             <TextBox VerticalAlignment="Center" Margin="10,10,0,0" FontSize="20" Name="nameBox" Width="300">
-                林國欽
+                楊博涵
             </TextBox>
         </StackPanel>
         <Grid Grid.Row="1" Background="Black" MouseMove="Grid_MouseMove" Margin="0,10,-0.4,0">

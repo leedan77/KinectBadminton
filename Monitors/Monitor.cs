@@ -49,7 +49,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
         public List<Frames> FrameList;
         public List<CriticalPoint> result;
         public int videoCount = 0;
-        public bool handedness;
+        public String handedness;
 
         public virtual void Start()
         {
@@ -93,7 +93,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
             double result = checkPoint.Y - a * checkPoint.X - b;
             if ((a > 0 && result > 0 && checkPoint.X < lineCoord1.X) || (a > 0 && result < 0 && checkPoint.X > lineCoord1.X)
                 || (a < 0 && result < 0 && checkPoint.Y < lineCoord1.Y) || (a < 0 && result > 0 && checkPoint.Y > lineCoord1.Y))
-            //if (result * a < 0)
                 return 1;
             return -1;
         }
