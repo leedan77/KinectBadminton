@@ -66,10 +66,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
             {
                 if(this.handedness == "right")
                 {
-                    Point3D thumbRight = this.FrameList[i].jointDict[JointType.ThumbRight];
                     Point3D handRight = this.FrameList[i].jointDict[JointType.HandRight];
                     Point3D handTipRight = this.FrameList[i].jointDict[JointType.HandTipRight];
-                    double thumbHandYDiff = thumbRight.Y - handRight.Y;
                     double handTipHandYDiff = handTipRight.Y - handRight.Y;
                     Debug(i, handTipHandYDiff);
                     steadyCount++;
@@ -84,10 +82,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
                 }
                 else
                 {
-                    Point3D thumbLeft = this.FrameList[i].jointDict[JointType.ThumbLeft];
                     Point3D handLeft = this.FrameList[i].jointDict[JointType.HandLeft];
                     Point3D handTipLeft = this.FrameList[i].jointDict[JointType.HandTipLeft];
-                    double thumbHandYDiff = thumbLeft.Y - handLeft.Y;
                     double handTipHandYDiff = handTipLeft.Y - handLeft.Y;
                     Debug(i, handTipHandYDiff);
                     steadyCount++;
