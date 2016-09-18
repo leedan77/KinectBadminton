@@ -25,12 +25,22 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         ArrayList list;
         string cur = Environment.CurrentDirectory;
         public string action_type;
+        public string experiment;
+        public string week;
         private string menuType;
         public string MenuType
         {
             get
             {
-                return $"\\..\\..\\..\\data\\{menuType}\\{action_type}";
+                if (menuType == "student")
+                {
+                    return $"\\..\\..\\..\\data\\{menuType}\\{experiment}\\{week}\\{action_type}";
+                }
+                else
+                {
+                    return $"\\..\\..\\..\\data\\{menuType}\\{action_type}";
+                }
+                //return $"\\..\\..\\..\\data\\{menuType}\\{action_type}";
             }
             set
             {
@@ -59,7 +69,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             }
         }
 
-        public MenuWindow(string type, string action_type)
+        public MenuWindow(string type, string action_type, string experiment, string week)
         {
             InitializeComponent();
             this.action_type = action_type;
@@ -75,7 +85,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 parent.RightVideoChoosen(selectedItem);
             else if(this.menuType == "student")
                 parent.LeftVideoChoosen(selectedItem);
-            parent.LoadJudgement(selectedItem, action_type, menuType);
+            parent.LoadJudgement(selectedItem, action_type, menuType, experiment, week);
             this.Close();
         }
 

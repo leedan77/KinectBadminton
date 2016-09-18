@@ -43,6 +43,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         
         private string studentFileName;
 
+        private string experiment = "experimental";
+        private string week = "week1";
+
         public int coachVideoCount = 0;
         public int studentVideoCount = 0;
 
@@ -79,7 +82,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             {
                 this.studentFileName = value;
                 // play right media
-                string path = cur + dataBasePath + $"\\student\\{action_type}\\{StudentFileName}\\{student_color_or_body}.avi";
+                string path = cur + dataBasePath + $"\\student\\{experiment}\\{week}\\{action_type}\\{StudentFileName}\\{student_color_or_body}.avi";
                 MediaPlayer_left.Source = new Uri(path);
                 MediaPlayer_left.Stop();
             }
@@ -155,14 +158,17 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private void MediaPlayer_right_MouseRightButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            MenuWindow ccw = new MenuWindow("coach", action_type);
+            //MenuWindow ccw = new MenuWindow("coach", action_type);
+            //experiment and week is useless here
+            MenuWindow ccw = new MenuWindow("coach", action_type, experiment, week);
             ccw.Owner = this;
             ccw.ShowDialog();
         }
 
         private void MediaPlayer_left_MouseRightButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            MenuWindow ccw = new MenuWindow("student", action_type);
+            //MenuWindow ccw = new MenuWindow("student", action_type);
+            MenuWindow ccw = new MenuWindow("coach", action_type, experiment, week);
             ccw.Owner = this;
             ccw.ShowDialog();
         }
@@ -191,9 +197,19 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             this.StudentFileName = selectedItem;
         }
 
-        public void LoadJudgement(String name, String action_type, String person_type)
+        public void LoadJudgement(String name, String action_type, String person_type, String experiment, String week)
         {
-            String judgementDir = "../../../data/" + person_type + "/" + action_type + "/" + name + "/judgement.json";
+            //String judgementDir = "../../../data/" + person_type + "/" + action_type + "/" + name + "/judgement.json";
+            String judgementDir = null;
+            if (person_type == "student")
+            {
+                judgementDir = "../../../data/" + person_type + "/" + experiment + "/" + week + "/" + action_type + "/" + name + "/judgement.json";
+            }
+            //person_type == coach
+            else
+            {
+                judgementDir = "../../../data/" + person_type + "/" + action_type + "/" + name + "/judgement.json";
+            }
             String rawJsonData = File.ReadAllText(judgementDir);
             if(person_type == "coach")
                 this.coachJudgement = JsonConvert.DeserializeObject<List<Monitors.Monitor.CriticalPoint>>(rawJsonData);
@@ -366,14 +382,17 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private void MenuLeftButton_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            MenuWindow ccw = new MenuWindow("student", action_type);
+            //MenuWindow ccw = new MenuWindow("student", action_type);
+            MenuWindow ccw = new MenuWindow("student", action_type, experiment, week);
             ccw.Owner = this;
             ccw.ShowDialog();
         }
 
         private void MenuRightButton_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            MenuWindow ccw = new MenuWindow("coach", action_type);
+            //MenuWindow ccw = new MenuWindow("coach", action_type);
+            //experiment and week is useless here
+            MenuWindow ccw = new MenuWindow("coach", action_type, experiment, week);
             ccw.Owner = this;
             ccw.ShowDialog();
         }
@@ -383,13 +402,13 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             if (leftColorRadio.IsChecked == true)
             {
                 student_color_or_body = "color";
-                string path = cur + dataBasePath + $"\\student\\{action_type}\\{StudentFileName}\\{student_color_or_body}.avi";
+                string path = cur + dataBasePath + $"\\student\\{action_type}\\{experiment}\\{week}\\{StudentFileName}\\{student_color_or_body}.avi";
                 resetUri(MediaPlayer_left, path);
             }
             else if (leftBodyRadio.IsChecked == true)
             {
                 student_color_or_body = "body";
-                string path = cur + dataBasePath + $"\\student\\{action_type}\\{StudentFileName}\\{student_color_or_body}.avi";
+                string path = cur + dataBasePath + $"\\student\\{action_type}\\{experiment}\\{week}\\{StudentFileName}\\{student_color_or_body}.avi";
                 resetUri(MediaPlayer_left, path);
             }
             if (rightBodyRadio.IsChecked == true)
@@ -419,7 +438,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     //Console.WriteLine("file exist");
                     //Console.WriteLine(path);
                     resetUri(MediaPlayer_right, path);
-                    LoadJudgement(CoachFileName, action_type, "coach");
+                    //experiment and week is useless here
+                    LoadJudgement(CoachFileName, action_type, "coach", experiment, week);
+                    //LoadJudgement(CoachFileName, action_type, "coach");
                     releaseMediaElement(MediaPlayer_left);
                 } 
                 else
@@ -438,8 +459,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 if (File.Exists(path))
                 {
                     //Console.WriteLine("file exist");
-                    resetUri(MediaPlayer_right, path);
-                    LoadJudgement(CoachFileName, action_type, "coach");
+                    //experiment and week is useless here
+                    LoadJudgement(CoachFileName, action_type, "coach", experiment, week);
+                    //LoadJudgement(CoachFileName, action_type, "coach");
                     releaseMediaElement(MediaPlayer_left);
                 }
                 else
@@ -458,8 +480,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 if (File.Exists(path))
                 {
                     //Console.WriteLine("file exist");
-                    resetUri(MediaPlayer_right, path);
-                    LoadJudgement(CoachFileName, action_type, "coach");
+                    //experiment and week is useless here
+                    LoadJudgement(CoachFileName, action_type, "coach", experiment, week);
+                    //LoadJudgement(CoachFileName, action_type, "coach");
                     releaseMediaElement(MediaPlayer_left);
                 }
                 else
@@ -500,6 +523,53 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         }
 
-        
+        private void ExperimentButton_Checked(object sender, RoutedEventArgs e)
+        {
+            if (experimentalRadio.IsChecked == true)
+            {
+                experiment = "experimental";
+                //Console.WriteLine(experiment);
+            }
+            else
+            {
+                experiment = "control";
+                //Console.WriteLine(experiment);
+            }
+        }
+
+        private void ComboBox_Loaded(object sender, RoutedEventArgs e)
+        {
+            // ... A List.
+            List<string> data = new List<string>();
+            data.Add("week1");
+            data.Add("week2");
+            data.Add("week3");
+            data.Add("week4");
+            data.Add("week5");
+            data.Add("week6");
+            data.Add("week7");
+            data.Add("week8");
+            data.Add("week9");
+            data.Add("week10");
+
+            // ... Get the ComboBox reference.
+            var comboBox = sender as ComboBox;
+
+            // ... Assign the ItemsSource to the List.
+            comboBox.ItemsSource = data;
+
+            // ... Make the first item selected.
+            comboBox.SelectedIndex = 0;
+        }
+
+        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            // ... Get the ComboBox.
+            var comboBox = sender as ComboBox;
+
+            // ... Set SelectedItem as Window Title.
+            week = comboBox.SelectedItem as string;
+            //Console.WriteLine(week);
+        }
     }
 }
