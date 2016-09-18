@@ -40,24 +40,29 @@
         </Style>
     </Window.Resources>
     <dragablz:TabablzControl>
-        
+
         <dragablz:TabablzControl.InterTabController>
             <dragablz:InterTabController />
         </dragablz:TabablzControl.InterTabController>
-        <TabItem Header="Record">
+        <TabItem Header="Record" HorizontalAlignment="Left" Width="52">
             <local:MenuUserControl />
         </TabItem>
 
 
         <TabItem Header="Main">
             <Grid Background="#bfb8ae">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="18*"/>
+                    <ColumnDefinition Width="19*"/>
+                    <ColumnDefinition Width="1649*"/>
+                </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="30" />
                     <RowDefinition Height="*" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                <Border Grid.Row="1" Margin="20 0 20 20" BorderBrush="#2a4357" BorderThickness="7">
+                <Border Grid.Row="1" Margin="2.416,0,20,20" BorderBrush="#2a4357" BorderThickness="7" Grid.ColumnSpan="2" Grid.Column="1">
                     <Grid Background="#b29f98">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition />
@@ -71,7 +76,7 @@
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
                         <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Left" Orientation="Horizontal">
-                            
+
                             <Viewbox Height="40" Margin="200, 0, 0, 0">
                                 <RadioButton x:Name="leftColorRadio" GroupName="left" Grid.Row="0" HorizontalAlignment="Center" Margin="0, 10, 25, 10" IsChecked="True" Click="ToggleButton_Checked">彩色</RadioButton>
                             </Viewbox>
@@ -96,8 +101,8 @@
                                 <RowDefinition Height="50"/>
                                 <RowDefinition Height="50"/>
                             </Grid.RowDefinitions>
-                            <Button Style="{StaticResource MyButtonStyle}" Grid.Row="0" Margin="5, 0" Background="#3a475b" MouseDown="MediaPlayer_left_MouseRightButtonDown" Click="Button_Click">
-                                <MediaElement x:Name="MediaPlayer_left" Grid.Row="0" LoadedBehavior="Manual" HorizontalAlignment="Center" MediaOpened="MediaLeftOpened" MediaEnded="MediaEnded" RenderTransformOrigin="0.5,0.5">
+                            <Button Style="{StaticResource MyButtonStyle}" Grid.Row="0" Margin="5, 0" Background="#3a475b" MouseDown="MediaPlayer_left_MouseRightButtonDown">
+                                <MediaElement x:Name="MediaPlayer_left" Grid.Row="0" LoadedBehavior="Manual" HorizontalAlignment="Center" MediaOpened="MediaLeftOpened" MediaEnded="MediaLeftEnded" RenderTransformOrigin="0.5,0.5">
                                     <MediaElement.RenderTransform>
                                         <ScaleTransform ScaleX="-1"/>
                                     </MediaElement.RenderTransform>
@@ -144,7 +149,7 @@
                                 <RowDefinition Height="50"/>
                             </Grid.RowDefinitions>
                             <Button Style="{StaticResource MyButtonStyle}" Grid.Row="0" Margin="5, 0" Background="#3a475b" MouseDown="MediaPlayer_right_MouseRightButtonDown" >
-                                <MediaElement x:Name="MediaPlayer_right" Grid.Row="0" LoadedBehavior="Manual" HorizontalAlignment="Center" MediaOpened="MediaRightOpened" MediaEnded="MediaEnded" RenderTransformOrigin="0.5,0.5">
+                                <MediaElement x:Name="MediaPlayer_right" Grid.Row="0" LoadedBehavior="Manual" HorizontalAlignment="Center" MediaOpened="MediaRightOpened" MediaEnded="MediaRightEnded" RenderTransformOrigin="0.5,0.5">
                                     <MediaElement.RenderTransform>
                                         <ScaleTransform ScaleX="-1"/>
                                     </MediaElement.RenderTransform>

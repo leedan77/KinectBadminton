@@ -24,13 +24,33 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         DirectoryInfo dirInfo;
         ArrayList list;
         string cur = Environment.CurrentDirectory;
-        public string action_type;
+        private string actionType;
+        public string ActionType
+        {
+            get
+            {
+                return actionType;
+            }
+            set
+            {
+                actionType = value;
+                if (value == "lob")
+                    this.actionTypeChinese = "挑球";
+                else if (value == "serve")
+                    this.actionTypeChinese = "發球";
+                else if (value == "smash")
+                    this.actionTypeChinese = "殺球";
+            }
+        }
+        private string actionTypeChinese;
         private string menuType;
+        private string selectedItem = string.Empty;
+
         public string MenuType
         {
             get
             {
-                return $"\\..\\..\\..\\data\\{menuType}\\{action_type}";
+                return $"\\..\\..\\..\\data\\{menuType}\\{ActionType}";
             }
             set
             {
@@ -62,22 +82,49 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         public MenuWindow(string type, string action_type)
         {
             InitializeComponent();
-            this.action_type = action_type;
+            this.ActionType = action_type;
             this.MenuType = type;         
            
         }
-        
-        private void MenuListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+
+        private void MenuListBox__SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var parent = this.Owner as MainWindow;
-            string selectedItem = MenuListBox.SelectedItem.ToString();
-            if (this.menuType == "coach") 
-                parent.RightVideoChoosen(selectedItem);
-            else if(this.menuType == "student")
-                parent.LeftVideoChoosen(selectedItem);
-            parent.LoadJudgement(selectedItem, action_type, menuType);
-            this.Close();
+            
         }
 
+        private void DeleteButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (MenuListBox.SelectedItem != null)
+            {
+                MessageBoxResult messageBoxResult = MessageBox.Show(
+                    $"刪除後無法回復，包含 {MenuListBox.SelectedItem.ToString()} {this.actionTypeChinese} 的彩色及骨架影片", 
+                    "Delete Confirmation", MessageBoxButton.YesNo);
+                if (messageBoxResult == MessageBoxResult.Yes)
+                {
+                    string path = cur + this.MenuType + $"\\{MenuListBox.SelectedItem.ToString()}";
+                    Directory.Delete(path, true);
+                    this.MenuType = this.menuType;
+                }
+            }
+            else
+                MessageBox.Show("請先選擇欲刪除的項目", "選單");
+        }
+
+        private void PlayButton_Click(object sender, RoutedEventArgs e)
+        {
+            if(MenuListBox.SelectedItem != null)
+            {
+                var parent = this.Owner as MainWindow;
+                string selectedItem = MenuListBox.SelectedItem.ToString();
+                if (this.menuType == "coach")
+                    parent.RightVideoChoosen(selectedItem);
+                else if (this.menuType == "student")
+                    parent.LeftVideoChoosen(selectedItem);
+                parent.LoadJudgement(selectedItem, ActionType, menuType);
+                this.Close();
+            }
+            else
+                MessageBox.Show("請先選擇欲播放的項目", "選單");
+        }
     }
 }

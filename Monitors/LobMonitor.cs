@@ -13,7 +13,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
         private double spineShoulderBaseDiff = 0;
         private double initAnkleRightZ = 0;
         private double initAnkleLeftZ = 0;
-        private String[] goals = { "持拍立腕", "右腳跨步", "腳跟著地", "手腕發力" };
+        private String[] goals = { "持拍立腕", "慣用腳跨步", "腳跟著地", "手腕發力" };
 
         public LobMonitor(List<Frames> frameList, String handedness, int videoCount)
         {
@@ -127,14 +127,14 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
                     Point3D ankleRight = this.FrameList[i].jointDict[JointType.AnkleRight];
                     double stepSpineRatio = (this.initAnkleRightZ - ankleRight.Z) / this.spineShoulderBaseDiff;
                     if (stepSpineRatio > 0.75)
-                        return Record(i, "右腳跨步");
+                        return Record(i, "慣用腳跨步");
                 }
                 else
                 {
                     Point3D ankleLeft = this.FrameList[i].jointDict[JointType.AnkleLeft];
                     double stepSpineRatio = (this.initAnkleRightZ - ankleLeft.Z) / this.spineShoulderBaseDiff;
                     if (stepSpineRatio > 0.75)
-                        return Record(i, "右腳跨步");
+                        return Record(i, "慣用腳跨步");
                 }
             }
             return this.FrameList.Count;
@@ -163,6 +163,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
                     Point3D wristRight = this.FrameList[i].jointDict[JointType.WristRight];
                     Point3D handTipRight = this.FrameList[i].jointDict[JointType.HandTipRight];
                     Point3D handRight = this.FrameList[i].jointDict[JointType.HandRight];
+                    Point3D spineShoulder = this.FrameList[i].jointDict[JointType.SpineShoulder];
                     Vector3 ankleMovement = new Vector3(ankleRight, prevAnkleRight);
                     steadyCount++;
                     if (Math.Abs(ankleMovement.d) > 0.01)
@@ -179,7 +180,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
                     prevAnkleRight = ankleRight;
 
                     nowResult = CheckSide(elbowRight, wristRight, handTipRight);
-                    if (nowResult < 0 && prevResult > 0 && !WristForced)
+                    if (nowResult < 0 && prevResult > 0 && handTipRight.X > spineShoulder.X && !WristForced)
                     {
                         recordFrame = Record(i, "手腕發力");
                         WristForced = true;
@@ -198,6 +199,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
                     Point3D wristLeft = this.FrameList[i].jointDict[JointType.WristLeft];
                     Point3D handTipLeft = this.FrameList[i].jointDict[JointType.HandTipLeft];
                     Point3D handLeft = this.FrameList[i].jointDict[JointType.HandLeft];
+                    Point3D spineShoulder = this.FrameList[i].jointDict[JointType.SpineShoulder];
                     Vector3 ankleMovement = new Vector3(ankleLeft, prevAnkleLeft);
                     steadyCount++;
                     if (Math.Abs(ankleMovement.d) > 0.01)
@@ -214,7 +216,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
                     prevAnkleLeft = ankleLeft;
 
                     nowResult = CheckSide(elbowLeft, wristLeft, handTipLeft);
-                    if (nowResult > 0 && prevResult < 0 && !WristForced)
+                    if (nowResult > 0 && prevResult < 0 && handTipLeft.X < spineShoulder.X && !WristForced)
                     {
                         recordFrame = Record(i, "手腕發力");
                         WristForced = true;

@@ -18,10 +18,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
     public sealed class VideoConverter
     {
         private List<Image<Bgr, byte>> video = new List<Image<Bgr, byte>>();
-        public VideoConverter()
-        {
-
-        }
 
         public void ColorViewToAVI(WriteableBitmap ColorBitmap)
         {
@@ -37,7 +33,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             video.Add(img);
         }
 
-        public List<Image<Bgr, byte>> BodyViewToAVI(DrawingImage image)
+        public void BodyViewToAVI(DrawingImage image)
         {
             Bitmap bmp;
             MemoryStream ms = new MemoryStream();
@@ -49,7 +45,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             bmp = new System.Drawing.Bitmap(ms);
             Image<Bgr, byte> img = new Image<Bgr, byte>(bmp);
             video.Add(img);
-            return video;
         }
 
         public List<Image<Bgr, byte>> GetVideo()

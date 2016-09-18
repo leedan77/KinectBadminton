@@ -13,7 +13,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
     class ServeMonitor:Monitor
     {
         private double hipWidthWhenBalanceChange = 0;
-        private String[] goals = { "重心腳在右腳" , "重心轉移到左腳", "轉腰" , "手腕發力" , "手肘向前" };
+        private String[] goals = { "重心腳在慣用腳" , "重心轉移至非慣用腳", "轉腰" , "手腕發力" , "手肘向前" };
 
         public ServeMonitor(List<Frames> frameList, String handedness, int videoCount)
         {
@@ -27,15 +27,16 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
         {
             int nowFrame = 0;
             nowFrame = FromKeyExist();
-            nowFrame = CheckBalancePoint(nowFrame, "right");
-            nowFrame = CheckBalancePoint(nowFrame, "left");
+            nowFrame = CheckBalancePoint(nowFrame);
+            //nowFrame = CheckBalancePoint(nowFrame, "left");
             nowFrame = CheckWaistTwist(nowFrame);
             nowFrame = CheckWristForward(nowFrame);
             nowFrame = CheckElbowEnded(nowFrame);
         }
 
-        private int CheckBalancePoint(int nowFrame, String side)
+        private int CheckBalancePoint(int nowFrame)
         {
+            bool init = false;
             for(int i = nowFrame; i < FrameList.Count; i++)
             {
                 Point3D hipRight = this.FrameList[i].jointDict[JointType.HipRight];
@@ -51,34 +52,66 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
 
                 double hipAngleRightHorAngle = Math.Acos((hipAngleRight.x * horizentalLine.x + hipAngleRight.y + horizentalLine.y) / (hipAngleRight.d * horizentalLine.d)) * 180 / Math.PI;
                 double hipAngleLeftHorAngle = Math.Acos((hipAngleLeft.x * horizentalLine.x + hipAngleLeft.y + horizentalLine.y) / (hipAngleLeft.d * horizentalLine.d)) * 180 / Math.PI;
-                
-                if(string.Compare(side, "right") == 0)
+
+                if (!init)
                 {
-                    if(Math.Abs(hipAngleRightHorAngle - 90) < Math.Abs(hipAngleLeftHorAngle - 90) - 5)
-                        return Record(i, "重心腳在右腳");
-                }
-                else if(string.Compare(side, "left") == 0)
-                {
-                    if (Math.Abs(hipAngleRightHorAngle - 90) > Math.Abs(hipAngleLeftHorAngle - 90) + 5)
+                    if(this.handedness == "right")
                     {
-                        this.hipWidthWhenBalanceChange = hipRight.X - hipLeft.X;
-                        return Record(i, "重心轉移到左腳");
+                        if (Math.Abs(hipAngleRightHorAngle - 90) < Math.Abs(hipAngleLeftHorAngle - 90) - 5)
+                        {
+                            Record(i, "重心腳在慣用腳");
+                            init = true;
+                        }
+                    }
+                    else if(this.handedness == "left")
+                    {
+                        if (Math.Abs(hipAngleRightHorAngle - 90) > Math.Abs(hipAngleLeftHorAngle - 90) + 5)
+                        {
+                            Record(i, "重心腳在慣用腳");
+                            init = true;
+                        }
                     }
                 }
+                else
+                {
+                    if(this.handedness == "right")
+                    {
+                        if (Math.Abs(hipAngleRightHorAngle - 90) > Math.Abs(hipAngleLeftHorAngle - 90) + 5)
+                        {
+                            this.hipWidthWhenBalanceChange = hipRight.X - hipLeft.X;
+                            return Record(i, "重心轉移至非慣用腳");
+                        }
+                    }
+                    else if (this.handedness == "left")
+                    {
+                        if (Math.Abs(hipAngleRightHorAngle - 90) < Math.Abs(hipAngleLeftHorAngle - 90) - 5)
+                        {
+                            this.hipWidthWhenBalanceChange = hipRight.X - hipLeft.X;
+                            return Record(i, "重心轉移至非慣用腳");
+                        }
+                    }
+                }
+
             }
             return this.FrameList.Count;
         }
 
         private int CheckWaistTwist(int nowFrame)
         {
-            double hipWidth = 0;
             for(int i = nowFrame; i < this.FrameList.Count; i++)
             {
                 Point3D hipRight = this.FrameList[i].jointDict[JointType.HipRight];
                 Point3D hipLeft = this.FrameList[i].jointDict[JointType.HipLeft];
-                hipWidth = hipRight.X - hipLeft.X;
-                if (hipRight.Z < hipLeft.Z)
-                    return Record(i, "轉腰");
+                if(this.handedness == "right")
+                {
+                    if (hipRight.Z < hipLeft.Z)
+                        return Record(i, "轉腰");
+                }
+                else if(this.handedness == "left")
+                {
+                    if (hipRight.Z > hipLeft.Z)
+                        return Record(i, "轉腰");
+                }
             }
             return this.FrameList.Count;
         }
@@ -92,14 +125,28 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
                 Point3D handTipRight = this.FrameList[i].jointDict[JointType.HandTipRight];
                 Point3D wristRight = this.FrameList[i].jointDict[JointType.WristRight];
                 Point3D elbowRight = this.FrameList[i].jointDict[JointType.ElbowRight];
+                Point3D handTipLeft = this.FrameList[i].jointDict[JointType.HandTipLeft];
+                Point3D wristLeft = this.FrameList[i].jointDict[JointType.WristLeft];
+                Point3D elbowLeft = this.FrameList[i].jointDict[JointType.ElbowLeft];
                 Point3D spineBase = this.FrameList[i].jointDict[JointType.SpineBase];
                 Point3D spineShoulder = this.FrameList[i].jointDict[JointType.SpineShoulder];
 
-                nowResult = CheckSide(elbowRight, wristRight, handTipRight);
-                double wristSpineAngle = CheckVec2Angle(spineShoulder, spineBase, wristRight);
-                if (nowResult * prevResult < 0 && (wristSpineAngle < 20 || handTipRight.X < spineBase.X))
-                    return Record(i, "手腕發力");
-                prevResult = nowResult;
+                if(this.handedness == "right")
+                {
+                    nowResult = CheckSide(elbowRight, wristRight, handTipRight);
+                    double wristSpineAngle = CheckVec2Angle(spineShoulder, spineBase, wristRight);
+                    if (nowResult * prevResult < 0 && (wristSpineAngle < 20 || handTipRight.X < spineBase.X))
+                        return Record(i, "手腕發力");
+                    prevResult = nowResult;
+                }
+                else if(this.handedness == "left")
+                {
+                    nowResult = CheckSide(elbowLeft, wristLeft, handTipLeft);
+                    double wristSpineAngle = CheckVec2Angle(spineShoulder, spineBase, wristLeft);
+                    if (nowResult * prevResult < 0 && (wristSpineAngle < 20 || handTipLeft.X > spineBase.X))
+                        return Record(i, "手腕發力");
+                    prevResult = nowResult;
+                }
             }
             return this.FrameList.Count;
 
@@ -110,11 +157,19 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
             for (int i = nowFrame; i < this.FrameList.Count; i++)
             {
                 Point3D shoulderRight = this.FrameList[i].jointDict[JointType.ShoulderRight];
-                Point3D spineShoulder = this.FrameList[i].jointDict[JointType.SpineShoulder];
-                Point3D handRight = this.FrameList[i].jointDict[JointType.HandRight];
                 Point3D elbowRight = this.FrameList[i].jointDict[JointType.ElbowRight];
-                if (elbowRight.Y > shoulderRight.Y)
-                    return Record(i, "手肘向前");
+                Point3D shoulderLeft = this.FrameList[i].jointDict[JointType.ShoulderLeft];
+                Point3D elbowLeft = this.FrameList[i].jointDict[JointType.ElbowLeft];
+                if(this.handedness == "right")
+                {
+                    if (elbowRight.Y > shoulderRight.Y)
+                        return Record(i, "手肘向前");
+                }
+                else if(this.handedness == "left")
+                {
+                    if (elbowLeft.Y > shoulderLeft.Y)
+                        return Record(i, "手肘向前");
+                }
             }
             return this.FrameList.Count;
         }

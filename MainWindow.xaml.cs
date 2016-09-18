@@ -20,9 +20,10 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
     using System.Diagnostics;
     using System.IO;
     using Newtonsoft.Json;
-    using System.Collections.Generic;/// <summary>
-                                     /// Interaction logic for the MainWindow
-                                     /// </summary>
+    using System.Collections.Generic;
+    using System.Threading;/// <summary>
+                           /// Interaction logic for the MainWindow
+                           /// </summary>
     public sealed partial class MainWindow : Window //, INotifyPropertyChanged, IDisposable
     {
 
@@ -41,7 +42,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private string coach_color_or_body;
         public string action_type;
         
-        private string studentFileName;
 
         public int coachVideoCount = 0;
         public int studentVideoCount = 0;
@@ -69,6 +69,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         }
         private Goals goals;
 
+        private string studentFileName;
         private string StudentFileName
         {
             get
@@ -78,10 +79,10 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             set
             {
                 this.studentFileName = value;
-                // play right media
                 string path = cur + dataBasePath + $"\\student\\{action_type}\\{StudentFileName}\\{student_color_or_body}.avi";
                 MediaPlayer_left.Source = new Uri(path);
-                MediaPlayer_left.Stop();
+                MediaPlayer_left.Play();
+                MediaPlayer_left.Pause();
             }
         }
 
@@ -98,7 +99,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 // play right media
                 string path = cur + dataBasePath + $"\\coach\\{action_type}\\{CoachFileName}\\{coach_color_or_body}.avi";
                 MediaPlayer_right.Source = new Uri(path);
-                MediaPlayer_right.Stop();
+                MediaPlayer_right.Play();
+                MediaPlayer_right.Pause();
             }
         }
 
@@ -148,9 +150,22 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             PlayPauseRightButton.IsEnabled = true;
         }
         
-        private void MediaEnded(object sender, RoutedEventArgs e)
+        private void MediaRightEnded(object sender, RoutedEventArgs e)
         {
+            MediaPlayer_right.Stop();
+            MediaPlayer_right.Position = new TimeSpan(0, 0, 0, 0, 0);
+            this.rightPlaying = false;
+            this.rightPausing = true;
+            MediaRightControlUpdateState();
+        }
 
+        private void MediaLeftEnded(object sender, RoutedEventArgs e)
+        {
+            MediaPlayer_left.Stop();
+            MediaPlayer_left.Position = new TimeSpan(0, 0, 0, 0, 0);
+            this.leftPlaying = false;
+            this.leftPausing = true;
+            MediaLeftControlUpdateState();
         }
 
         private void MediaPlayer_right_MouseRightButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -277,15 +292,14 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 this.rightPlaying = true;
                 this.rightPausing = false;
                 MediaPlayer_right.Play();
-                PlayPauseRightButton.Source = new BitmapImage(new Uri(@"Images\pause-circle.png", UriKind.Relative));
             }
             else
             {
                 this.rightPlaying = false;
                 this.rightPausing = true;
                 MediaPlayer_right.Pause();
-                PlayPauseRightButton.Source = new BitmapImage(new Uri(@"Images\play-circle.png", UriKind.Relative));
             }
+            MediaRightControlUpdateState();
         }
 
         private void StopRightButton_Click(object sender, RoutedEventArgs e)
@@ -293,9 +307,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             MediaPlayer_right.Stop();
             MediaPlayer_right.Position = new TimeSpan(0, 0, 0, 0, 0);
             this.rightPlaying = false;
-            this.rightPausing = false;
+            this.rightPausing = true;
+            MediaRightControlUpdateState();
         }
-
 
         private void PlayPauseLeftButton_Click(object sender, RoutedEventArgs e)
         {
@@ -304,15 +318,14 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 this.leftPlaying = true;
                 this.leftPausing = false;
                 MediaPlayer_left.Play();
-                PlayPauseLeftButton.Source = new BitmapImage(new Uri(@"Images\pause-circle.png", UriKind.Relative));
             }
             else
             {
                 this.leftPlaying = false;
                 this.leftPausing = true;
                 MediaPlayer_left.Pause();
-                PlayPauseLeftButton.Source = new BitmapImage(new Uri(@"Images\play-circle.png", UriKind.Relative));
             }
+            MediaLeftControlUpdateState();
         }
 
         private void StopLeftButton_Click(object sender, RoutedEventArgs e)
@@ -320,7 +333,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             MediaPlayer_left.Stop();
             MediaPlayer_left.Position = new TimeSpan(0, 0, 0, 0, 0);
             this.leftPlaying = false;
-            this.leftPausing = false;
+            this.leftPausing = true;
+            MediaLeftControlUpdateState();
         }
 
         private void RightTimelineSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -331,11 +345,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 int SliderValue = (int)RightTimelineSlider.Value;
                 TimeSpan ts = new TimeSpan(0, 0, 0, 0, SliderValue);
                 MediaPlayer_right.Position = ts;
-
-            }
-            else if(this.rightPlaying && !this.rightPausing)
-            {
-                MediaPlayer_right.Play();
             }
         }
 
@@ -347,10 +356,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 int SliderValue = (int)LeftTimelineSlider.Value;
                 TimeSpan ts = new TimeSpan(0, 0, 0, 0, SliderValue);
                 MediaPlayer_left.Position = ts;
-            }
-            else if(this.leftPlaying && !this.leftPausing)
-            {
-                MediaPlayer_left.Play();
             }
         }
 
@@ -410,25 +415,21 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private void ActionSwitch_Click(object sender, RoutedEventArgs e)
         {
             clearUserBtns();
+            clearCoachBtns();
             if (lobRadio.IsChecked == true)
             {
                 action_type = "lob";
                 string path = cur + dataBasePath + $"\\coach\\{action_type}\\{CoachFileName}\\{coach_color_or_body}.avi";
                 if(File.Exists(path))
                 {
-                    //Console.WriteLine("file exist");
-                    //Console.WriteLine(path);
                     resetUri(MediaPlayer_right, path);
                     LoadJudgement(CoachFileName, action_type, "coach");
                     releaseMediaElement(MediaPlayer_left);
                 } 
                 else
                 {
-                    //Console.WriteLine("file not exist");
                     releaseMediaElement(MediaPlayer_left);
                     releaseMediaElement(MediaPlayer_right);
-                    clearCoachBtns();
-                    
                 }
             }
             else if (serveRadio.IsChecked == true)
@@ -437,18 +438,14 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 string path = cur + dataBasePath + $"\\coach\\{action_type}\\{CoachFileName}\\{coach_color_or_body}.avi";
                 if (File.Exists(path))
                 {
-                    //Console.WriteLine("file exist");
                     resetUri(MediaPlayer_right, path);
                     LoadJudgement(CoachFileName, action_type, "coach");
                     releaseMediaElement(MediaPlayer_left);
                 }
                 else
                 {
-                    //Console.WriteLine("file not exist");
                     releaseMediaElement(MediaPlayer_left);
                     releaseMediaElement(MediaPlayer_right);
-                    clearCoachBtns();
-                   
                 }
             }
             else if (smashRadio.IsChecked == true)
@@ -457,18 +454,14 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 string path = cur + dataBasePath + $"\\coach\\{action_type}\\{CoachFileName}\\{coach_color_or_body}.avi";
                 if (File.Exists(path))
                 {
-                    //Console.WriteLine("file exist");
                     resetUri(MediaPlayer_right, path);
                     LoadJudgement(CoachFileName, action_type, "coach");
                     releaseMediaElement(MediaPlayer_left);
                 }
                 else
                 {
-                    //Console.WriteLine("file not exist");
                     releaseMediaElement(MediaPlayer_left);
                     releaseMediaElement(MediaPlayer_right);
-                    clearCoachBtns();
-                    
                 }
             }
         }
@@ -495,11 +488,28 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             stuGrid.Children.Clear();
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void MediaRightControlUpdateState()
         {
-
+            if (this.rightPlaying)
+            {
+                PlayPauseRightButton.Source = new BitmapImage(new Uri(@"Images\pause-circle.png", UriKind.Relative));
+            }
+            else if (this.rightPausing)
+            {
+                PlayPauseRightButton.Source = new BitmapImage(new Uri(@"Images\play-circle.png", UriKind.Relative));
+            }
         }
 
-        
+        private void MediaLeftControlUpdateState()
+        {
+            if (this.leftPlaying)
+            {
+                PlayPauseLeftButton.Source = new BitmapImage(new Uri(@"Images\pause-circle.png", UriKind.Relative));
+            }
+            else if (this.leftPausing)
+            {
+                PlayPauseLeftButton.Source = new BitmapImage(new Uri(@"Images\play-circle.png", UriKind.Relative));
+            }
+        }
     }
 }

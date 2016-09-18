@@ -35,12 +35,10 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
     class Frames
     {
         public int num;
-        //public List<Joints> jointList;
         public Dictionary<JointType, Point3D> jointDict = new Dictionary<JointType, Point3D>();
         public Frames(int num, Dictionary<JointType, Point3D> jointDict)
         {
             this.num = num;
-            //this.jointList = jointList;
             this.jointDict = jointDict;
         }
     }
@@ -146,7 +144,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         /// </summary>
         private List<Pen> bodyColors;
 
-        private VideoConverter video_converter = new VideoConverter();
+        private VideoConverter videoConverter = new VideoConverter();
         private List<Image<Bgr, byte>> video = new List<Image<Bgr, byte>>();
         public bool converting = false;
 
@@ -290,6 +288,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         /// </summary>
         /// <param name="sender">object sending the event</param>
         /// <param name="e">event arguments</param>
+        private bool newData = false;
         private void Reader_BodyFrameArrived(object sender, BodyFrameArrivedEventArgs e)
         {
             bool dataReceived = false;
@@ -308,6 +307,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     // those body objects will be re-used.
                     bodyFrame.GetAndRefreshBodyData(this.bodies);
                     dataReceived = true;
+                    newData = true;
                 }
             }
 
@@ -317,9 +317,19 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 this.UpdateBodyFrame(this.bodies);
                 if (converting)
                 {
-                    video = video_converter.BodyViewToAVI(this.imageSource);
+                    this.videoConverter.BodyViewToAVI(this.imageSource);
                 }
             }
+        }
+
+        public void ConvertImageSource()
+        {
+            if (this.newData)
+            {
+                this.videoConverter.BodyViewToAVI(this.imageSource);
+                this.newData = false;
+            }
+
         }
 
         /// <summary>
@@ -490,7 +500,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         {
             get
             {
-                return this.video;
+                return this.videoConverter.GetVideo();
             }
         }
     }

@@ -40,8 +40,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private bool converting = false;
 
         private string idenity = "student";
-        private string motion = "serve";
-        private String handedness = "right";
+        private string motion = "lob";
+        private string handedness = "right";
 
         /// <summary> Delegate to use for placing a job with no arguments onto the Dispatcher </summary>
         private delegate void NoArgDelegate();
@@ -69,17 +69,12 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         /// Body visualizer
         /// </summary>
         private KinectBodyView kinectBodyView = null;
-
-        //new add
+        
         /// <summary>
         /// Color visualizer
         /// </summary>
         private KinectColorView kinectColorView = null;
-
-
-        /// <summary>
-        /// Initializes a new instance of the MainWindow class.
-        /// </summary>
+        
         public MenuUserControl()
         {
             // initialize the components (controls) of the window
@@ -103,12 +98,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             //new add
             // create the Color visualizer
             this.kinectColorView = new KinectColorView(this.kinectSensor);
-            // set data context for display in UI
-            //left
             this.DataContext = this;
-            //this.kinectIRViewbox.DataContext = this.kinectIRView;
-            //this.kinectDepthViewbox.DataContext = this.kinectDepthView;
-            //this.kinectBodyIndexViewbox.DataContext = this.kinectBodyIndexView;
             this.kinectColorbox.DataContext = this.kinectColorView;
             this.kinectBodybox.DataContext = this.kinectBodyView;
         }
@@ -182,12 +172,18 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 this.kinectBodyView = null;
             }
 
-            //new add
             if (this.kinectColorView != null)
             {
                 this.kinectColorView.Dispose();
                 this.kinectColorView = null;
             }
+        }
+
+        private void Sensor_IsAvailableChanged(object sender, IsAvailableChangedEventArgs e)
+        {
+            // set the status text
+            //this.KinectStatusText = this.kinectSensor.IsAvailable ? Properties.Resources.RunningStatusText
+            //                                                : Properties.Resources.SensorNotAvailableStatusText;
         }
 
         /// <summary>
@@ -218,18 +214,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             }
             //this.Owner.Show();
         }
-
-        /// <summary>
-        /// Handles the event in which the sensor becomes unavailable (E.g. paused, closed, unplugged).
-        /// </summary>
-        /// <param name="sender">object sending the event</param>
-        /// <param name="e">event arguments</param>
-        private void Sensor_IsAvailableChanged(object sender, IsAvailableChangedEventArgs e)
-        {
-            // set the status text
-            //this.KinectStatusText = this.kinectSensor.IsAvailable ? Properties.Resources.RunningStatusText
-            //                                                : Properties.Resources.SensorNotAvailableStatusText;
-        }
+        
 
         /// <summary>
         /// Handles the user clicking on the Record button
@@ -438,6 +423,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     playback.Start();
                     while (playback.State == KStudioPlaybackState.Playing)
                     {
+                        this.kinectBodyView.converting = true;
                         nowFrame = (int)(playback.CurrentRelativeTime.TotalMilliseconds / 33.33);
                         if (nowFrame > prevFrame)
                         {
@@ -447,7 +433,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                             Console.WriteLine(nowFrame);
                         }
                         prevFrame = nowFrame;
-                        this.kinectBodyView.converting = true;
                     }
                     playback.Dispose();
                 }
@@ -469,7 +454,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         }
         private void ColorConvertClip(string filePath, string personName)
         {
-            
             using (KStudioClient client = KStudio.CreateClient())
             {
                 client.ConnectToService();
