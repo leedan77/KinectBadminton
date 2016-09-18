@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Microsoft.Samples.Kinect.RecordAndPlaybackBasics"
              mc:Ignorable="d" 
-             d:DesignHeight="700" d:DesignWidth="1000"
+             d:DesignHeight="700" d:DesignWidth="1500"
             >
     <Grid Margin="10 0 10 0">
         <Grid.RowDefinitions>
@@ -33,7 +33,12 @@
                 <RadioButton x:Name="lefthandedRadio" GroupName="handedness" HorizontalAlignment="Center" Margin="0, 10, 50, 10" Click="HandednessRadio_Click" Content="左"/>
                 <RadioButton x:Name="righthandedRadio" GroupName="handedness" HorizontalAlignment="Center" Margin="0, 10, 50, 10" IsChecked="True" Click="HandednessRadio_Click" Content="右"/>
             </StackPanel>
-            <TextBox VerticalAlignment="Center" Margin="10,10,0,0" FontSize="20" Name="nameBox" Width="300">
+            <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Horizontal" Margin="30, 10, 0, 0">
+                <RadioButton x:Name="experimentalRadio" GroupName="experiment" HorizontalAlignment="Center" Margin="0, 10, 20, 10" IsChecked="True" Click="ExperimentButton_Checked">實驗組</RadioButton>
+                <RadioButton x:Name="controlRadio" GroupName="experiment" HorizontalAlignment="Center" Margin="0, 10, 20, 10" Click="ExperimentButton_Checked">對照組</RadioButton>
+            </StackPanel>
+            <ComboBox HorizontalAlignment="Left" Margin="30,10,0,0" VerticalAlignment="Center" Width="80" Loaded="ComboBox_Loaded" SelectionChanged="ComboBox_SelectionChanged"/>
+            <TextBox VerticalAlignment="Center" Margin="30,10,0,0" FontSize="20" Name="nameBox" Width="150">
                 楊博涵
             </TextBox>
         </StackPanel>

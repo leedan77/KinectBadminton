@@ -258,14 +258,27 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             }
         }
 
-        public void Judge(String name, String person_type, String handedness, int videoCount)
+        public void Judge(String name, String person_type, String handedness, String experiment, String week, int videoCount)
         {
+            //create path
+            string path = null;
+            if (person_type == "student")
+            {
+                path = "../../../data/" + person_type + "/" + experiment + "/" + week + "/" + this.type + "/" + name + "/judgement.json";
+            }
+            //idenity == coach
+            else
+            {
+                path = "../../../data/" + person_type + "/" + this.type + "/" + name + "/judgement.json";
+            }
+
             if (this.type == "smash")
             {
                 SmashMonitor smashMonitor = new SmashMonitor(this.frameList, handedness, videoCount);
                 smashMonitor.Start();
                 string judgeResult = JsonConvert.SerializeObject(smashMonitor.GetResult());
-                File.WriteAllText("../../../data/" + person_type + "/" + this.type + "/" + name + "/judgement.json", judgeResult);
+                //File.WriteAllText("../../../data/" + person_type + "/" + this.type + "/" + name + "/judgement.json", judgeResult);
+                File.WriteAllText(path, judgeResult);
             }
 
             else if(this.type == "serve")
@@ -273,7 +286,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 ServeMonitor serveMonitor = new ServeMonitor(this.frameList, handedness, videoCount);
                 serveMonitor.Start();
                 string judgeResult = JsonConvert.SerializeObject(serveMonitor.GetResult());
-                File.WriteAllText("../../../data/" + person_type + "/" + this.type + "/" + name + "/judgement.json", judgeResult);
+                //File.WriteAllText("../../../data/" + person_type + "/" + this.type + "/" + name + "/judgement.json", judgeResult);
+                File.WriteAllText(path, judgeResult);
             }
 
             else if(this.type == "lob")
@@ -281,7 +295,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 LobMonitor lobMonitor = new LobMonitor(this.frameList, handedness, videoCount);
                 lobMonitor.Start();
                 string judgeResult = JsonConvert.SerializeObject(lobMonitor.GetResult());
-                File.WriteAllText("../../../data/" + person_type + "/" + this.type + "/" + name + "/judgement.json", judgeResult);
+                //File.WriteAllText("../../../data/" + person_type + "/" + this.type + "/" + name + "/judgement.json", judgeResult);
+                File.WriteAllText(path, judgeResult);
             }
         }
 

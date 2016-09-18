@@ -42,6 +42,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private string idenity = "student";
         private string motion = "serve";
         private String handedness = "right";
+        private string experiment = "experimental";
+        private string week = "week1";
 
         /// <summary> Delegate to use for placing a job with no arguments onto the Dispatcher </summary>
         private delegate void NoArgDelegate();
@@ -368,7 +370,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     string folderName = nameBox.Text + "_" + DateTime.Now.ToString("HH-mm-ss(yyyy-MM-dd)");
                     //Console.WriteLine(folderName);
                     string cur = Environment.CurrentDirectory;
-                    string relativePath = $"\\..\\..\\..\\data\\student\\{motion}\\";
+                    string relativePath = $"\\..\\..\\..\\data\\student\\{experiment}\\{week}\\{motion}\\";
                     string filePath = cur + relativePath + folderName;
                     if (Directory.Exists(filePath))
                     {
@@ -457,9 +459,19 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             int videoCount = makeVideo("body", personName);
             this.converting = false;
             this.kinectBodyView.converting = false;
-            this.kinectBodyView.Judge(personName, this.idenity, this.handedness, videoCount);
+            this.kinectBodyView.Judge(personName, this.idenity, this.handedness, this.experiment,  this.week, videoCount);
             this.kinectBodyView.Dispose();
-            if (File.Exists(@"..\..\..\data\" + this.idenity + @"\" + this.motion + @"\" + personName + @"\color.avi"))
+            string path = null;
+            if (this.idenity == "student")
+            {
+                path = @"..\..\..\data\" + this.idenity + @"\" + this.experiment + @"\" + this.week + @"\" + this.motion + @"\" + personName + @"\color.avi";
+            }
+            //idenity == coach
+            else
+            {
+                path = @"..\..\..\data\" + this.idenity + @"\" + this.motion + @"\" + personName + @"\color.avi";
+            }
+            if (File.Exists(path))
             {
                 Thread.Sleep(1000);
                 this.Dispatcher.BeginInvoke(new NoArgDelegate(UpdateState));
@@ -540,8 +552,17 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             else if (string.Compare(video_type, "color") == 0)
                 Video = this.kinectColorView.Video;
             videoCount = Video.Count;
-            Console.WriteLine(Video.Count);
-            string path = @"..\..\..\data\" + this.idenity + @"\" + this.motion + @"\" + personName + @"\";
+            //string path = @"..\..\..\data\" + this.idenity + @"\"+  this.experiment + @"\" + this.week + @"\" + this.motion + @"\" + personName + @"\";
+            string path = null;
+            if (this.idenity == "student")
+            {
+                path = @"..\..\..\data\" + this.idenity + @"\" + this.experiment + @"\" + this.week + @"\" + this.motion + @"\" + personName + @"\color.avi";
+            }
+            //idenity == coach
+            else
+            {
+                path = @"..\..\..\data\" + this.idenity + @"\" + this.motion + @"\" + personName + @"\color.avi";
+            }
             Directory.CreateDirectory(path);
 
             using (VideoWriter vw = new VideoWriter(path + video_type + @".avi", 30, Video[0].Width, Video[0].Height, true))
@@ -606,6 +627,55 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 this.handedness = "left";
             else
                 this.handedness = "right";
+        }
+
+        private void ExperimentButton_Checked(object sender, RoutedEventArgs e)
+        {
+            if (experimentalRadio.IsChecked == true)
+            {
+                experiment = "experimental";
+                //Console.WriteLine(experiment);
+            }
+            else
+            {
+                experiment = "control";
+                //Console.WriteLine(experiment);
+            }
+        }
+
+        private void ComboBox_Loaded(object sender, RoutedEventArgs e)
+        {
+            // ... A List.
+            List<string> data = new List<string>();
+            data.Add("week1");
+            data.Add("week2");
+            data.Add("week3");
+            data.Add("week4");
+            data.Add("week5");
+            data.Add("week6");
+            data.Add("week7");
+            data.Add("week8");
+            data.Add("week9");
+            data.Add("week10");
+
+            // ... Get the ComboBox reference.
+            var comboBox = sender as ComboBox;
+
+            // ... Assign the ItemsSource to the List.
+            comboBox.ItemsSource = data;
+
+            // ... Make the first item selected.
+            comboBox.SelectedIndex = 0;
+        }
+
+        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            // ... Get the ComboBox.
+            var comboBox = sender as ComboBox;
+
+            // ... Set SelectedItem as Window Title.
+            week = comboBox.SelectedItem as string;
+            //Console.WriteLine(week);
         }
     }
 
