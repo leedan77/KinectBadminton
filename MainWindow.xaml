@@ -39,17 +39,17 @@
             </Setter>
         </Style>
     </Window.Resources>
-    <dragablz:TabablzControl>
+    <dragablz:TabablzControl SelectionChanged="TabControl_SelectionChanged">
 
         <dragablz:TabablzControl.InterTabController>
             <dragablz:InterTabController />
         </dragablz:TabablzControl.InterTabController>
-        <TabItem Header="Record" HorizontalAlignment="Left" Width="52">
+        <TabItem x:Name="Record" Header="Record" HorizontalAlignment="Left" Width="52">
             <local:MenuUserControl />
         </TabItem>
 
 
-        <TabItem Header="Main">
+        <TabItem x:Name="Main" Header="Main">
             <Grid Background="#bfb8ae">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="18*"/>

@@ -664,6 +664,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             // ... Set SelectedItem as Window Title.
             week = comboBox.SelectedItem as string;
             //Console.WriteLine(week);
+            MainWindow.weekFromControl = week;
         }
     }
 

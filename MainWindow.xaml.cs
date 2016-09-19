@@ -47,6 +47,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private string week = "week1";
         private bool output_txt = false;
 
+        //for week in main to change same as record 
+        public static string weekFromControl;
+
         public int coachVideoCount = 0;
         public int studentVideoCount = 0;
 
@@ -111,20 +114,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 MediaPlayer_right.Source = new Uri(path);
                 MediaPlayer_right.Play();
                 MediaPlayer_right.Pause();
-            }
-        }
-
-        public static string weekFromControl;
-        public static string WeekFromControl
-        {
-            get
-            {
-                return weekFromControl;
-            }
-            set
-            {
-                weekFromControl = value;
-                Console.WriteLine("weekFromControl       " + weekFromControl);             
             }
         }
 
@@ -639,7 +628,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
             // ... Set SelectedItem as Window Title.
             week = comboBox.SelectedItem as string;
-            Console.WriteLine("ComboBox_SelectionChanged_Main      " + week);
+            //Console.WriteLine(week);
         }
 
         private void recordRadio_Click(object sender, RoutedEventArgs e)
@@ -739,6 +728,23 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             {
                 file.WriteLine(output_judge);
             }
+        }
+
+        private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (Main.IsSelected)
+            {
+                if (!(string.Compare(week, weekFromControl) == 0))
+                {
+                    week = weekFromControl;
+                    //Console.WriteLine(week);
+                    // ... Get the ComboBox.
+                    var comboBox = this.week_main;
+                    comboBox.SelectedItem = week;
+                    // ... Set SelectedItem as Window Title.
+                    //Console.WriteLine("combobox     "+comboBox.SelectedItem as string);
+                }
+            }           
         }
     }
 }
