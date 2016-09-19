@@ -578,7 +578,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             }
         }
 
-        private void ComboBox_Loaded(object sender, RoutedEventArgs e)
+        private void ComboBox_Loaded_Main(object sender, RoutedEventArgs e)
         {
             // ... A List.
             List<string> data = new List<string>();
@@ -592,6 +592,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             data.Add("week8");
             data.Add("week9");
             data.Add("week10");
+            data.Add("other");
 
             // ... Get the ComboBox reference.
             var comboBox = sender as ComboBox;
@@ -603,7 +604,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             comboBox.SelectedIndex = 0;
         }
 
-        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void ComboBox_SelectionChanged_Main(object sender, SelectionChangedEventArgs e)
         {
             // ... Get the ComboBox.
             var comboBox = sender as ComboBox;
@@ -663,7 +664,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 {
                     using (System.IO.StreamWriter file = new System.IO.StreamWriter(filePath, true))
                     {
-                        file.WriteLine(" 姓名     重心腳在左腳   重心腳移到右腳     轉腰        手腕發力       肩膀向前      時間");
+                        file.WriteLine(" 姓名     持拍立腕   右腳跨步   腳跟著地   手腕發力   時間");
                     }
                 }
                 //action_type == serve
@@ -671,47 +672,44 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 {
                     using (System.IO.StreamWriter file = new System.IO.StreamWriter(filePath, true))
                     {
-                        file.WriteLine(" 姓名     持拍立腕   右腳跨步   腳跟著地   手腕發力   時間");
+                        file.WriteLine(" 姓名     重心腳在左腳   重心腳移到右腳     轉腰        手腕發力       肩膀向前      時間");
                     }
                 }
             }
+            string output_judge = null;
+            if (action_type == "smash")
+            {
+                output_judge = name + "      ";
+            }
+            else if (action_type == "lob")
+            {
+                output_judge = name + "    ";
+            }
+            //action_type == serve
             else
             {
-                string output_judge = null;
+                output_judge = name + "          ";
+            }
+            for (int i = 0; i < correct.Length; i++)
+            {
                 if (action_type == "smash")
                 {
-                    output_judge = name + "      ";
+                    output_judge = output_judge + correct[i] + "         ";
                 }
                 else if (action_type == "lob")
                 {
-                    output_judge = name + "          ";
+                    output_judge = output_judge + correct[i] + "          ";
                 }
                 //action_type == serve
                 else
                 {
-                    output_judge = name + "    ";
+                    output_judge = output_judge + correct[i] + "              ";
                 }
-                for (int i = 0; i < correct.Length; i++)
-                {
-                    if (action_type == "smash")
-                    {
-                        output_judge = output_judge + correct[i] + "         ";
-                    }
-                    else if (action_type == "lob")
-                    {
-                        output_judge = output_judge + correct[i] + "              ";
-                    }
-                    //action_type == serve
-                    else
-                    {
-                        output_judge = output_judge + correct[i] + "          ";
-                    }
-                }
-                output_judge = output_judge + DateTime.Now.ToString("HH:mm:ss(yyyy/MM/dd)");
-                using (System.IO.StreamWriter file = new System.IO.StreamWriter(filePath, true))
-                {
-                    file.WriteLine(output_judge);
-                }
+            }
+            output_judge = output_judge + DateTime.Now.ToString("HH:mm:ss(yyyy/MM/dd)");
+            using (System.IO.StreamWriter file = new System.IO.StreamWriter(filePath, true))
+            {
+                file.WriteLine(output_judge);
             }
         }
     }

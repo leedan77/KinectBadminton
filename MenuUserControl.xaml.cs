@@ -630,7 +630,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             }
         }
 
-        private void ComboBox_Loaded(object sender, RoutedEventArgs e)
+        private void ComboBox_Loaded_Control(object sender, RoutedEventArgs e)
         {
             // ... A List.
             List<string> data = new List<string>();
@@ -644,6 +644,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             data.Add("week8");
             data.Add("week9");
             data.Add("week10");
+            data.Add("other");
 
             // ... Get the ComboBox reference.
             var comboBox = sender as ComboBox;
@@ -655,7 +656,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             comboBox.SelectedIndex = 0;
         }
 
-        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void ComboBox_SelectionChanged_Control(object sender, SelectionChangedEventArgs e)
         {
             // ... Get the ComboBox.
             var comboBox = sender as ComboBox;

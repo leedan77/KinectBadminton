@@ -94,7 +94,7 @@
                                     <RadioButton x:Name="controlRadio" GroupName="experiment_main" HorizontalAlignment="Center" Margin="0, 10, 0, 10" Click="ExperimentButton_Checked">對照組</RadioButton>
                                 </Viewbox>
                             </StackPanel>
-                            <ComboBox HorizontalAlignment="Left" Margin="50,0,0,0" VerticalAlignment="Center" Width="70" Loaded="ComboBox_Loaded" SelectionChanged="ComboBox_SelectionChanged"/>
+                            <ComboBox HorizontalAlignment="Left" Margin="50,0,0,0" VerticalAlignment="Center" Width="70" Loaded="ComboBox_Loaded_Main" SelectionChanged="ComboBox_SelectionChanged_Main"/>
 
                         </StackPanel>
                         <StackPanel Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" HorizontalAlignment="Left" Orientation="Horizontal">
