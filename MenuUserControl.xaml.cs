@@ -392,8 +392,10 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
             this.converting = true;
             this.kinectBodybox.DataContext = this.kinectBodyView;
+            string name = new DirectoryInfo(System.IO.Path.GetDirectoryName(filePath)).Name;
             TwoArgDelegate bodyConvert = new TwoArgDelegate(this.BodyConvertClip);
-            bodyConvert.BeginInvoke(filePath, nameBox.Text, null, null);
+            bodyConvert.BeginInvoke(filePath, name, null, null);
+            //bodyConvert.BeginInvoke(filePath, nameBox.Text, null, null);
         }
 
         private void ConvertColor(String filePath)
@@ -404,8 +406,10 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
             this.converting = true;
             this.kinectColorbox.DataContext = this.kinectColorView;
+            string name = new DirectoryInfo(System.IO.Path.GetDirectoryName(filePath)).Name;
             TwoArgDelegate colorConvert = new TwoArgDelegate(this.ColorConvertClip);
-            colorConvert.BeginInvoke(filePath, nameBox.Text, null, null);
+            colorConvert.BeginInvoke(filePath, name, null, null);
+            //colorConvert.BeginInvoke(filePath, nameBox.Text, null, null);
         }
 
         /// <summary>Plays back a .xef file to the Kinect sensor</summary>
