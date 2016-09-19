@@ -541,12 +541,14 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             string path = null;
             if (this.idenity == "student")
             {
-                path = @"..\..\..\data\" + this.idenity + @"\" + this.experiment + @"\" + this.week + @"\" + this.motion + @"\" + personName + @"\color.avi";
+                //path = $"\\..\\..\\..\\data\\{this.idenity}\\{this.experiment}\\{this.week}\\{this.motion}\\{personName}";
+                path = @"..\..\..\data\" + this.idenity + @"\" + this.experiment + @"\" + this.week + @"\" + this.motion + @"\" + personName + @"\";
             }
             //idenity == coach
             else
             {
-                path = @"..\..\..\data\" + this.idenity + @"\" + this.motion + @"\" + personName + @"\color.avi";
+                //path = $"\\..\\..\\..\\data\\{this.idenity}\\{this.motion}\\{personName}";
+                path = @"..\..\..\data\" + this.idenity + @"\" + this.motion + @"\" + personName + @"\";
             }
             Directory.CreateDirectory(path);
 

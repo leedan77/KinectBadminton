@@ -219,7 +219,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             this.StudentFileName = selectedItem;
         }
 
-        public void LoadJudgement(String name, String action_type, String person_type, String experiment, String week)
+        public void LoadJudgement(string name, string action_type, string person_type, string experiment, string week)
         {
             //String judgementDir = "../../../data/" + person_type + "/" + action_type + "/" + name + "/judgement.json";
             String judgementDir = null;
@@ -237,9 +237,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 this.coachJudgement = JsonConvert.DeserializeObject<List<Monitors.Monitor.CriticalPoint>>(rawJsonData);
             else if (person_type == "student")
                 this.studentJudgement = JsonConvert.DeserializeObject<List<Monitors.Monitor.CriticalPoint>>(rawJsonData);
-            
 
-            if(person_type == "coach")
+
+            if (person_type == "coach")
             {
                 textBlock2.Text = name;
                 
@@ -269,7 +269,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             else if(person_type == "student")
             {
                 textBlock1.Text = name;
-                int[] correct = new int[this.studentJudgement.Count-1];
+                int[] correct = new int[this.studentJudgement.Count];
                 for (int i = 0; i < this.studentJudgement.Count; i++)
                 {
                     Image image = new Image();
@@ -645,6 +645,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         {
             string cur = Environment.CurrentDirectory;
             string relativePath = $"\\..\\..\\..\\data\\txt\\{experiment}\\{week}\\{action_type}\\";
+            Directory.CreateDirectory(cur + relativePath);
             string filename = DateTime.Now.ToString("yyyy-MM-dd");
             string filePath = cur + relativePath + filename + ".txt";
             if (!File.Exists(filePath))

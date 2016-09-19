@@ -67,6 +67,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             set
             {
                 menuType = value;
+                Console.WriteLine(this.MenuType);
                 dirInfo = new DirectoryInfo(cur + this.MenuType);
                 list = new ArrayList();
                 DirectoryInfo[] subDir = dirInfo.GetDirectories();
@@ -95,7 +96,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         {
             InitializeComponent();
             this.ActionType = action_type;
-            this.MenuType = type;         
+            this.experiment = experiment;
+            this.week = week;
+            this.MenuType = type;
            
         }
 
