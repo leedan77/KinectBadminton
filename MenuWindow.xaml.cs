@@ -24,6 +24,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         DirectoryInfo dirInfo;
         ArrayList list;
         string cur = Environment.CurrentDirectory;
+
         private string actionType;
         public string ActionType
         {
@@ -43,6 +44,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             }
         }
         private string actionTypeChinese;
+        public string experiment;
+        public string week;
+
         private string menuType;
         private string selectedItem = string.Empty;
 
@@ -50,7 +54,15 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         {
             get
             {
-                return $"\\..\\..\\..\\data\\{menuType}\\{ActionType}";
+                if (menuType == "student")
+                {
+                    return $"\\..\\..\\..\\data\\{menuType}\\{experiment}\\{week}\\{ActionType}";
+                }
+                else
+                {
+                    return $"\\..\\..\\..\\data\\{menuType}\\{ActionType}";
+                }
+                //return $"\\..\\..\\..\\data\\{menuType}\\{action_type}";
             }
             set
             {
@@ -79,7 +91,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             }
         }
 
-        public MenuWindow(string type, string action_type)
+        public MenuWindow(string type, string action_type, string experiment, string week)
         {
             InitializeComponent();
             this.ActionType = action_type;
@@ -89,7 +101,14 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private void MenuListBox__SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            
+            //var parent = this.Owner as MainWindow;
+            //string selectedItem = MenuListBox.SelectedItem.ToString();
+            //if (this.menuType == "coach")
+            //    parent.RightVideoChoosen(selectedItem);
+            //else if (this.menuType == "student")
+            //    parent.LeftVideoChoosen(selectedItem);
+            //parent.LoadJudgement(selectedItem, ActionType, menuType, experiment, week);
+            //this.Close();
         }
 
         private void DeleteButton_Click(object sender, RoutedEventArgs e)
@@ -120,7 +139,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     parent.RightVideoChoosen(selectedItem);
                 else if (this.menuType == "student")
                     parent.LeftVideoChoosen(selectedItem);
-                parent.LoadJudgement(selectedItem, ActionType, menuType);
+                parent.LoadJudgement(selectedItem, ActionType, menuType, experiment, week);
                 this.Close();
             }
             else

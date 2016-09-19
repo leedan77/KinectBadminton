@@ -43,6 +43,10 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         public string action_type;
         
 
+        private string experiment = "experimental";
+        private string week = "week1";
+        private bool output_txt = false;
+
         public int coachVideoCount = 0;
         public int studentVideoCount = 0;
 
@@ -79,7 +83,13 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             set
             {
                 this.studentFileName = value;
-                string path = cur + dataBasePath + $"\\student\\{action_type}\\{StudentFileName}\\{student_color_or_body}.avi";
+//<<<<<<< HEAD
+//                string path = cur + dataBasePath + $"\\student\\{action_type}\\{StudentFileName}\\{student_color_or_body}.avi";
+//=======
+                // play right media
+                
+                string path = cur + dataBasePath + $"\\student\\{experiment}\\{week}\\{action_type}\\{StudentFileName}\\{student_color_or_body}.avi";
+//>>>> output_txt
                 MediaPlayer_left.Source = new Uri(path);
                 MediaPlayer_left.Play();
                 MediaPlayer_left.Pause();
@@ -170,14 +180,17 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private void MediaPlayer_right_MouseRightButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            MenuWindow ccw = new MenuWindow("coach", action_type);
+            //MenuWindow ccw = new MenuWindow("coach", action_type);
+            //experiment and week is useless here
+            MenuWindow ccw = new MenuWindow("coach", action_type, experiment, week);
             ccw.Owner = this;
             ccw.ShowDialog();
         }
 
         private void MediaPlayer_left_MouseRightButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            MenuWindow ccw = new MenuWindow("student", action_type);
+            //MenuWindow ccw = new MenuWindow("student", action_type);
+            MenuWindow ccw = new MenuWindow("student", action_type, experiment, week);
             ccw.Owner = this;
             ccw.ShowDialog();
         }
@@ -206,9 +219,19 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             this.StudentFileName = selectedItem;
         }
 
-        public void LoadJudgement(String name, String action_type, String person_type)
+        public void LoadJudgement(String name, String action_type, String person_type, String experiment, String week)
         {
-            String judgementDir = "../../../data/" + person_type + "/" + action_type + "/" + name + "/judgement.json";
+            //String judgementDir = "../../../data/" + person_type + "/" + action_type + "/" + name + "/judgement.json";
+            String judgementDir = null;
+            if (person_type == "student")
+            {
+                judgementDir = "../../../data/" + person_type + "/" + experiment + "/" + week + "/" + action_type + "/" + name + "/judgement.json";
+            }
+            //person_type == coach
+            else
+            {
+                judgementDir = "../../../data/" + person_type + "/" + action_type + "/" + name + "/judgement.json";
+            }
             String rawJsonData = File.ReadAllText(judgementDir);
             if(person_type == "coach")
                 this.coachJudgement = JsonConvert.DeserializeObject<List<Monitors.Monitor.CriticalPoint>>(rawJsonData);
@@ -246,14 +269,20 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             else if(person_type == "student")
             {
                 textBlock1.Text = name;
-
+                int[] correct = new int[this.studentJudgement.Count-1];
                 for (int i = 0; i < this.studentJudgement.Count; i++)
                 {
                     Image image = new Image();
-                    if(this.studentJudgement[i].portion <= 1)
+                    if (this.studentJudgement[i].portion <= 1)
+                    {
                         image.Source = new BitmapImage(new Uri(@"Images\tick.png", UriKind.Relative));
+                        correct[i] = 1;
+                    }
                     else
+                    {
                         image.Source = new BitmapImage(new Uri(@"Images\cross.png", UriKind.Relative));
+                        correct[i] = 0;
+                    }
                     image.Height = 20;
                     image.Width = 20;
                     image.HorizontalAlignment = HorizontalAlignment.Center;
@@ -281,6 +310,10 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
                     grid.Children.Add(button);
                     stuGrid.Children.Add(grid);
+                }
+                if (output_txt)
+                {
+                    Output_TXT(name, action_type, experiment, week, correct);
                 }
             }
         }
@@ -371,14 +404,17 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private void MenuLeftButton_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            MenuWindow ccw = new MenuWindow("student", action_type);
+            //MenuWindow ccw = new MenuWindow("student", action_type);
+            MenuWindow ccw = new MenuWindow("student", action_type, experiment, week);
             ccw.Owner = this;
             ccw.ShowDialog();
         }
 
         private void MenuRightButton_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            MenuWindow ccw = new MenuWindow("coach", action_type);
+            //MenuWindow ccw = new MenuWindow("coach", action_type);
+            //experiment and week is useless here
+            MenuWindow ccw = new MenuWindow("coach", action_type, experiment, week);
             ccw.Owner = this;
             ccw.ShowDialog();
         }
@@ -388,13 +424,13 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             if (leftColorRadio.IsChecked == true)
             {
                 student_color_or_body = "color";
-                string path = cur + dataBasePath + $"\\student\\{action_type}\\{StudentFileName}\\{student_color_or_body}.avi";
+                string path = cur + dataBasePath + $"\\student\\{action_type}\\{experiment}\\{week}\\{StudentFileName}\\{student_color_or_body}.avi";
                 resetUri(MediaPlayer_left, path);
             }
             else if (leftBodyRadio.IsChecked == true)
             {
                 student_color_or_body = "body";
-                string path = cur + dataBasePath + $"\\student\\{action_type}\\{StudentFileName}\\{student_color_or_body}.avi";
+                string path = cur + dataBasePath + $"\\student\\{action_type}\\{experiment}\\{week}\\{StudentFileName}\\{student_color_or_body}.avi";
                 resetUri(MediaPlayer_left, path);
             }
             if (rightBodyRadio.IsChecked == true)
@@ -423,7 +459,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 if(File.Exists(path))
                 {
                     resetUri(MediaPlayer_right, path);
-                    LoadJudgement(CoachFileName, action_type, "coach");
+                    //experiment and week is useless here
+                    LoadJudgement(CoachFileName, action_type, "coach", experiment, week);
+                    //LoadJudgement(CoachFileName, action_type, "coach");
                     releaseMediaElement(MediaPlayer_left);
                 } 
                 else
@@ -438,8 +476,15 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 string path = cur + dataBasePath + $"\\coach\\{action_type}\\{CoachFileName}\\{coach_color_or_body}.avi";
                 if (File.Exists(path))
                 {
+//<<<<< HEAD
                     resetUri(MediaPlayer_right, path);
-                    LoadJudgement(CoachFileName, action_type, "coach");
+                    //adJudgement(CoachFileName, action_type, "coach");
+//=====
+                    //Console.WriteLine("file exist");
+                    //experiment and week is useless here
+                    LoadJudgement(CoachFileName, action_type, "coach", experiment, week);
+                    //LoadJudgement(CoachFileName, action_type, "coach");
+//>>>>> output_txt
                     releaseMediaElement(MediaPlayer_left);
                 }
                 else
@@ -454,8 +499,15 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 string path = cur + dataBasePath + $"\\coach\\{action_type}\\{CoachFileName}\\{coach_color_or_body}.avi";
                 if (File.Exists(path))
                 {
+//<<<<< HEAD
                     resetUri(MediaPlayer_right, path);
-                    LoadJudgement(CoachFileName, action_type, "coach");
+                    //adJudgement(CoachFileName, action_type, "coach");
+//=====
+                    //Console.WriteLine("file exist");
+                    //experiment and week is useless here
+                    LoadJudgement(CoachFileName, action_type, "coach", experiment, week);
+                    //LoadJudgement(CoachFileName, action_type, "coach");
+//> output_txt
                     releaseMediaElement(MediaPlayer_left);
                 }
                 else
@@ -499,7 +551,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 PlayPauseRightButton.Source = new BitmapImage(new Uri(@"Images\play-circle.png", UriKind.Relative));
             }
         }
-
+        
         private void MediaLeftControlUpdateState()
         {
             if (this.leftPlaying)
@@ -509,6 +561,156 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             else if (this.leftPausing)
             {
                 PlayPauseLeftButton.Source = new BitmapImage(new Uri(@"Images\play-circle.png", UriKind.Relative));
+            }
+        }
+
+        private void ExperimentButton_Checked(object sender, RoutedEventArgs e)
+        {
+            if (experimentalRadio.IsChecked == true)
+            {
+                experiment = "experimental";
+                //Console.WriteLine(experiment);
+            }
+            else
+            {
+                experiment = "control";
+                //Console.WriteLine(experiment);
+            }
+        }
+
+        private void ComboBox_Loaded(object sender, RoutedEventArgs e)
+        {
+            // ... A List.
+            List<string> data = new List<string>();
+            data.Add("week1");
+            data.Add("week2");
+            data.Add("week3");
+            data.Add("week4");
+            data.Add("week5");
+            data.Add("week6");
+            data.Add("week7");
+            data.Add("week8");
+            data.Add("week9");
+            data.Add("week10");
+
+            // ... Get the ComboBox reference.
+            var comboBox = sender as ComboBox;
+
+            // ... Assign the ItemsSource to the List.
+            comboBox.ItemsSource = data;
+
+            // ... Make the first item selected.
+            comboBox.SelectedIndex = 0;
+        }
+
+        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            // ... Get the ComboBox.
+            var comboBox = sender as ComboBox;
+
+            // ... Set SelectedItem as Window Title.
+            week = comboBox.SelectedItem as string;
+            //Console.WriteLine(week);
+        }
+
+        private void recordRadio_Click(object sender, RoutedEventArgs e)
+        {
+            if (experimentalRadio.IsChecked == true)
+            {
+                experiment = "experimental";
+                //Console.WriteLine(experiment);
+            }
+            else
+            {
+                experiment = "control";
+                //Console.WriteLine(experiment);
+            }
+        }
+
+        private void OutputTXT_Click(object sender, RoutedEventArgs e)
+        {
+            if (output_txtRadio.IsChecked == true)
+            {
+                output_txt = true;
+                //Console.WriteLine(output_txt);
+            }
+            else
+            {
+                output_txt = false;
+                //Console.WriteLine(not_output_txt);
+            }
+        }
+
+        private void Output_TXT(String name, String action_type, String experiment, String week, int[] correct)
+        {
+            string cur = Environment.CurrentDirectory;
+            string relativePath = $"\\..\\..\\..\\data\\txt\\{experiment}\\{week}\\{action_type}\\";
+            string filename = DateTime.Now.ToString("yyyy-MM-dd");
+            string filePath = cur + relativePath + filename + ".txt";
+            if (!File.Exists(filePath))
+            {
+                FileStream fileStream = new FileStream(filePath, FileMode.Append);
+                fileStream.Close();
+                if (action_type == "smash")
+                {
+                    using (System.IO.StreamWriter file = new System.IO.StreamWriter(filePath, true))
+                    {
+                        file.WriteLine(" 姓名     側身   手肘抬高   手肘轉向前   手腕發力   收拍     時間");
+                    }
+                }
+                else if (action_type == "lob")
+                {
+                    using (System.IO.StreamWriter file = new System.IO.StreamWriter(filePath, true))
+                    {
+                        file.WriteLine(" 姓名     重心腳在左腳   重心腳移到右腳     轉腰        手腕發力       肩膀向前      時間");
+                    }
+                }
+                //action_type == serve
+                else
+                {
+                    using (System.IO.StreamWriter file = new System.IO.StreamWriter(filePath, true))
+                    {
+                        file.WriteLine(" 姓名     持拍立腕   右腳跨步   腳跟著地   手腕發力   時間");
+                    }
+                }
+            }
+            else
+            {
+                string output_judge = null;
+                if (action_type == "smash")
+                {
+                    output_judge = name + "      ";
+                }
+                else if (action_type == "lob")
+                {
+                    output_judge = name + "          ";
+                }
+                //action_type == serve
+                else
+                {
+                    output_judge = name + "    ";
+                }
+                for (int i = 0; i < correct.Length; i++)
+                {
+                    if (action_type == "smash")
+                    {
+                        output_judge = output_judge + correct[i] + "         ";
+                    }
+                    else if (action_type == "lob")
+                    {
+                        output_judge = output_judge + correct[i] + "              ";
+                    }
+                    //action_type == serve
+                    else
+                    {
+                        output_judge = output_judge + correct[i] + "          ";
+                    }
+                }
+                output_judge = output_judge + DateTime.Now.ToString("HH:mm:ss(yyyy/MM/dd)");
+                using (System.IO.StreamWriter file = new System.IO.StreamWriter(filePath, true))
+                {
+                    file.WriteLine(output_judge);
+                }
             }
         }
     }

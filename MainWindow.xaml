@@ -75,15 +75,26 @@
                             <RowDefinition />
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
-                        <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Left" Orientation="Horizontal">
 
-                            <Viewbox Height="40" Margin="200, 0, 0, 0">
-                                <RadioButton x:Name="leftColorRadio" GroupName="left" Grid.Row="0" HorizontalAlignment="Center" Margin="0, 10, 25, 10" IsChecked="True" Click="ToggleButton_Checked">彩色</RadioButton>
-                            </Viewbox>
-                            <Viewbox Height="40">
-                                <RadioButton x:Name="leftBodyRadio" GroupName="left" Grid.Row="0" HorizontalAlignment="Center" Margin="50, 10, 0, 10" Click="ToggleButton_Checked" Content="骨架"/>
-                            </Viewbox>
 
+                        <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="1" HorizontalAlignment="Center" Orientation="Horizontal">
+                            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                                <Viewbox Height="40" Margin="0, 0, 0, 0">
+                                    <RadioButton x:Name="leftColorRadio" GroupName="left" Grid.Row="0" HorizontalAlignment="Center" Margin="0, 10, 25, 10" IsChecked="True" Click="ToggleButton_Checked">彩色</RadioButton>
+                                </Viewbox>
+                                <Viewbox Height="40">
+                                    <RadioButton x:Name="leftBodyRadio" GroupName="left" Grid.Row="0" HorizontalAlignment="Center" Margin="0, 10, 0, 10" Click="ToggleButton_Checked" Content="骨架"/>
+                                </Viewbox>
+                            </StackPanel>
+                            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Margin="50, 0, 0, 0">
+                                <Viewbox Height="40" Margin="0, 0, 0, 0">
+                                    <RadioButton x:Name="experimentalRadio" GroupName="experiment" HorizontalAlignment="Center" Margin="0, 10, 25, 10" IsChecked="True" Click="ExperimentButton_Checked">實驗組</RadioButton>
+                                </Viewbox>
+                                <Viewbox Height="40">
+                                    <RadioButton x:Name="controlRadio" GroupName="experiment" HorizontalAlignment="Center" Margin="0, 10, 0, 10" Click="ExperimentButton_Checked">對照組</RadioButton>
+                                </Viewbox>
+                            </StackPanel>
+                            <ComboBox HorizontalAlignment="Left" Margin="50,0,0,0" VerticalAlignment="Center" Width="70" Loaded="ComboBox_Loaded" SelectionChanged="ComboBox_SelectionChanged"/>
 
                         </StackPanel>
                         <StackPanel Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" HorizontalAlignment="Left" Orientation="Horizontal">
@@ -117,6 +128,14 @@
                             <Viewbox Grid.Row="3" Height="40" HorizontalAlignment="Left">
                                 <RadioButton x:Name="smashRadio" GroupName="action" Grid.Row="0" HorizontalAlignment="Center" Margin="5, 10, 0, 10" Click="ActionSwitch_Click" Content="殺球"/>
                             </Viewbox>
+                            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                                <Viewbox Height="40" Margin="0, 0, 0, 0">
+                                    <RadioButton x:Name="output_txtRadio" GroupName="output_txt" HorizontalAlignment="Center" Margin="0, 10, 10, 10" Click="OutputTXT_Click">紀錄</RadioButton>
+                                </Viewbox>
+                                <Viewbox Height="40">
+                                    <RadioButton x:Name="not_output_txtRadio" GroupName="output_txt" HorizontalAlignment="Center" Margin="0, 10, 0, 10" IsChecked="True" Click="OutputTXT_Click">不紀錄</RadioButton>
+                                </Viewbox>
+                            </StackPanel>
                             <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
 
                                 <Image x:Name="MenuLeftButton" Source="Images/menu.png" Height="30" MouseLeftButtonDown="MenuLeftButton_MouseLeftButtonDown"></Image>
