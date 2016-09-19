@@ -120,6 +120,14 @@
                             <Viewbox Grid.Row="3" Height="40" HorizontalAlignment="Left">
                                 <RadioButton x:Name="smashRadio" GroupName="action" Grid.Row="0" HorizontalAlignment="Center" Margin="5, 10, 0, 10" Click="ActionSwitch_Click" Content="殺球"/>
                             </Viewbox>
+                            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                                <Viewbox Height="40" Margin="0, 0, 0, 0">
+                                    <RadioButton x:Name="output_txtRadio" GroupName="output_txt" HorizontalAlignment="Center" Margin="0, 10, 10, 10" Click="OutputTXT_Click">紀錄</RadioButton>
+                                </Viewbox>
+                                <Viewbox Height="40">
+                                    <RadioButton x:Name="not_output_txtRadio" GroupName="output_txt" HorizontalAlignment="Center" Margin="0, 10, 0, 10" IsChecked="True" Click="OutputTXT_Click">不紀錄</RadioButton>
+                                </Viewbox>
+                            </StackPanel>
                             <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
 
                                 <Image x:Name="MenuLeftButton" Source="Images/menu.png" Height="30" MouseLeftButtonDown="MenuLeftButton_MouseLeftButtonDown"></Image>
