@@ -647,6 +647,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private void OutputTXT_Click(object sender, RoutedEventArgs e)
         {
+            //Console.WriteLine(output_txt);
             if (output_txtCheck.IsChecked == true)
             {
                 output_txt = true;
@@ -732,7 +733,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (Main.IsSelected)
+            if (!Main.IsSelected)
             {
                 if (!(string.Compare(week, weekFromControl) == 0))
                 {
