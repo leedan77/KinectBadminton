@@ -647,7 +647,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private void OutputTXT_Click(object sender, RoutedEventArgs e)
         {
-            if (output_txtRadio.IsChecked == true)
+            if (output_txtCheck.IsChecked == true)
             {
                 output_txt = true;
                 //Console.WriteLine(output_txt);
@@ -655,7 +655,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             else
             {
                 output_txt = false;
-                //Console.WriteLine(not_output_txt);
+                //Console.WriteLine(output_txt);
             }
         }
 
@@ -744,6 +744,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     // ... Set SelectedItem as Window Title.
                     //Console.WriteLine("combobox     "+comboBox.SelectedItem as string);
                 }
+                this.output_txtCheck.IsChecked = false;
+                output_txt = false;
+                //Console.WriteLine(output_txt);
             }           
         }
     }
