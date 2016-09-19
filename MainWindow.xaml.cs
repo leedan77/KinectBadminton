@@ -114,6 +114,20 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             }
         }
 
+        public static string weekFromControl;
+        public static string WeekFromControl
+        {
+            get
+            {
+                return weekFromControl;
+            }
+            set
+            {
+                weekFromControl = value;
+                Console.WriteLine("weekFromControl       " + weekFromControl);             
+            }
+        }
+
         public MainWindow()
         {
             InitializeComponent();
@@ -425,13 +439,27 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             {
                 student_color_or_body = "color";
                 string path = cur + dataBasePath + $"\\student\\{action_type}\\{experiment}\\{week}\\{StudentFileName}\\{student_color_or_body}.avi";
-                resetUri(MediaPlayer_left, path);
+                if (File.Exists(path))
+                {
+                    resetUri(MediaPlayer_left, path);
+                }
+                else
+                {
+                    MessageBox.Show("請先重新選擇欲播放的項目", "沒有該檔案");
+                }
             }
             else if (leftBodyRadio.IsChecked == true)
             {
                 student_color_or_body = "body";
                 string path = cur + dataBasePath + $"\\student\\{action_type}\\{experiment}\\{week}\\{StudentFileName}\\{student_color_or_body}.avi";
-                resetUri(MediaPlayer_left, path);
+                if (File.Exists(path))
+                {
+                    resetUri(MediaPlayer_left, path);
+                }
+                else
+                {
+                    MessageBox.Show("請先重新選擇欲播放的項目", "沒有該檔案");
+                }
             }
             if (rightBodyRadio.IsChecked == true)
             {
@@ -611,7 +639,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
             // ... Set SelectedItem as Window Title.
             week = comboBox.SelectedItem as string;
-            //Console.WriteLine(week);
+            Console.WriteLine("ComboBox_SelectionChanged_Main      " + week);
         }
 
         private void recordRadio_Click(object sender, RoutedEventArgs e)
