@@ -67,7 +67,11 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             set
             {
                 menuType = value;
-                Console.WriteLine(this.MenuType);
+                //Console.WriteLine(this.MenuType);
+                if (!Directory.Exists(cur + this.MenuType))
+                {
+                    Directory.CreateDirectory(cur + this.MenuType);
+                }
                 dirInfo = new DirectoryInfo(cur + this.MenuType);
                 list = new ArrayList();
                 DirectoryInfo[] subDir = dirInfo.GetDirectories();

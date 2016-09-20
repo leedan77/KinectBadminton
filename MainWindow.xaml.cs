@@ -47,6 +47,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private string week = "week1";
         private bool output_txt = false;
 
+        //for week in main to change same as record 
+        public static string weekFromControl;
+
         public int coachVideoCount = 0;
         public int studentVideoCount = 0;
 
@@ -425,13 +428,27 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             {
                 student_color_or_body = "color";
                 string path = cur + dataBasePath + $"\\student\\{action_type}\\{experiment}\\{week}\\{StudentFileName}\\{student_color_or_body}.avi";
-                resetUri(MediaPlayer_left, path);
+                if (File.Exists(path))
+                {
+                    resetUri(MediaPlayer_left, path);
+                }
+                else
+                {
+                    MessageBox.Show("請先重新選擇欲播放的項目", "沒有該檔案");
+                }
             }
             else if (leftBodyRadio.IsChecked == true)
             {
                 student_color_or_body = "body";
                 string path = cur + dataBasePath + $"\\student\\{action_type}\\{experiment}\\{week}\\{StudentFileName}\\{student_color_or_body}.avi";
-                resetUri(MediaPlayer_left, path);
+                if (File.Exists(path))
+                {
+                    resetUri(MediaPlayer_left, path);
+                }
+                else
+                {
+                    MessageBox.Show("請先重新選擇欲播放的項目", "沒有該檔案");
+                }
             }
             if (rightBodyRadio.IsChecked == true)
             {
@@ -630,7 +647,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private void OutputTXT_Click(object sender, RoutedEventArgs e)
         {
-            if (output_txtRadio.IsChecked == true)
+            //Console.WriteLine(output_txt);
+            if (output_txtCheck.IsChecked == true)
             {
                 output_txt = true;
                 //Console.WriteLine(output_txt);
@@ -638,7 +656,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             else
             {
                 output_txt = false;
-                //Console.WriteLine(not_output_txt);
+                //Console.WriteLine(output_txt);
             }
         }
 
@@ -711,6 +729,26 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             {
                 file.WriteLine(output_judge);
             }
+        }
+
+        private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (!Main.IsSelected)
+            {
+                if (!(string.Compare(week, weekFromControl) == 0))
+                {
+                    week = weekFromControl;
+                    //Console.WriteLine(week);
+                    // ... Get the ComboBox.
+                    var comboBox = this.week_main;
+                    comboBox.SelectedItem = week;
+                    // ... Set SelectedItem as Window Title.
+                    //Console.WriteLine("combobox     "+comboBox.SelectedItem as string);
+                }
+                this.output_txtCheck.IsChecked = false;
+                output_txt = false;
+                //Console.WriteLine(output_txt);
+            }           
         }
     }
 }
