@@ -713,10 +713,10 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 recordList = JsonConvert.DeserializeObject<List<PersonalRecord>>(rawJsonData);
             }
 
-            string relativePath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
 
             string filename = DateTime.Now.ToString("yyyy-MM-dd");
-            string filePath = $"{this.className}_{filename}.txt";
+            string filePath = $"{desktopPath}\\{this.className}_{filename}.txt";
             FileStream fileStream = new FileStream(filePath, FileMode.Create);
             fileStream.Close();
             if (action_type == "smash")
@@ -753,7 +753,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 {
                     output_judge = pr.name + "    ";
                 }
-                //action_type == serve
                 else
                 {
                     output_judge = pr.name + "          ";

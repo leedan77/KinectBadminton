@@ -44,9 +44,6 @@
         <dragablz:TabablzControl.InterTabController>
             <dragablz:InterTabController />
         </dragablz:TabablzControl.InterTabController>
-        <TabItem x:Name="Record" Header="Record" HorizontalAlignment="Left" Width="52">
-            <local:MenuUserControl />
-        </TabItem>
 
 
         <TabItem x:Name="Main" Header="Main">
@@ -136,7 +133,7 @@
                             </StackPanel>
                             <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
                                 <ComboBox x:Name="class" HorizontalAlignment="Left" Margin="50,0,0,0" VerticalAlignment="Center" Width="70" Loaded="class_Loaded" SelectionChanged="class_SelectionChanged"/>
-                                <Button x:Name="Output_txt" Content="輸出.txt" Click="Output_txt_Click" Margin="10" Padding="5" />
+                                <Button x:Name="Output_txt" Content="輸出" Click="Output_txt_Click" Margin="10" Padding="5" />
                             </StackPanel>
                             <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
                                 <TextBlock x:Name="LeftMediaLabel" Text="00:000" Margin="0, 12, 0, 0"/>
@@ -242,6 +239,10 @@
                 </Border>
 
             </Grid>
+        </TabItem>
+
+        <TabItem x:Name="Record" Header="Record" HorizontalAlignment="Left" Width="52">
+            <local:MenuUserControl />
         </TabItem>
     </dragablz:TabablzControl>
 </Window>

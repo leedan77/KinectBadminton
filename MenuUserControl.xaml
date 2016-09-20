@@ -14,29 +14,37 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Horizontal">
-            <Button x:Name="RecordButton" Width="100" Height="35" Click="RecordButton_Click" Grid.Row="0" HorizontalAlignment="Left" Margin="0, 10, 0, 0">
+            <Button x:Name="RecordButton" Width="120" Height="35" Click="RecordButton_Click" Grid.Row="0" HorizontalAlignment="Left" Margin="0, 10, 0, 0">
                 <StackPanel Grid.Row="2" Grid.ColumnSpan="4" Orientation="Horizontal">
                     <Image Source="Images/record.png" Width="20" Height="20"/>
                     <TextBlock Text="Record" Padding="5" VerticalAlignment="Center" RenderTransformOrigin="1.755,0.645" />
                 </StackPanel>
             </Button>
-            <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Horizontal" Margin="30, 10, 0, 0">
-                <RadioButton x:Name="studentRadio" GroupName="idenity" HorizontalAlignment="Center" Margin="0, 10, 50, 10" IsChecked="True" Click="IdentiyButton_Checked">學員</RadioButton>
-                <RadioButton x:Name="coachRadio" GroupName="idenity" HorizontalAlignment="Center" Margin="0, 10, 50, 10" Click="IdentiyButton_Checked">標準</RadioButton>
-            </StackPanel>
-            <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Horizontal" Margin="30, 10, 0, 0">
-                <RadioButton x:Name="lobRadio" GroupName="motion" HorizontalAlignment="Center" Margin="0, 10, 50, 10" IsChecked="True" Click="MotionRadio_Click" Content="挑球"/>
-                <RadioButton x:Name="serveRadio" GroupName="motion" HorizontalAlignment="Center" Margin="0, 10, 50, 10" Click="MotionRadio_Click" Content="發球"/>
-                <RadioButton x:Name="smashRadio" GroupName="motion" HorizontalAlignment="Center" Margin="0, 10, 50, 10" Click="MotionRadio_Click" Content="殺球"/>
-            </StackPanel>
-            <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Horizontal" Margin="30, 10, 0, 0">
-                <RadioButton x:Name="lefthandedRadio" GroupName="handedness" HorizontalAlignment="Center" Margin="0, 10, 50, 10" Click="HandednessRadio_Click" Content="左"/>
-                <RadioButton x:Name="righthandedRadio" GroupName="handedness" HorizontalAlignment="Center" Margin="0, 10, 50, 10" IsChecked="True" Click="HandednessRadio_Click" Content="右"/>
-            </StackPanel>
-            <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Horizontal" Margin="30, 10, 0, 0">
-                <RadioButton x:Name="experimentalRadio" GroupName="experiment_control" HorizontalAlignment="Center" Margin="0, 10, 20, 10" IsChecked="True" Click="ExperimentButton_Checked" Content="實驗組"/>
-                <RadioButton x:Name="controlRadio" GroupName="experiment_control" HorizontalAlignment="Center" Margin="0, 10, 20, 10" Click="ExperimentButton_Checked" Content="對照組"/> 
-            </StackPanel>
+            <Border CornerRadius="6" BorderBrush="Gray" Background="LightGray" BorderThickness="2" Margin="10, 10, 10, 0">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal" Margin="30, 10, 0, 10" >
+                    <RadioButton x:Name="studentRadio" GroupName="idenity" HorizontalAlignment="Center" Margin="0, 10, 50, 10" IsChecked="True" Click="IdentiyButton_Checked">學員</RadioButton>
+                    <RadioButton x:Name="coachRadio" GroupName="idenity" HorizontalAlignment="Center" Margin="0, 10, 50, 10" Click="IdentiyButton_Checked">標準</RadioButton>
+                </StackPanel>
+            </Border>
+            <Border CornerRadius="6" BorderBrush="Gray" Background="LightGray" BorderThickness="2" Margin="10, 10, 10, 0">
+                <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Horizontal" Margin="30, 10, 0, 10">
+                    <RadioButton x:Name="lobRadio" GroupName="motion" HorizontalAlignment="Center" Margin="0, 10, 50, 10" IsChecked="True" Click="MotionRadio_Click" Content="挑球"/>
+                    <RadioButton x:Name="serveRadio" GroupName="motion" HorizontalAlignment="Center" Margin="0, 10, 50, 10" Click="MotionRadio_Click" Content="發球"/>
+                    <RadioButton x:Name="smashRadio" GroupName="motion" HorizontalAlignment="Center" Margin="0, 10, 50, 10" Click="MotionRadio_Click" Content="殺球"/>
+                </StackPanel>
+            </Border>
+            <Border CornerRadius="6" BorderBrush="Gray" Background="LightGray" BorderThickness="2" Margin="10, 10, 10, 0">
+                <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Horizontal" Margin="30, 10, 0, 10">
+                    <RadioButton x:Name="lefthandedRadio" GroupName="handedness" HorizontalAlignment="Center" Margin="0, 10, 50, 10" Click="HandednessRadio_Click" Content="左"/>
+                    <RadioButton x:Name="righthandedRadio" GroupName="handedness" HorizontalAlignment="Center" Margin="0, 10, 50, 10" IsChecked="True" Click="HandednessRadio_Click" Content="右"/>
+                </StackPanel>
+            </Border>
+            <Border CornerRadius="6" BorderBrush="Gray" Background="LightGray" BorderThickness="2" Margin="10, 10, 10, 0">
+                <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Horizontal" Margin="30, 10, 0, 10">
+                    <RadioButton x:Name="experimentalRadio" GroupName="experiment_control" HorizontalAlignment="Center" Margin="0, 10, 20, 10" IsChecked="True" Click="ExperimentButton_Checked" Content="實驗組"/>
+                    <RadioButton x:Name="controlRadio" GroupName="experiment_control" HorizontalAlignment="Center" Margin="0, 10, 20, 10" Click="ExperimentButton_Checked" Content="對照組"/>
+                </StackPanel>
+            </Border>
             <ComboBox x:Name="week_control" HorizontalAlignment="Left" Margin="30,10,0,0" VerticalAlignment="Center" Width="80" Loaded="ComboBox_Loaded_Control" SelectionChanged="ComboBox_SelectionChanged_Control"/>
             <TextBox VerticalAlignment="Center" Margin="30,10,0,0" FontSize="20" Name="nameBox" Width="150">
                 楊博涵
