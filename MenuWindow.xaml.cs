@@ -141,7 +141,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             if(MenuListBox.SelectedItem != null)
             {
                 var parent = this.Owner as MainWindow;
-                string selectedItem = MenuListBox.SelectedItem.ToString();
+                String selectedItem = MenuListBox.SelectedItem.ToString();
                 if (this.menuType == "coach")
                     parent.RightVideoChoosen(selectedItem);
                 else if (this.menuType == "student")

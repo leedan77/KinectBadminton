@@ -21,11 +21,22 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
     using System.IO;
     using Newtonsoft.Json;
     using System.Collections.Generic;
-    using System.Threading;/// <summary>
-                           /// Interaction logic for the MainWindow
-                           /// </summary>
+    using System.Threading;
+    using System.Text;/// <summary>
+                      /// Interaction logic for the MainWindow
+                      /// </summary>
     public sealed partial class MainWindow : Window //, INotifyPropertyChanged, IDisposable
     {
+        public struct PersonalRecord
+        {
+            public String name;
+            public int[] performance;
+            public PersonalRecord(String n, int[] p)
+            {
+                name = n;
+                performance = p;
+            }
+        }
 
         private bool leftPlaying = false;
         private bool leftPausing = false;
@@ -76,8 +87,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         }
         private Goals goals;
 
-        private string studentFileName;
-        private string StudentFileName
+        private String studentFileName;
+        private String StudentFileName
         {
             get
             {
@@ -86,21 +97,15 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             set
             {
                 this.studentFileName = value;
-//<<<<<<< HEAD
-//                string path = cur + dataBasePath + $"\\student\\{action_type}\\{StudentFileName}\\{student_color_or_body}.avi";
-//=======
-                // play right media
-                
                 string path = cur + dataBasePath + $"\\student\\{experiment}\\{week}\\{action_type}\\{StudentFileName}\\{student_color_or_body}.avi";
-//>>>> output_txt
                 MediaPlayer_left.Source = new Uri(path);
                 MediaPlayer_left.Play();
                 MediaPlayer_left.Pause();
             }
         }
 
-        private string coachFileName;
-        private string CoachFileName
+        private String coachFileName;
+        private String CoachFileName
         {
             get
             {
@@ -224,7 +229,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             this.StudentFileName = selectedItem;
         }
 
-        public void LoadJudgement(string name, string action_type, string person_type, string experiment, string week)
+        public void LoadJudgement(String name, string action_type, string person_type, string experiment, string week)
         {
             //String judgementDir = "../../../data/" + person_type + "/" + action_type + "/" + name + "/judgement.json";
             String judgementDir = null;
@@ -318,7 +323,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 }
                 if (output_txt)
                 {
-                    Output_TXT(name, action_type, experiment, week, correct);
+                    Output_TXT(experiment, week, action_type, name, correct);
                 }
             }
         }
@@ -495,15 +500,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 string path = cur + dataBasePath + $"\\coach\\{action_type}\\{CoachFileName}\\{coach_color_or_body}.avi";
                 if (File.Exists(path))
                 {
-//<<<<< HEAD
                     resetUri(MediaPlayer_right, path);
-                    //adJudgement(CoachFileName, action_type, "coach");
-//=====
-                    //Console.WriteLine("file exist");
-                    //experiment and week is useless here
                     LoadJudgement(CoachFileName, action_type, "coach", experiment, week);
-                    //LoadJudgement(CoachFileName, action_type, "coach");
-//>>>>> output_txt
                     releaseMediaElement(MediaPlayer_left);
                 }
                 else
@@ -518,15 +516,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 string path = cur + dataBasePath + $"\\coach\\{action_type}\\{CoachFileName}\\{coach_color_or_body}.avi";
                 if (File.Exists(path))
                 {
-//<<<<< HEAD
                     resetUri(MediaPlayer_right, path);
-                    //adJudgement(CoachFileName, action_type, "coach");
-//=====
-                    //Console.WriteLine("file exist");
-                    //experiment and week is useless here
                     LoadJudgement(CoachFileName, action_type, "coach", experiment, week);
-                    //LoadJudgement(CoachFileName, action_type, "coach");
-//> output_txt
                     releaseMediaElement(MediaPlayer_left);
                 }
                 else
@@ -662,8 +653,47 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             }
         }
 
-        private void Output_TXT(String name, String action_type, String experiment, String week, int[] correct)
+        private void ReadRecordJson(string experiment, string week, string action_type, String name, int[] performance)
         {
+            String cur = Environment.CurrentDirectory;
+            String directory = $"\\..\\..\\..\\data\\txt\\{experiment}\\{week}\\{action_type}\\";
+            Directory.CreateDirectory(cur + directory);
+            String filePath = $"{cur}\\..\\..\\..\\data\\txt\\{experiment}\\{week}\\{action_type}\\123.json";
+            List<PersonalRecord> recordList = new List<PersonalRecord>();
+            string encodeName = Encoding.GetEncoding(950).GetString(Encoding.Convert(Encoding.Unicode, Encoding.GetEncoding(950), Encoding.Unicode.GetBytes(name)));
+            PersonalRecord pr = new PersonalRecord(encodeName, performance);
+            
+
+            if (File.Exists(filePath))
+            {
+                String rawJsonData = File.ReadAllText(filePath);
+                recordList = JsonConvert.DeserializeObject<List<PersonalRecord>>(rawJsonData);
+            }
+            bool nameExist = false;
+            for (int i = 0; i < recordList.Count; i++)
+            {
+                if(recordList[i].name == pr.name)
+                {
+                    nameExist = true;
+                    MessageBoxResult messageBoxResult = MessageBox.Show(
+                    $"{recordList[i].name} 的資料已經存在，要複寫嗎？",
+                    "Overwrite Confirmation", MessageBoxButton.YesNo);
+                    if (messageBoxResult == MessageBoxResult.Yes)
+                    {
+                        recordList[i] = new PersonalRecord(pr.name, pr.performance);
+                    }
+                    break;
+                }
+            }
+            if(!nameExist)
+                recordList.Add(pr);
+            String recordResult = JsonConvert.SerializeObject(recordList);
+            File.WriteAllText(filePath, recordResult);
+        }
+
+        private void Output_TXT(String experiment, String week, String action_type, String name, int[] correct)
+        {
+            ReadRecordJson(experiment, week, action_type, name, correct);
             string cur = Environment.CurrentDirectory;
             string relativePath = $"\\..\\..\\..\\data\\txt\\{experiment}\\{week}\\{action_type}\\";
             Directory.CreateDirectory(cur + relativePath);
