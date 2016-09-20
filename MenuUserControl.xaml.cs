@@ -688,6 +688,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             }
             DirectoryInfo dirInfo = new DirectoryInfo(cur + relatePath);
             ArrayList list = new ArrayList();
+            list.Add("---");
             foreach (DirectoryInfo d in dirInfo.GetDirectories())
             {
                 list.Add(d.Name);
@@ -704,8 +705,32 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             var comboBox = sender as ComboBox;
             if(comboBox.SelectedItem as string == "新增班級")
             {
-                string input = Microsoft.VisualBasic.Interaction.InputBox("Prompt", "Title", "Default", -1, -1);
-                Console.WriteLine(input);
+                string newClassName = Microsoft.VisualBasic.Interaction.InputBox("請輸入班級名稱", "新增班級", "", -1, -1);
+                if(newClassName == "")
+                {
+                    MessageBox.Show("班級名稱不可為空白", "錯誤");
+                }
+                bool classNameExist = false;
+                foreach (string s in comboBox.Items)
+                {
+                    if(s == newClassName)
+                    {
+                        classNameExist = true;
+                        MessageBox.Show($"班級名稱 {newClassName} 已存在", "錯誤");
+                        break;
+                    }
+                }
+                if (!classNameExist)
+                {
+                    ArrayList list = new ArrayList();
+                    foreach (string s in comboBox.Items)
+                    {
+                        list.Add(s);
+                    }
+                    list.Add(newClassName);
+                    comboBox.ItemsSource = list;
+                    comboBox.SelectedIndex = comboBox.Items.Count - 1;
+                }
             }
             else
                 this.className = comboBox.SelectedItem as string;
