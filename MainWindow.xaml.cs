@@ -60,6 +60,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         //for week in main to change same as record 
         public static string weekFromControl;
+        public static string classNameControl;
 
         public int coachVideoCount = 0;
         public int studentVideoCount = 0;
@@ -228,7 +229,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         {
             this.StudentFileName = selectedItem;
         }
-        public void LoadJudgement(string name, string action_type, string person_type, string className, string week, bool output_txt, string class_name)
+        public void LoadJudgement(string name, string action_type, string person_type, string className, string week, bool output_txt)
         {
             //String judgementDir = "../../../data/" + person_type + "/" + action_type + "/" + name + "/judgement.json";
             String judgementDir = null;
@@ -322,8 +323,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 }
                 if (output_txt)
                 {
-                    this.className = class_name;
-                    ReadRecordJson(className, week, action_type, class_name, name, correct);
+                    ReadRecordJson(className, week, action_type, name, correct);
                     //Output_TXT(experiment, week, action_type, class_name, name, correct);
                 }
             }
@@ -485,7 +485,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 {
                     resetUri(MediaPlayer_right, path);
                     //experiment and week is useless here
-                    LoadJudgement(CoachFileName, action_type, "coach", this.className, week, false, "");
+                    LoadJudgement(CoachFileName, action_type, "coach", this.className, week, false);
                     //LoadJudgement(CoachFileName, action_type, "coach");
                     releaseMediaElement(MediaPlayer_left);
                 } 
@@ -502,7 +502,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 if (File.Exists(path))
                 {
                     resetUri(MediaPlayer_right, path);
-                    LoadJudgement(CoachFileName, action_type, "coach", this.className, week, false, "");
+                    LoadJudgement(CoachFileName, action_type, "coach", this.className, week, false);
                     releaseMediaElement(MediaPlayer_left);
                 }
                 else
@@ -518,7 +518,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 if (File.Exists(path))
                 {
                     resetUri(MediaPlayer_right, path);
-                    LoadJudgement(CoachFileName, action_type, "coach", this.className, week, false, "");
+                    LoadJudgement(CoachFileName, action_type, "coach", this.className, week, false);
                     releaseMediaElement(MediaPlayer_left);
                 }
                 else
@@ -615,12 +615,12 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         
 
 
-        private void ReadRecordJson(string className, string week, string action_type, string class_name, String name, int[] performance)
+        private void ReadRecordJson(string className, string week, string action_type, String name, int[] performance)
         {
             String cur = Environment.CurrentDirectory;
             String directory = $"\\..\\..\\..\\data\\txt\\{className}\\{week}\\{action_type}\\";
             Directory.CreateDirectory(cur + directory);
-            String filePath = $"{cur}\\..\\..\\..\\data\\txt\\{className}\\{week}\\{action_type}\\{class_name}.json";
+            String filePath = $"{cur}\\..\\..\\..\\data\\txt\\{className}\\{week}\\{action_type}\\{className}.json";
             List<PersonalRecord> recordList = new List<PersonalRecord>();
             string encodeName = Encoding.GetEncoding(950).GetString(Encoding.Convert(Encoding.Unicode, Encoding.GetEncoding(950), Encoding.Unicode.GetBytes(name)));
             PersonalRecord pr = new PersonalRecord(encodeName, performance);
@@ -666,6 +666,14 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     comboBox.SelectedItem = week;
                     // ... Set SelectedItem as Window Title.
                     //Console.WriteLine("combobox     "+comboBox.SelectedItem as string);
+                }
+                if (!(string.Compare(this.className, classNameControl) == 0) && classNameControl != "---" && classNameControl != "新增班級")
+                {
+                    this.className = classNameControl;
+                    // ... Get the ComboBox.
+                    要先update;
+                    var comboBox = this.classList;
+                    comboBox.SelectedItem = this.className;
                 }
             }           
         }
@@ -778,6 +786,5 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             var comboBox = sender as ComboBox;
             this.className = comboBox.SelectedItem as string;
         }
-
     }
 }

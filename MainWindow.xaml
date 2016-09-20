@@ -96,11 +96,6 @@
                             </Viewbox>
                         </StackPanel>
                         <Grid Grid.Row="1" Grid.Column="0" Margin="30 0 30 0">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="259*"/>
-                                <ColumnDefinition Width="21*"/>
-                                <ColumnDefinition Width="226*"/>
-                            </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
                                 <RowDefinition />
                                 <RowDefinition Height="50"/>

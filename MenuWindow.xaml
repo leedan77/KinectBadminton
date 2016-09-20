@@ -14,23 +14,19 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="auto"/>
             </Grid.ColumnDefinitions>
             <Button Grid.Column="0" x:Name="playButton" Click="PlayButton_Click">Play</Button>
             <Button Grid.Column="1" x:Name="deleteButton" Click="DeleteButton_Click">Delete</Button>
-        </Grid>
-        <Grid Grid.Row="1" x:Name="outputGrid">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="100"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="2" x:Name="outputGrid">
             </Grid>
+        </Grid>
         <ListBox Grid.Row="2" x:Name="MenuListBox" BorderBrush="Transparent" SelectionChanged="MenuListBox__SelectionChanged"/>
     </Grid>
 </Window>
