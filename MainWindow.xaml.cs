@@ -22,9 +22,10 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
     using Newtonsoft.Json;
     using System.Collections.Generic;
     using System.Threading;
-    using System.Text;/// <summary>
-                      /// Interaction logic for the MainWindow
-                      /// </summary>
+    using System.Text;
+    using System.Collections;/// <summary>
+                             /// Interaction logic for the MainWindow
+                             /// </summary>
     public sealed partial class MainWindow : Window //, INotifyPropertyChanged, IDisposable
     {
         public struct PersonalRecord
@@ -56,6 +57,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private string experiment = "experimental";
         private string week = "week1";
+
+        private string class_name;
 
         //for week in main to change same as record 
         public static string weekFromControl;
@@ -771,12 +774,37 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private void class_Loaded(object sender, RoutedEventArgs e)
         {
+            string cur = Environment.CurrentDirectory;
+            string relatePath = $"\\..\\..\\..\\data\\txt\\{experiment}\\{week}\\{action_type}";
+            if (!Directory.Exists(cur + relatePath))
+            {
+                Directory.CreateDirectory(cur + relatePath);
+            }
+            DirectoryInfo dirInfo = new DirectoryInfo(cur + relatePath);
+            ArrayList list = new ArrayList();
+            foreach (FileInfo d in dirInfo.GetFiles())
+            {
+                list.Add(d.Name);
+            }
 
+            // ... Get the ComboBox reference.
+            var comboBox = sender as ComboBox;
+
+            // ... Assign the ItemsSource to the List.
+            comboBox.ItemsSource = list;
+
+            // ... Make the first item selected.
+            comboBox.SelectedIndex = 0;
         }
 
         private void class_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            // ... Get the ComboBox.
+            var comboBox = sender as ComboBox;
 
+            // ... Set SelectedItem as Window Title.
+            class_name = comboBox.SelectedItem as string;
+            //Console.WriteLine(class_name);
         }
     }
 }
