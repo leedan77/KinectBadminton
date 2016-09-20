@@ -704,7 +704,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             var comboBox = sender as ComboBox;
             if(comboBox.SelectedItem as string == "新增班級")
             {
-
+                string input = Microsoft.VisualBasic.Interaction.InputBox("Prompt", "Title", "Default", -1, -1);
+                Console.WriteLine(input);
             }
             else
                 this.className = comboBox.SelectedItem as string;
