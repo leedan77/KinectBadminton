@@ -442,6 +442,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
                 client.DisconnectFromService();
             }
+            Thread.Sleep(40);
             int videoCount = makeVideo("body", personName);
             this.converting = false;
             this.kinectBodyView.converting = false;
@@ -452,8 +453,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             {
                 path = @"..\..\..\data\" + this.idenity + @"\" + this.experiment + @"\" + this.week + @"\" + this.motion + @"\" + personName + @"\color.avi";
             }
-            //idenity == coach
-            else
+            else if(this.idenity == "coach")
             {
                 path = @"..\..\..\data\" + this.idenity + @"\" + this.motion + @"\" + personName + @"\color.avi";
             }
@@ -528,7 +528,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private int makeVideo(string video_type, string personName)
         {
             List<Image<Bgr, byte>> Video = new List<Image<Bgr, byte>>();
-            int videoCount;
             if (string.Compare(video_type, "body") == 0)
             {
                 Video = this.kinectBodyView.Video;
@@ -536,7 +535,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             }
             else if (string.Compare(video_type, "color") == 0)
                 Video = this.kinectColorView.Video;
-            videoCount = Video.Count;
+            Console.WriteLine($"video count: {Video.Count}");
             //string path = @"..\..\..\data\" + this.idenity + @"\"+  this.experiment + @"\" + this.week + @"\" + this.motion + @"\" + personName + @"\";
             string path = null;
             if (this.idenity == "student")
@@ -564,7 +563,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             else if (string.Compare(video_type, "color") == 0)
                 this.kinectColorView.Video.Clear();
             Video.Clear();
-            return videoCount;
+            return Video.Count;
         }
 
         private void Grid_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)

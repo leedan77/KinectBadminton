@@ -119,7 +119,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             if (MenuListBox.SelectedItem != null)
             {
                 MessageBoxResult messageBoxResult = MessageBox.Show(
-                    $"刪除後無法回復，包含 {MenuListBox.SelectedItem.ToString()} {this.actionTypeChinese} 的彩色及骨架影片", 
+                    $"刪除後無法還原，包含 {MenuListBox.SelectedItem.ToString()} {this.actionTypeChinese} 的彩色及骨架影片", 
                     "Delete Confirmation", MessageBoxButton.YesNo);
                 if (messageBoxResult == MessageBoxResult.Yes)
                 {

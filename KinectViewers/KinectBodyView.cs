@@ -303,7 +303,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         /// </summary>
         /// <param name="sender">object sending the event</param>
         /// <param name="e">event arguments</param>
-        private bool newData = false;
         private void Reader_BodyFrameArrived(object sender, BodyFrameArrivedEventArgs e)
         {
             bool dataReceived = false;
@@ -322,7 +321,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     // those body objects will be re-used.
                     bodyFrame.GetAndRefreshBodyData(this.bodies);
                     dataReceived = true;
-                    newData = true;
                 }
             }
 
@@ -333,18 +331,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 if (converting)
                 {
                     this.videoConverter.BodyViewToAVI(this.imageSource);
+                    Console.WriteLine("get");
                 }
             }
-        }
-
-        public void ConvertImageSource()
-        {
-            if (this.newData)
-            {
-                this.videoConverter.BodyViewToAVI(this.imageSource);
-                this.newData = false;
-            }
-
         }
 
         /// <summary>

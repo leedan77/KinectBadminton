@@ -69,7 +69,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
                     Point3D handRight = this.FrameList[i].jointDict[JointType.HandRight];
                     Point3D handTipRight = this.FrameList[i].jointDict[JointType.HandTipRight];
                     double handTipHandYDiff = handTipRight.Y - handRight.Y;
-                    Debug(i, handTipHandYDiff);
                     steadyCount++;
                     if (handTipHandYDiff <= 0.01)
                     {

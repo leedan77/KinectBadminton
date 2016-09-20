@@ -71,7 +71,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
 
         public void Debug(int i, double value)
         {
-            Console.WriteLine("Frame: " + i + ", " + value);
+            Console.WriteLine($"Frame: {i}, {value}");
         }
 
         public int Record(int frame, String criticalPoint)
