@@ -533,12 +533,11 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         {
             List<Image<Bgr, byte>> Video = new List<Image<Bgr, byte>>();
             if (string.Compare(video_type, "body") == 0)
-            {
                 Video = this.kinectBodyView.Video;
-
-            }
+                
             else if (string.Compare(video_type, "color") == 0)
                 Video = this.kinectColorView.Video;
+            int videoCount = Video.Count;
             Console.WriteLine($"video count: {Video.Count}");
             //string path = @"..\..\..\data\" + this.idenity + @"\"+  this.experiment + @"\" + this.week + @"\" + this.motion + @"\" + personName + @"\";
             string path = null;
@@ -567,7 +566,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             else if (string.Compare(video_type, "color") == 0)
                 this.kinectColorView.Video.Clear();
             Video.Clear();
-            return Video.Count;
+            return videoCount;
         }
 
         private void Grid_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)

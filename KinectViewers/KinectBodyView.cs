@@ -292,7 +292,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             {
                 LobMonitor lobMonitor = new LobMonitor(this.frameList, handedness, videoCount);
                 lobMonitor.Start();
-                Console.WriteLine(lobMonitor.GetResult()[0].portion);
                 string judgeResult = JsonConvert.SerializeObject(lobMonitor.GetResult());
                 //File.WriteAllText("../../../data/" + person_type + "/" + this.type + "/" + name + "/judgement.json", judgeResult);
                 File.WriteAllText(path, judgeResult);

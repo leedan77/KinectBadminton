@@ -677,14 +677,14 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 {
                     using (System.IO.StreamWriter file = new System.IO.StreamWriter(filePath, true))
                     {
-                        file.WriteLine(" 姓名     側身   手肘抬高   手肘轉向前   手腕發力   收拍     時間");
+                        file.WriteLine(" 姓名     側身   手肘抬高   手肘轉向前   手腕發力   收拍     ");
                     }
                 }
                 else if (action_type == "lob")
                 {
                     using (System.IO.StreamWriter file = new System.IO.StreamWriter(filePath, true))
                     {
-                        file.WriteLine(" 姓名     持拍立腕   右腳跨步   腳跟著地   手腕發力   時間");
+                        file.WriteLine(" 姓名     持拍立腕   右腳跨步   腳跟著地   手腕發力   ");
                     }
                 }
                 //action_type == serve
@@ -692,7 +692,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 {
                     using (System.IO.StreamWriter file = new System.IO.StreamWriter(filePath, true))
                     {
-                        file.WriteLine(" 姓名     重心腳在左腳   重心腳移到右腳     轉腰        手腕發力       肩膀向前      時間");
+                        file.WriteLine(" 姓名     重心腳在左腳   重心腳移到右腳     轉腰        手腕發力       肩膀向前      ");
                     }
                 }
             }
@@ -726,7 +726,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     output_judge = output_judge + correct[i] + "              ";
                 }
             }
-            output_judge = output_judge + DateTime.Now.ToString("HH:mm:ss(yyyy/MM/dd)");
+            //output_judge = output_judge + DateTime.Now.ToString("HH:mm:ss(yyyy/MM/dd)");
             using (System.IO.StreamWriter file = new System.IO.StreamWriter(filePath, true))
             {
                 file.WriteLine(output_judge);
