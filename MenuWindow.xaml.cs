@@ -25,6 +25,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         ArrayList list;
         string cur = Environment.CurrentDirectory;
 
+        private bool output_record = false;
+        private TextBox classNameBox;
+
         private string actionType;
         public string ActionType
         {
@@ -103,7 +106,34 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             this.experiment = experiment;
             this.week = week;
             this.MenuType = type;
-           
+            if (type == "student")
+            {
+                Grid grid = new Grid();
+                Grid.SetRow(grid , 0);
+                Grid.SetColumn(grid, 0);
+                CheckBox output_txtCheck = new CheckBox
+                {
+                    Content = "紀錄",
+                    VerticalAlignment = VerticalAlignment.Center,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                };
+                output_txtCheck.Click += new RoutedEventHandler(OutputTXT_Click);
+                grid.Children.Add(output_txtCheck);
+                outputGrid.Children.Add(grid);
+
+                Grid grid1 = new Grid();
+                Grid.SetRow(grid1, 0);
+                Grid.SetColumn(grid1, 1);
+                this.classNameBox = new TextBox
+                {
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    FontSize = 15,
+                    Width = 150,
+                };
+                grid1.Children.Add(this.classNameBox);
+                outputGrid.Children.Add(grid1);
+            }
         }
 
         private void MenuListBox__SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -143,14 +173,45 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 var parent = this.Owner as MainWindow;
                 String selectedItem = MenuListBox.SelectedItem.ToString();
                 if (this.menuType == "coach")
+                {
                     parent.RightVideoChoosen(selectedItem);
+                    parent.LoadJudgement(selectedItem, ActionType, menuType, experiment, week, false, "");
+                    this.Close();
+                }
                 else if (this.menuType == "student")
-                    parent.LeftVideoChoosen(selectedItem);
-                parent.LoadJudgement(selectedItem, ActionType, menuType, experiment, week);
-                this.Close();
+                {
+                    if (string.IsNullOrWhiteSpace(this.classNameBox.Text))
+                    {
+                        //Console.WriteLine(this.classNameBox.Text);
+                        MessageBox.Show("請先輸入班級名稱", "名稱");
+                    }
+                    else
+                    {
+                        //Console.WriteLine(this.classNameBox.Text);
+                        parent.LeftVideoChoosen(selectedItem);
+                        parent.LoadJudgement(selectedItem, ActionType, menuType, experiment, week, output_record, this.classNameBox.Text);
+                        this.Close();
+                    }
+                }
             }
             else
                 MessageBox.Show("請先選擇欲播放的項目", "選單");
+        }
+
+        private void OutputTXT_Click(object sender, RoutedEventArgs e)
+        {
+            //Console.WriteLine(output_record);
+            var checkbox = sender as CheckBox;
+            if (checkbox.IsChecked == true)
+            {
+                output_record = true;
+                //Console.WriteLine(output_record);
+            }
+            else
+            {
+                output_record = false;
+                //Console.WriteLine(output_record);
+            }
         }
     }
 }

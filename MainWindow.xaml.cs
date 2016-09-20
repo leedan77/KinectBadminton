@@ -56,7 +56,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private string experiment = "experimental";
         private string week = "week1";
-        private bool output_txt = false;
 
         //for week in main to change same as record 
         public static string weekFromControl;
@@ -228,8 +227,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         {
             this.StudentFileName = selectedItem;
         }
-
-        public void LoadJudgement(String name, string action_type, string person_type, string experiment, string week)
+        public void LoadJudgement(string name, string action_type, string person_type, string experiment, string week, bool output_txt, string class_name)
         {
             //String judgementDir = "../../../data/" + person_type + "/" + action_type + "/" + name + "/judgement.json";
             String judgementDir = null;
@@ -323,7 +321,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 }
                 if (output_txt)
                 {
-                    Output_TXT(experiment, week, action_type, name, correct);
+                    ReadRecordJson(experiment, week, action_type, class_name, name, correct);
+                    //Output_TXT(experiment, week, action_type, class_name, name, correct);
                 }
             }
         }
@@ -484,7 +483,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 {
                     resetUri(MediaPlayer_right, path);
                     //experiment and week is useless here
-                    LoadJudgement(CoachFileName, action_type, "coach", experiment, week);
+                    LoadJudgement(CoachFileName, action_type, "coach", experiment, week, false, "");
                     //LoadJudgement(CoachFileName, action_type, "coach");
                     releaseMediaElement(MediaPlayer_left);
                 } 
@@ -501,7 +500,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 if (File.Exists(path))
                 {
                     resetUri(MediaPlayer_right, path);
-                    LoadJudgement(CoachFileName, action_type, "coach", experiment, week);
+                    LoadJudgement(CoachFileName, action_type, "coach", experiment, week, false, "");
                     releaseMediaElement(MediaPlayer_left);
                 }
                 else
@@ -517,7 +516,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 if (File.Exists(path))
                 {
                     resetUri(MediaPlayer_right, path);
-                    LoadJudgement(CoachFileName, action_type, "coach", experiment, week);
+                    LoadJudgement(CoachFileName, action_type, "coach", experiment, week, false, "");
                     releaseMediaElement(MediaPlayer_left);
                 }
                 else
@@ -638,22 +637,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             }
         }
 
-        private void OutputTXT_Click(object sender, RoutedEventArgs e)
-        {
-            //Console.WriteLine(output_txt);
-            if (output_txtCheck.IsChecked == true)
-            {
-                output_txt = true;
-                //Console.WriteLine(output_txt);
-            }
-            else
-            {
-                output_txt = false;
-                //Console.WriteLine(output_txt);
-            }
-        }
 
-        private void ReadRecordJson(string experiment, string week, string action_type, String name, int[] performance)
+        private void ReadRecordJson(string experiment, string week, string action_type, string class_name, String name, int[] performance)
         {
             String cur = Environment.CurrentDirectory;
             String directory = $"\\..\\..\\..\\data\\txt\\{experiment}\\{week}\\{action_type}\\";
@@ -690,10 +675,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             String recordResult = JsonConvert.SerializeObject(recordList);
             File.WriteAllText(filePath, recordResult);
         }
-
-        private void Output_TXT(String experiment, String week, String action_type, String name, int[] correct)
+        private void Output_TXT(String experiment, String week, String action_type, String class_name, String name, int[] correct)
         {
-            ReadRecordJson(experiment, week, action_type, name, correct);
+            //ReadRecordJson(experiment, week, action_type, name, correct);
             string cur = Environment.CurrentDirectory;
             string relativePath = $"\\..\\..\\..\\data\\txt\\{experiment}\\{week}\\{action_type}\\";
             Directory.CreateDirectory(cur + relativePath);
@@ -777,10 +761,12 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     // ... Set SelectedItem as Window Title.
                     //Console.WriteLine("combobox     "+comboBox.SelectedItem as string);
                 }
-                this.output_txtCheck.IsChecked = false;
-                output_txt = false;
-                //Console.WriteLine(output_txt);
             }           
+        }
+
+        private void Output_txt_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }
