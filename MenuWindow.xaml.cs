@@ -26,7 +26,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         string cur = Environment.CurrentDirectory;
 
         private bool output_record = false;
-        private TextBox classNameBox;
 
         private string actionType;
         public string ActionType
@@ -47,7 +46,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             }
         }
         private string actionTypeChinese;
-        public string experiment;
+        public string class_name;
         public string week;
 
         private string menuType;
@@ -59,7 +58,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             {
                 if (menuType == "student")
                 {
-                    return $"\\..\\..\\..\\data\\{menuType}\\{experiment}\\{week}\\{ActionType}";
+                    return $"\\..\\..\\..\\data\\{menuType}\\{class_name}\\{week}\\{ActionType}";
                 }
                 else
                 {
@@ -99,18 +98,17 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             }
         }
 
-        public MenuWindow(string type, string action_type, string experiment, string week)
+        public MenuWindow(string type, string action_type, string class_name, string week)
         {
             InitializeComponent();
             this.ActionType = action_type;
-            this.experiment = experiment;
+            this.class_name = class_name;
             this.week = week;
             this.MenuType = type;
             if (type == "student")
             {
                 Grid grid = new Grid();
-                Grid.SetRow(grid , 0);
-                Grid.SetColumn(grid, 0);
+                grid.Width = 80;
                 CheckBox output_txtCheck = new CheckBox
                 {
                     Content = "紀錄",
@@ -120,19 +118,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 output_txtCheck.Click += new RoutedEventHandler(OutputTXT_Click);
                 grid.Children.Add(output_txtCheck);
                 outputGrid.Children.Add(grid);
-
-                Grid grid1 = new Grid();
-                Grid.SetRow(grid1, 0);
-                Grid.SetColumn(grid1, 1);
-                this.classNameBox = new TextBox
-                {
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    FontSize = 15,
-                    Width = 150,
-                };
-                grid1.Children.Add(this.classNameBox);
-                outputGrid.Children.Add(grid1);
             }
         }
 
@@ -172,7 +157,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             {
                 var parent = this.Owner as MainWindow;
                 String selectedItem = MenuListBox.SelectedItem.ToString();
-                if (this.menuType == "coach")
+                /*if (this.menuType == "coach")
                 {
                     parent.RightVideoChoosen(selectedItem);
                     parent.LoadJudgement(selectedItem, ActionType, menuType, experiment, week, false, "");
@@ -192,7 +177,13 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                         parent.LoadJudgement(selectedItem, ActionType, menuType, experiment, week, output_record, this.classNameBox.Text);
                         this.Close();
                     }
-                }
+                }*/
+                if (this.menuType == "coach")
+                    parent.RightVideoChoosen(selectedItem);
+                else if (this.menuType == "student")
+                    parent.LeftVideoChoosen(selectedItem);
+                parent.LoadJudgement(selectedItem, ActionType, menuType, class_name, week, output_record);
+                this.Close();
             }
             else
                 MessageBox.Show("請先選擇欲播放的項目", "選單");

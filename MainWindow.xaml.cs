@@ -61,6 +61,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         //for week in main to change same as record 
         public static string weekFromControl;
+        public static string classNameControl;
 
         public int coachVideoCount = 0;
         public int studentVideoCount = 0;
@@ -232,7 +233,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         {
             this.StudentFileName = selectedItem;
         }
-        public void LoadJudgement(string name, string action_type, string person_type, string className, string week, bool output_txt, string class_name)
+        public void LoadJudgement(string name, string action_type, string person_type, string className, string week, bool output_txt)
         {
             //String judgementDir = "../../../data/" + person_type + "/" + action_type + "/" + name + "/judgement.json";
             String judgementDir = null;
@@ -326,7 +327,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 }
                 if (output_txt)
                 {
-                    ReadRecordJson(className, week, action_type, class_name, name, correct);
+                    ReadRecordJson(className, week, action_type, name, correct);
                     //Output_TXT(experiment, week, action_type, class_name, name, correct);
                 }
             }
@@ -488,7 +489,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 {
                     resetUri(MediaPlayer_right, path);
                     //experiment and week is useless here
-                    LoadJudgement(CoachFileName, action_type, "coach", this.className, week, false, "");
+                    LoadJudgement(CoachFileName, action_type, "coach", this.className, week, false);
                     //LoadJudgement(CoachFileName, action_type, "coach");
                     releaseMediaElement(MediaPlayer_left);
                 } 
@@ -505,7 +506,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 if (File.Exists(path))
                 {
                     resetUri(MediaPlayer_right, path);
-                    LoadJudgement(CoachFileName, action_type, "coach", this.className, week, false, "");
+                    LoadJudgement(CoachFileName, action_type, "coach", this.className, week, false);
                     releaseMediaElement(MediaPlayer_left);
                 }
                 else
@@ -521,7 +522,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 if (File.Exists(path))
                 {
                     resetUri(MediaPlayer_right, path);
-                    LoadJudgement(CoachFileName, action_type, "coach", this.className, week, false, "");
+                    LoadJudgement(CoachFileName, action_type, "coach", this.className, week, false);
                     releaseMediaElement(MediaPlayer_left);
                 }
                 else
@@ -615,8 +616,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             week = comboBox.SelectedItem as string;
             //Console.WriteLine(week);
         }
-       
-        private void ReadRecordJson(string className, string week, string action_type, string class_name, String name, int[] performance)
+        private void ReadRecordJson(string className, string week, string action_type, String name, int[] performance)
         {
             String cur = Environment.CurrentDirectory;
             String directory = $"\\..\\..\\..\\data\\{className}\\{week}\\{action_type}\\";
@@ -679,6 +679,15 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     prevSeletedName = nowSelectedName;
                 }
             }
+                //if (!(string.Compare(this.className, classNameControl) == 0) && classNameControl != "---" && classNameControl != "新增班級")
+                //{
+                //    this.className = classNameControl;
+                //    // ... Get the ComboBox.
+                //    //要先update;
+                //    var comboBox = this.classList;
+                //    comboBox.SelectedItem = this.className;
+                //}
+                       
         }
 
         private void Output_txt_Click(object sender, RoutedEventArgs e)

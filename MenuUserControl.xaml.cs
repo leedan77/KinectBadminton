@@ -706,11 +706,12 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             if(comboBox.SelectedItem as string == "新增班級")
             {
                 string newClassName = Microsoft.VisualBasic.Interaction.InputBox("請輸入班級名稱", "新增班級", "", -1, -1);
-                if(newClassName == "")
+                bool classNameExist = false;
+                if (newClassName == "")
                 {
                     MessageBox.Show("班級名稱不可為空白", "錯誤");
+                    classNameExist = true;
                 }
-                bool classNameExist = false;
                 foreach (string s in comboBox.Items)
                 {
                     if(s == newClassName)
@@ -737,6 +738,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             }
             else
                 this.className = comboBox.SelectedItem as string;
+            MainWindow.classNameControl = comboBox.SelectedItem as String;
         }
 
 
