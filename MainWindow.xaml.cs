@@ -643,7 +643,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             String cur = Environment.CurrentDirectory;
             String directory = $"\\..\\..\\..\\data\\txt\\{experiment}\\{week}\\{action_type}\\";
             Directory.CreateDirectory(cur + directory);
-            String filePath = $"{cur}\\..\\..\\..\\data\\txt\\{experiment}\\{week}\\{action_type}\\123.json";
+            String filePath = $"{cur}\\..\\..\\..\\data\\txt\\{experiment}\\{week}\\{action_type}\\{class_name}.json";
             List<PersonalRecord> recordList = new List<PersonalRecord>();
             string encodeName = Encoding.GetEncoding(950).GetString(Encoding.Convert(Encoding.Unicode, Encoding.GetEncoding(950), Encoding.Unicode.GetBytes(name)));
             PersonalRecord pr = new PersonalRecord(encodeName, performance);
