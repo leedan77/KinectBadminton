@@ -86,6 +86,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         }
         private Goals goals;
 
+        private string className = string.Empty;
+
         private String studentFileName;
         private String StudentFileName
         {
@@ -321,6 +323,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 }
                 if (output_txt)
                 {
+                    this.className = class_name;
                     ReadRecordJson(experiment, week, action_type, class_name, name, correct);
                     //Output_TXT(experiment, week, action_type, class_name, name, correct);
                 }
@@ -675,76 +678,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             String recordResult = JsonConvert.SerializeObject(recordList);
             File.WriteAllText(filePath, recordResult);
         }
-        private void Output_TXT(String experiment, String week, String action_type, String class_name, String name, int[] correct)
+        private void Output_TXT(String experiment, String week, String action_type, String class_name)
         {
-            //ReadRecordJson(experiment, week, action_type, name, correct);
-            string cur = Environment.CurrentDirectory;
-            string relativePath = $"\\..\\..\\..\\data\\txt\\{experiment}\\{week}\\{action_type}\\";
-            Directory.CreateDirectory(cur + relativePath);
-            string filename = DateTime.Now.ToString("yyyy-MM-dd");
-            string filePath = cur + relativePath + filename + ".txt";
-            if (!File.Exists(filePath))
-            {
-                FileStream fileStream = new FileStream(filePath, FileMode.Append);
-                fileStream.Close();
-                if (action_type == "smash")
-                {
-                    using (System.IO.StreamWriter file = new System.IO.StreamWriter(filePath, true))
-                    {
-                        file.WriteLine(" 姓名     側身   手肘抬高   手肘轉向前   手腕發力   收拍     ");
-                    }
-                }
-                else if (action_type == "lob")
-                {
-                    using (System.IO.StreamWriter file = new System.IO.StreamWriter(filePath, true))
-                    {
-                        file.WriteLine(" 姓名     持拍立腕   右腳跨步   腳跟著地   手腕發力   ");
-                    }
-                }
-                //action_type == serve
-                else
-                {
-                    using (System.IO.StreamWriter file = new System.IO.StreamWriter(filePath, true))
-                    {
-                        file.WriteLine(" 姓名     重心腳在左腳   重心腳移到右腳     轉腰        手腕發力       肩膀向前      ");
-                    }
-                }
-            }
-            string output_judge = null;
-            if (action_type == "smash")
-            {
-                output_judge = name + "      ";
-            }
-            else if (action_type == "lob")
-            {
-                output_judge = name + "    ";
-            }
-            //action_type == serve
-            else
-            {
-                output_judge = name + "          ";
-            }
-            for (int i = 0; i < correct.Length; i++)
-            {
-                if (action_type == "smash")
-                {
-                    output_judge = output_judge + correct[i] + "         ";
-                }
-                else if (action_type == "lob")
-                {
-                    output_judge = output_judge + correct[i] + "          ";
-                }
-                //action_type == serve
-                else
-                {
-                    output_judge = output_judge + correct[i] + "              ";
-                }
-            }
-            //output_judge = output_judge + DateTime.Now.ToString("HH:mm:ss(yyyy/MM/dd)");
-            using (System.IO.StreamWriter file = new System.IO.StreamWriter(filePath, true))
-            {
-                file.WriteLine(output_judge);
-            }
+            
         }
 
         private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -766,6 +702,85 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private void Output_txt_Click(object sender, RoutedEventArgs e)
         {
+            String cur = Environment.CurrentDirectory;
+            String jsonFilePath = $"{cur}\\..\\..\\..\\data\\txt\\{this.experiment}\\{this.week}\\{this.action_type}\\{this.className}.json";
+            List<PersonalRecord> recordList = new List<PersonalRecord>();
+
+
+            if (File.Exists(jsonFilePath))
+            {
+                String rawJsonData = File.ReadAllText(jsonFilePath);
+                recordList = JsonConvert.DeserializeObject<List<PersonalRecord>>(rawJsonData);
+            }
+
+            string relativePath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+
+            string filename = DateTime.Now.ToString("yyyy-MM-dd");
+            string filePath = $"{this.className}_{filename}.txt";
+            FileStream fileStream = new FileStream(filePath, FileMode.Create);
+            fileStream.Close();
+            if (action_type == "smash")
+            {
+                using (System.IO.StreamWriter file = new System.IO.StreamWriter(filePath, true))
+                {
+                    file.WriteLine(" 姓名     側身   手肘抬高   手肘轉向前   手腕發力   收拍     ");
+                }
+            }
+            else if (action_type == "lob")
+            {
+                using (System.IO.StreamWriter file = new System.IO.StreamWriter(filePath, true))
+                {
+                    file.WriteLine(" 姓名     持拍立腕   右腳跨步   腳跟著地   手腕發力   ");
+                }
+            }
+            else
+            {
+                using (System.IO.StreamWriter file = new System.IO.StreamWriter(filePath, true))
+                {
+                    file.WriteLine(" 姓名     重心腳在左腳   重心腳移到右腳     轉腰        手腕發力       肩膀向前      ");
+                }
+            }
+
+            foreach (PersonalRecord pr in recordList)
+            {
+                string output_judge = null;
+
+                if (action_type == "smash")
+                {
+                    output_judge = pr.name + "      ";
+                }
+                else if (action_type == "lob")
+                {
+                    output_judge = pr.name + "    ";
+                }
+                //action_type == serve
+                else
+                {
+                    output_judge = pr.name + "          ";
+                }
+                for (int i = 0; i < pr.performance.Length; i++)
+                {
+                    if (action_type == "smash")
+                    {
+                        output_judge = output_judge + pr.performance[i] + "         ";
+                    }
+                    else if (action_type == "lob")
+                    {
+                        output_judge = output_judge + pr.performance[i] + "          ";
+                    }
+                    //action_type == serve
+                    else
+                    {
+                        output_judge = output_judge + pr.performance[i] + "              ";
+                    }
+                }
+                //output_judge = output_judge + DateTime.Now.ToString("HH:mm:ss(yyyy/MM/dd)");
+                using (System.IO.StreamWriter file = new System.IO.StreamWriter(filePath, true))
+                {
+                    file.WriteLine(output_judge);
+                }
+            }
+
 
         }
     }
