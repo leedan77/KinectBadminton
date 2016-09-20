@@ -20,6 +20,7 @@ using System.IO;
 using System.ComponentModel;
 using System.Threading;
 using Microsoft.Win32;
+using System.Collections;
 
 namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 {
@@ -43,7 +44,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private string motion = "lob";
         private string handedness = "right";
-        private string experiment = "experimental";
+        private string className = string.Empty;
         private string week = "week1";
 
         private string auto_convert = null;
@@ -364,7 +365,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     string folderName = nameBox.Text + "_" + DateTime.Now.ToString("HH-mm-ss(yyyy-MM-dd)");
                     //Console.WriteLine(folderName);
                     string cur = Environment.CurrentDirectory;
-                    string relativePath = $"\\..\\..\\..\\data\\student\\{experiment}\\{week}\\{motion}\\";
+                    string relativePath = $"\\..\\..\\..\\data\\student\\{this.className}\\{this.week}\\{this.motion}\\";
                     string filePath = cur + relativePath + folderName;
                     if (Directory.Exists(filePath))
                     {
@@ -458,12 +459,12 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             int videoCount = makeVideo("body", personName);
             this.converting = false;
             this.kinectBodyView.converting = false;
-            this.kinectBodyView.Judge(personName, this.idenity, this.handedness, this.experiment,  this.week, videoCount);
+            this.kinectBodyView.Judge(personName, this.idenity, this.handedness, this.className,  this.week, videoCount);
             this.kinectBodyView.Dispose();
             string path = null;
             if (this.idenity == "student")
             {
-                path = @"..\..\..\data\" + this.idenity + @"\" + this.experiment + @"\" + this.week + @"\" + this.motion + @"\" + personName + @"\color.avi";
+                path = @"..\..\..\data\" + this.idenity + @"\" + this.className + @"\" + this.week + @"\" + this.motion + @"\" + personName + @"\color.avi";
             }
             else if(this.idenity == "coach")
             {
@@ -552,7 +553,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             if (this.idenity == "student")
             {
                 //path = $"\\..\\..\\..\\data\\{this.idenity}\\{this.experiment}\\{this.week}\\{this.motion}\\{personName}";
-                path = @"..\..\..\data\" + this.idenity + @"\" + this.experiment + @"\" + this.week + @"\" + this.motion + @"\" + personName + @"\";
+                path = @"..\..\..\data\" + this.idenity + @"\" + this.className + @"\" + this.week + @"\" + this.motion + @"\" + personName + @"\";
             }
             //idenity == coach
             else
@@ -626,34 +627,34 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 this.handedness = "right";
         }
 
-        private void ExperimentButton_Checked(object sender, RoutedEventArgs e)
-        {
-            if (experimentalRadio.IsChecked == true)
-            {
-                experiment = "experimental";
-                //Console.WriteLine(experiment);
-            }
-            else
-            {
-                experiment = "control";
-                //Console.WriteLine(experiment);
-            }
-        }
+        //private void ExperimentButton_Checked(object sender, RoutedEventArgs e)
+        //{
+        //    if (experimentalRadio.IsChecked == true)
+        //    {
+        //        experiment = "experimental";
+        //        //Console.WriteLine(experiment);
+        //    }
+        //    else
+        //    {
+        //        experiment = "control";
+        //        //Console.WriteLine(experiment);
+        //    }
+        //}
 
         private void ComboBox_Loaded_Control(object sender, RoutedEventArgs e)
         {
             // ... A List.
             List<string> data = new List<string>();
-            data.Add("week1");
-            data.Add("week2");
-            data.Add("week3");
-            data.Add("week4");
-            data.Add("week5");
-            data.Add("week6");
-            data.Add("week7");
-            data.Add("week8");
-            data.Add("week9");
-            data.Add("week10");
+            data.Add("第一週");
+            data.Add("第二週");
+            data.Add("第三週");
+            data.Add("第四週");
+            data.Add("第五週");
+            data.Add("第六週");
+            data.Add("第七週");
+            data.Add("第八週");
+            data.Add("第九週");
+            data.Add("第十週");
             data.Add("other");
 
             // ... Get the ComboBox reference.
@@ -676,6 +677,41 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             //Console.WriteLine(week);
             MainWindow.weekFromControl = week;
         }
+
+        private void ClassLoaded(object sender, RoutedEventArgs e)
+        {
+            string cur = Environment.CurrentDirectory;
+            string relatePath = $"\\..\\..\\..\\data\\student";
+            if (!Directory.Exists(cur + relatePath))
+            {
+                Directory.CreateDirectory(cur + relatePath);
+            }
+            DirectoryInfo dirInfo = new DirectoryInfo(cur + relatePath);
+            ArrayList list = new ArrayList();
+            foreach (DirectoryInfo d in dirInfo.GetDirectories())
+            {
+                list.Add(d.Name);
+            }
+            list.Add("新增班級");
+            
+            var comboBox = sender as ComboBox;
+            comboBox.ItemsSource = list;
+            comboBox.SelectedIndex = 0;
+        }
+
+        private void ClassSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var comboBox = sender as ComboBox;
+            if(comboBox.SelectedItem as string == "新增班級")
+            {
+
+            }
+            else
+                this.className = comboBox.SelectedItem as string;
+        }
+
+
     }
+
 
 }

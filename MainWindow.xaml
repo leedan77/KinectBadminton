@@ -83,14 +83,7 @@
                                     <RadioButton x:Name="leftBodyRadio" GroupName="left" Grid.Row="0" HorizontalAlignment="Center" Margin="0, 10, 0, 10" Click="ToggleButton_Checked" Content="骨架"/>
                                 </Viewbox>
                             </StackPanel>
-                            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Margin="50, 0, 0, 0">
-                                <Viewbox Height="40" Margin="0, 0, 0, 0">
-                                    <RadioButton x:Name="experimentalRadio" GroupName="experiment_main" HorizontalAlignment="Center" Margin="0, 10, 25, 10" IsChecked="True" Click="ExperimentButton_Checked">實驗組</RadioButton>
-                                </Viewbox>
-                                <Viewbox Height="40">
-                                    <RadioButton x:Name="controlRadio" GroupName="experiment_main" HorizontalAlignment="Center" Margin="0, 10, 0, 10" Click="ExperimentButton_Checked">對照組</RadioButton>
-                                </Viewbox>
-                            </StackPanel>
+                            <ComboBox x:Name="classList" HorizontalAlignment="Center" Margin="50,0,0,0" VerticalAlignment="Center" Width="70" Loaded="ClassLoaded" SelectionChanged="ClassSelectionChanged"/>
                             <ComboBox x:Name="week_main" HorizontalAlignment="Left" Margin="50,0,0,0" VerticalAlignment="Center" Width="70" Loaded="ComboBox_Loaded_Main" SelectionChanged="ComboBox_SelectionChanged_Main"/>
 
                         </StackPanel>
@@ -103,39 +96,43 @@
                             </Viewbox>
                         </StackPanel>
                         <Grid Grid.Row="1" Grid.Column="0" Margin="30 0 30 0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="259*"/>
+                                <ColumnDefinition Width="21*"/>
+                                <ColumnDefinition Width="226*"/>
+                            </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
                                 <RowDefinition />
                                 <RowDefinition Height="50"/>
                                 <RowDefinition Height="50"/>
                                 <RowDefinition Height="50"/>
                             </Grid.RowDefinitions>
-                            <Button Style="{StaticResource MyButtonStyle}" Grid.Row="0" Margin="5, 0" Background="#3a475b" MouseDown="MediaPlayer_left_MouseRightButtonDown">
+                            <Button Style="{StaticResource MyButtonStyle}" Grid.Row="0" Margin="10,-5,0,5" Background="#3a475b" MouseDown="MediaPlayer_left_MouseRightButtonDown" Grid.ColumnSpan="3" Height="328" VerticalAlignment="Bottom">
                                 <MediaElement x:Name="MediaPlayer_left" Grid.Row="0" LoadedBehavior="Manual" HorizontalAlignment="Center" MediaOpened="MediaLeftOpened" MediaEnded="MediaLeftEnded" RenderTransformOrigin="0.5,0.5">
                                     <MediaElement.RenderTransform>
                                         <ScaleTransform ScaleX="-1"/>
                                     </MediaElement.RenderTransform>
                                 </MediaElement>
                             </Button>
-                            <Viewbox Grid.Row="1" Height="40" HorizontalAlignment="Left">
+                            <Viewbox Grid.Row="1" Height="40" HorizontalAlignment="Left" Margin="0,5">
                                 <RadioButton x:Name="lobRadio" GroupName="action" Grid.Row="0" HorizontalAlignment="Center" Margin="5, 10, 0, 10" IsChecked="True" Click="ActionSwitch_Click" Content="挑球"/>
                             </Viewbox>
-                            <Viewbox Grid.Row="2" Height="40" HorizontalAlignment="Left">
+                            <Viewbox Grid.Row="2" Height="40" HorizontalAlignment="Left" Margin="0,5">
                                 <RadioButton x:Name="serveRadio" GroupName="action" Grid.Row="0" HorizontalAlignment="Center" Margin="5, 10, 0, 10" Click="ActionSwitch_Click" Content="發球"/>
                             </Viewbox>
-                            <Viewbox Grid.Row="3" Height="40" HorizontalAlignment="Left">
+                            <Viewbox Grid.Row="3" Height="40" HorizontalAlignment="Left" Margin="0,5">
                                 <RadioButton x:Name="smashRadio" GroupName="action" Grid.Row="0" HorizontalAlignment="Center" Margin="5, 10, 0, 10" Click="ActionSwitch_Click" Content="殺球"/>
                             </Viewbox>
-                            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
+                            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Grid.ColumnSpan="3" Margin="180,0">
 
                                 <Image x:Name="MenuLeftButton" Source="Images/menu.png" Height="30" MouseLeftButtonDown="MenuLeftButton_MouseLeftButtonDown"></Image>
                                 <Image x:Name="PlayPauseLeftButton" Source="Images/play-circle.png" Width="50" MouseLeftButtonDown="PlayPauseLeftButton_Click" Margin="8" />
                                 <Image x:Name="StopLeftButton" Source="Images/stop-circle.png"  MouseLeftButtonDown="StopLeftButton_Click" Margin="8" />
                             </StackPanel>
-                            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
-                                <ComboBox x:Name="class" HorizontalAlignment="Left" Margin="50,0,0,0" VerticalAlignment="Center" Width="70" Loaded="class_Loaded" SelectionChanged="class_SelectionChanged"/>
+                            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Grid.Column="2">
                                 <Button x:Name="Output_txt" Content="輸出" Click="Output_txt_Click" Margin="10" Padding="5" />
                             </StackPanel>
-                            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
+                            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Grid.ColumnSpan="3" Margin="129,0">
                                 <TextBlock x:Name="LeftMediaLabel" Text="00:000" Margin="0, 12, 0, 0"/>
                                 <Slider x:Name="LeftTimelineSlider" Width="200" Margin="5,10,5,18" ValueChanged="LeftTimelineSlider_ValueChanged" RenderTransformOrigin="0.5,1.533" 
                                     TickPlacement="BottomRight"
@@ -143,7 +140,7 @@
                                     TickFrequency="200"
                                     />
                             </StackPanel>
-                            <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center">
+                            <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" Grid.ColumnSpan="3" Margin="130,0">
                                 <Image Source="Images/turtle-128.png" Width="35" Margin="0, -10, 0, 0"></Image>
                                 <Slider x:Name="LeftSpeedSlider" Width="200" Margin="5,10,5,18" ValueChanged="RightSpeedSlider_ValueChanged_1" RenderTransformOrigin="0.5,1.533" Minimum="0.1" Maximum="1" Value="1"
                                     Ticks="0.1, 0.25, 0.5, 0.75, 1" 
