@@ -25,7 +25,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         ArrayList list;
         string cur = Environment.CurrentDirectory;
 
-        private bool output_txt = false;
+        private bool output_record = false;
         private TextBox classNameBox;
 
         private string actionType;
@@ -189,7 +189,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     {
                         //Console.WriteLine(this.classNameBox.Text);
                         parent.LeftVideoChoosen(selectedItem);
-                        parent.LoadJudgement(selectedItem, ActionType, menuType, experiment, week, output_txt, this.classNameBox.Text);
+                        parent.LoadJudgement(selectedItem, ActionType, menuType, experiment, week, output_record, this.classNameBox.Text);
                         this.Close();
                     }
                 }
@@ -200,17 +200,17 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private void OutputTXT_Click(object sender, RoutedEventArgs e)
         {
-            //Console.WriteLine(output_txt);
+            //Console.WriteLine(output_record);
             var checkbox = sender as CheckBox;
             if (checkbox.IsChecked == true)
             {
-                output_txt = true;
-                //Console.WriteLine(output_txt);
+                output_record = true;
+                //Console.WriteLine(output_record);
             }
             else
             {
-                output_txt = false;
-                //Console.WriteLine(output_txt);
+                output_record = false;
+                //Console.WriteLine(output_record);
             }
         }
     }

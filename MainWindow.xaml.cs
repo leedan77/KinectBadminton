@@ -733,5 +733,10 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 }
             }           
         }
+
+        private void Output_txt_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
