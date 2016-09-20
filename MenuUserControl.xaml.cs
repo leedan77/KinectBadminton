@@ -46,6 +46,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private string experiment = "experimental";
         private string week = "week1";
 
+        private string auto_convert = null;
+
         /// <summary> Delegate to use for placing a job with no arguments onto the Dispatcher </summary>
         private delegate void NoArgDelegate();
 
@@ -248,6 +250,12 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private void RecordStopButton_Click(object sender, RoutedEventArgs e)
         {
             this.recordingStop = true;
+            Console.WriteLine(this.auto_convert);
+            if (!string.IsNullOrEmpty(this.auto_convert))
+            {
+                ConvertBody(this.auto_convert);
+            }
+            this.auto_convert = null;
         }
 
         /// <summary>
@@ -371,7 +379,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     }
                 }
             }
-
+            this.auto_convert = fileName;
             return fileName;
         }
 
