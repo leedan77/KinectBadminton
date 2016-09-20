@@ -730,6 +730,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     list.Add(newClassName);
                     comboBox.ItemsSource = list;
                     comboBox.SelectedIndex = comboBox.Items.Count - 1;
+                    MainWindow.nowSelectedName = newClassName;
+                    //MainWindow.nowSelectedClass = comboBox.Items.Count - 1;
+                    //MainWindow.ClassUpdateState(comboBox.Items.Count - 1);
                 }
             }
             else

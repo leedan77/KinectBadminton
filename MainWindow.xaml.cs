@@ -23,9 +23,10 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
     using System.Collections.Generic;
     using System.Threading;
     using System.Text;
-    using System.Collections;/// <summary>
-                             /// Interaction logic for the MainWindow
-                             /// </summary>
+    using System.Collections;
+    using System.Windows.Input;/// <summary>
+                               /// Interaction logic for the MainWindow
+                               /// </summary>
     public sealed partial class MainWindow : Window //, INotifyPropertyChanged, IDisposable
     {
         public struct PersonalRecord
@@ -72,6 +73,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private double rightVideoDuration = 0;
         private double leftVideoDuration = 0;
+        
+        public static string nowSelectedName = string.Empty;
+        private string prevSeletedName = string.Empty;
 
         public struct Goals
         {
@@ -322,7 +326,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 }
                 if (output_txt)
                 {
-                    this.className = class_name;
                     ReadRecordJson(className, week, action_type, class_name, name, correct);
                     //Output_TXT(experiment, week, action_type, class_name, name, correct);
                 }
@@ -612,15 +615,13 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             week = comboBox.SelectedItem as string;
             //Console.WriteLine(week);
         }
-        
-
-
+       
         private void ReadRecordJson(string className, string week, string action_type, string class_name, String name, int[] performance)
         {
             String cur = Environment.CurrentDirectory;
-            String directory = $"\\..\\..\\..\\data\\txt\\{className}\\{week}\\{action_type}\\";
+            String directory = $"\\..\\..\\..\\data\\{className}\\{week}\\{action_type}\\";
             Directory.CreateDirectory(cur + directory);
-            String filePath = $"{cur}\\..\\..\\..\\data\\txt\\{className}\\{week}\\{action_type}\\{class_name}.json";
+            String filePath = $"{cur}\\..\\..\\..\\data\\{className}\\{week}\\{action_type}\\class_record.json";
             List<PersonalRecord> recordList = new List<PersonalRecord>();
             string encodeName = Encoding.GetEncoding(950).GetString(Encoding.Convert(Encoding.Unicode, Encoding.GetEncoding(950), Encoding.Unicode.GetBytes(name)));
             PersonalRecord pr = new PersonalRecord(encodeName, performance);
@@ -655,6 +656,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            string tabItem = ((sender as TabControl).SelectedItem as TabItem).Header as string;
             if (!Main.IsSelected)
             {
                 if (!(string.Compare(week, weekFromControl) == 0))
@@ -667,13 +669,22 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     // ... Set SelectedItem as Window Title.
                     //Console.WriteLine("combobox     "+comboBox.SelectedItem as string);
                 }
-            }           
+            }
+            else
+            {
+                ClassUpdateState(-1);
+                if(nowSelectedName != prevSeletedName)
+                {
+                    classList.SelectedIndex = classList.Items.IndexOf(nowSelectedName);
+                    prevSeletedName = nowSelectedName;
+                }
+            }
         }
 
         private void Output_txt_Click(object sender, RoutedEventArgs e)
         {
             String cur = Environment.CurrentDirectory;
-            String jsonFilePath = $"{cur}\\..\\..\\..\\data\\txt\\{this.className}\\{this.week}\\{this.action_type}\\{this.className}.json";
+            String jsonFilePath = $"{cur}\\..\\..\\..\\data\\{this.className}\\{this.week}\\{this.action_type}\\class_record.json";
             List<PersonalRecord> recordList = new List<PersonalRecord>();
 
 
@@ -750,34 +761,34 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 }
             }
 
-
+            MessageBox.Show($"已將 {this.className} {this.week} {this.action_type} 的結果輸出至桌面", "輸出完成");
         }
 
         private void ClassLoaded(object sender, RoutedEventArgs e)
         {
+            ClassUpdateState(0);
+        }
+
+        private void ClassSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            e.Handled = true;
+            var comboBox = sender as ComboBox;
+            this.className = comboBox.SelectedItem as string;
+        }
+
+        public void ClassUpdateState(int selectecClass)
+        {
             string cur = Environment.CurrentDirectory;
             string relatePath = $"\\..\\..\\..\\data\\student";
-            if (!Directory.Exists(cur + relatePath))
-            {
-                Directory.CreateDirectory(cur + relatePath);
-            }
             DirectoryInfo dirInfo = new DirectoryInfo(cur + relatePath);
             ArrayList list = new ArrayList();
             foreach (DirectoryInfo d in dirInfo.GetDirectories())
             {
                 list.Add(d.Name);
             }
-
-            var comboBox = sender as ComboBox;
-            comboBox.ItemsSource = list;
-            comboBox.SelectedIndex = 0;
+            classList.ItemsSource = list;
+            if(selectecClass != -1)
+                classList.SelectedIndex = selectecClass;
         }
-
-        private void ClassSelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            var comboBox = sender as ComboBox;
-            this.className = comboBox.SelectedItem as string;
-        }
-
     }
 }
