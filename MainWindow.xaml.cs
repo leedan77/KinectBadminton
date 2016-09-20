@@ -208,6 +208,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private void coach_Button_Click(object sender, RoutedEventArgs e)
         {
             MediaPlayer_right.Pause();
+            Console.WriteLine(this.coachJudgement.Count);
+            Console.WriteLine(this.coachJudgement[(int)(sender as Button).Tag - 1].portion);
             double positionInMillisecond = this.rightVideoDuration * this.coachJudgement[(int)(sender as Button).Tag - 1].portion;
             MediaPlayer_right.Position = new TimeSpan(0, 0, 0, 0, (int)positionInMillisecond);
         }

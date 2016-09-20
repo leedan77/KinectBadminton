@@ -99,6 +99,10 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
 
         public List<CriticalPoint> GetResult()
         {
+            foreach (CriticalPoint CP in this.result)
+            {
+                Console.WriteLine($"{CP.name}: {CP.portion}");
+            }
             this.result.Sort(delegate (CriticalPoint cp1, CriticalPoint cp2) { return cp1.portion.CompareTo(cp2.portion); });
             return this.result;
         }
