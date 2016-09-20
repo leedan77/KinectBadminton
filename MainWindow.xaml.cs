@@ -45,7 +45,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private string experiment = "experimental";
         private string week = "week1";
-        private bool output_txt = false;
 
         //for week in main to change same as record 
         public static string weekFromControl;
@@ -224,7 +223,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             this.StudentFileName = selectedItem;
         }
 
-        public void LoadJudgement(string name, string action_type, string person_type, string experiment, string week)
+        public void LoadJudgement(string name, string action_type, string person_type, string experiment, string week, bool output_txt, string class_name)
         {
             //String judgementDir = "../../../data/" + person_type + "/" + action_type + "/" + name + "/judgement.json";
             String judgementDir = null;
@@ -318,7 +317,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 }
                 if (output_txt)
                 {
-                    Output_TXT(name, action_type, experiment, week, correct);
+                    Output_TXT(name, action_type, experiment, week, correct, class_name);
                 }
             }
         }
@@ -479,7 +478,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 {
                     resetUri(MediaPlayer_right, path);
                     //experiment and week is useless here
-                    LoadJudgement(CoachFileName, action_type, "coach", experiment, week);
+                    LoadJudgement(CoachFileName, action_type, "coach", experiment, week, false, "");
                     //LoadJudgement(CoachFileName, action_type, "coach");
                     releaseMediaElement(MediaPlayer_left);
                 } 
@@ -501,7 +500,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 //=====
                     //Console.WriteLine("file exist");
                     //experiment and week is useless here
-                    LoadJudgement(CoachFileName, action_type, "coach", experiment, week);
+                    LoadJudgement(CoachFileName, action_type, "coach", experiment, week, false, "");
                     //LoadJudgement(CoachFileName, action_type, "coach");
 //>>>>> output_txt
                     releaseMediaElement(MediaPlayer_left);
@@ -524,7 +523,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 //=====
                     //Console.WriteLine("file exist");
                     //experiment and week is useless here
-                    LoadJudgement(CoachFileName, action_type, "coach", experiment, week);
+                    LoadJudgement(CoachFileName, action_type, "coach", experiment, week, false, "");
                     //LoadJudgement(CoachFileName, action_type, "coach");
 //> output_txt
                     releaseMediaElement(MediaPlayer_left);
@@ -647,22 +646,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             }
         }
 
-        private void OutputTXT_Click(object sender, RoutedEventArgs e)
-        {
-            //Console.WriteLine(output_txt);
-            if (output_txtCheck.IsChecked == true)
-            {
-                output_txt = true;
-                //Console.WriteLine(output_txt);
-            }
-            else
-            {
-                output_txt = false;
-                //Console.WriteLine(output_txt);
-            }
-        }
-
-        private void Output_TXT(String name, String action_type, String experiment, String week, int[] correct)
+        private void Output_TXT(String name, String action_type, String experiment, String week, int[] correct, string class_name)
         {
             string cur = Environment.CurrentDirectory;
             string relativePath = $"\\..\\..\\..\\data\\txt\\{experiment}\\{week}\\{action_type}\\";
@@ -747,9 +731,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     // ... Set SelectedItem as Window Title.
                     //Console.WriteLine("combobox     "+comboBox.SelectedItem as string);
                 }
-                this.output_txtCheck.IsChecked = false;
-                output_txt = false;
-                //Console.WriteLine(output_txt);
             }           
         }
     }
