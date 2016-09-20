@@ -768,5 +768,15 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         {
 
         }
+
+        private void class_Loaded(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void class_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
     }
 }
