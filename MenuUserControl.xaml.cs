@@ -251,12 +251,12 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private void RecordStopButton_Click(object sender, RoutedEventArgs e)
         {
             this.recordingStop = true;
-            Console.WriteLine(this.auto_convert);
+            /*Console.WriteLine(this.auto_convert);
             if (!string.IsNullOrEmpty(this.auto_convert))
             {
                 ConvertBody(this.auto_convert);
             }
-            this.auto_convert = null;
+            this.auto_convert = null;*/
         }
 
         /// <summary>
@@ -293,7 +293,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
                 client.DisconnectFromService();
             }
-
             // Update UI after the background recording task has completed
             this.recordingStop = false;
             this.isRecording = false;

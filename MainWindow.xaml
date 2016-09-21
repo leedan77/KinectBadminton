@@ -102,7 +102,7 @@
                                 <RowDefinition Height="50"/>
                                 <RowDefinition Height="50"/>
                             </Grid.RowDefinitions>
-                            <Button Style="{StaticResource MyButtonStyle}" Grid.Row="0" Margin="10,-5,0,5" Background="#3a475b" MouseDown="MediaPlayer_left_MouseRightButtonDown" Grid.ColumnSpan="3" Height="328" VerticalAlignment="Bottom">
+                            <Button Style="{StaticResource MyButtonStyle}" Grid.Row="0" Margin="10,0,0.2,44.2" Background="#3a475b" MouseDown="MediaPlayer_left_MouseRightButtonDown" Grid.RowSpan="2">
                                 <MediaElement x:Name="MediaPlayer_left" Grid.Row="0" LoadedBehavior="Manual" HorizontalAlignment="Center" MediaOpened="MediaLeftOpened" MediaEnded="MediaLeftEnded" RenderTransformOrigin="0.5,0.5">
                                     <MediaElement.RenderTransform>
                                         <ScaleTransform ScaleX="-1"/>
@@ -118,8 +118,7 @@
                             <Viewbox Grid.Row="3" Height="40" HorizontalAlignment="Left" Margin="0,5">
                                 <RadioButton x:Name="smashRadio" GroupName="action" Grid.Row="0" HorizontalAlignment="Center" Margin="5, 10, 0, 10" Click="ActionSwitch_Click" Content="殺球"/>
                             </Viewbox>
-                            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Grid.ColumnSpan="3" Margin="180,0">
-
+                            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Grid.ColumnSpan="3" >
                                 <Image x:Name="MenuLeftButton" Source="Images/menu.png" Height="30" MouseLeftButtonDown="MenuLeftButton_MouseLeftButtonDown"></Image>
                                 <Image x:Name="PlayPauseLeftButton" Source="Images/play-circle.png" Width="50" MouseLeftButtonDown="PlayPauseLeftButton_Click" Margin="8" />
                                 <Image x:Name="StopLeftButton" Source="Images/stop-circle.png"  MouseLeftButtonDown="StopLeftButton_Click" Margin="8" />
@@ -152,7 +151,7 @@
                                 <RowDefinition Height="50"/>
                                 <RowDefinition Height="50"/>
                             </Grid.RowDefinitions>
-                            <Button Style="{StaticResource MyButtonStyle}" Grid.Row="0" Margin="5, 0" Background="#3a475b" MouseDown="MediaPlayer_right_MouseRightButtonDown" >
+                            <Button Style="{StaticResource MyButtonStyle}" Grid.Row="0" Margin="10,0,0.2,49.2" Background="#3a475b" MouseDown="MediaPlayer_right_MouseRightButtonDown" Grid.RowSpan="2">
                                 <MediaElement x:Name="MediaPlayer_right" Grid.Row="0" LoadedBehavior="Manual" HorizontalAlignment="Center" MediaOpened="MediaRightOpened" MediaEnded="MediaRightEnded" RenderTransformOrigin="0.5,0.5">
                                     <MediaElement.RenderTransform>
                                         <ScaleTransform ScaleX="-1"/>
