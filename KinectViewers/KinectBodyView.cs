@@ -17,6 +17,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
     using Newtonsoft.Json;
     using System.Windows.Media.Media3D;
     using Monitors;
+    using System.Threading;
     class Joints
     {
         public string jointType;
@@ -165,6 +166,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             // open the reader for the body frames
             this.bodyFrameReader = kinectSensor.BodyFrameSource.OpenReader();
 
+            Console.WriteLine("ddd");
             this.bodyFrameReader.FrameArrived += this.Reader_BodyFrameArrived;
 
             // get the coordinate mapper
@@ -298,6 +300,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             }
         }
 
+
+        private int n = 0;
         /// <summary>
         /// Handles the body frame data arriving from the sensor and updates the associated gesture detector object for each body
         /// </summary>
@@ -326,10 +330,12 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
             if (dataReceived)
             {
-                // visualize the new body data
+                //visualize the new body data
                 this.UpdateBodyFrame(this.bodies);
                 if (converting)
                 {
+                    n++;
+                    Console.WriteLine("..." + n);
                     this.videoConverter.BodyViewToAVI(this.imageSource);
                 }
             }

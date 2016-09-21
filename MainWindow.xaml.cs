@@ -214,6 +214,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         {
             this.StudentFileName = selectedItem;
         }
+
         public void LoadJudgement(string name, string action_type, string person_type, string className, string week, bool output_txt)
         {
             //String judgementDir = "../../../data/" + person_type + "/" + action_type + "/" + name + "/judgement.json";
@@ -559,9 +560,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 PlayPauseLeftButton.Source = new BitmapImage(new Uri(@"Images\play-circle.png", UriKind.Relative));
             }
         }
-
         
-
         private void ComboBox_Loaded_Main(object sender, RoutedEventArgs e)
         {
             // ... A List.
@@ -596,6 +595,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             // ... Set SelectedItem as Window Title.
             week = comboBox.SelectedItem as string;
         }
+
         private void ReadRecordJson(string className, string week, string action_type, String name, int[] performance)
         {
             String cur = Environment.CurrentDirectory;
@@ -603,7 +603,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             Directory.CreateDirectory(cur + directory);
             String filePath = $"{cur}\\..\\..\\..\\data\\{className}\\{week}\\{action_type}\\class_record.json";
             List<PersonalRecord> recordList = new List<PersonalRecord>();
-            string encodeName = Encoding.GetEncoding(950).GetString(Encoding.Convert(Encoding.Unicode, Encoding.GetEncoding(950), Encoding.Unicode.GetBytes(name)));
+            string encodeName = EncodeString(name);
             PersonalRecord pr = new PersonalRecord(encodeName, performance);
             
 
@@ -673,85 +673,77 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private void Output_txt_Click(object sender, RoutedEventArgs e)
         {
+
             String cur = Environment.CurrentDirectory;
             String jsonFilePath = $"{cur}\\..\\..\\..\\data\\{this.className}\\{this.week}\\{this.action_type}\\class_record.json";
             List<PersonalRecord> recordList = new List<PersonalRecord>();
-
+            string[] smashGoals = new string[] { "姓名", "側身", "手肘抬高", "手肘轉向前", "手腕發力", "收拍" };
+            string[] serveGoals = new string[] { "姓名", "重心腳在慣用腳", "重心轉移至非慣用腳", "轉腰", "手腕發力", "手肘向前" };
+            string[] lobGoals = new string[] { "姓名", "持拍立腕", "慣用腳跨步", "手腕轉動", "腳跟著地", "手腕發力" };
+            string delimiter = ",";
+            //StringBuilder sb = new StringBuilder();
+            string[] title = new string[] { };
+            string actionChinese = string.Empty;
+            if (this.action_type == "smash")
+            {
+                actionChinese = "殺球";
+                title = smashGoals;
+            }
+            else if (this.action_type == "serve")
+            {
+                actionChinese = "發球";
+                title = serveGoals;
+            }
+            else if (this.action_type == "lob")
+            {
+                actionChinese = "挑球";
+                title = lobGoals;
+            }
 
             if (File.Exists(jsonFilePath))
             {
                 String rawJsonData = File.ReadAllText(jsonFilePath);
                 recordList = JsonConvert.DeserializeObject<List<PersonalRecord>>(rawJsonData);
-            }
 
-            string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
 
-            string filename = DateTime.Now.ToString("yyyy-MM-dd");
-            string filePath = $"{desktopPath}\\{this.className}_{filename}.txt";
-            FileStream fileStream = new FileStream(filePath, FileMode.Create);
-            fileStream.Close();
-            if (action_type == "smash")
-            {
-                using (System.IO.StreamWriter file = new System.IO.StreamWriter(filePath, true))
-                {
-                    file.WriteLine(" 姓名     側身   手肘抬高   手肘轉向前   手腕發力   收拍     ");
-                }
-            }
-            else if (action_type == "lob")
-            {
-                using (System.IO.StreamWriter file = new System.IO.StreamWriter(filePath, true))
-                {
-                    file.WriteLine(" 姓名     持拍立腕   右腳跨步   腳跟著地   手腕發力   ");
-                }
-            }
-            else
-            {
-                using (System.IO.StreamWriter file = new System.IO.StreamWriter(filePath, true))
-                {
-                    file.WriteLine(" 姓名     重心腳在左腳   重心腳移到右腳     轉腰        手腕發力       肩膀向前      ");
-                }
-            }
+                string filename = DateTime.Now.ToString("yyyy-MM-dd");
+                string filePath = $"{desktopPath}\\{this.className}_{filename}.csv";
 
-            foreach (PersonalRecord pr in recordList)
-            {
-                string output_judge = null;
+                
+                FileStream fileStream = new FileStream(filePath, FileMode.Create);
+                fileStream.Close();
+                using (StreamWriter sw = new StreamWriter(filePath, false, System.Text.Encoding.UTF8))
+                {
+                    sw.WriteLine(string.Join(delimiter, title));
+                }
+                //sb.AppendLine(string.Join(delimiter, title));
 
-                if (action_type == "smash")
+                foreach (PersonalRecord pr in recordList)
                 {
-                    output_judge = pr.name + "      ";
-                }
-                else if (action_type == "lob")
-                {
-                    output_judge = pr.name + "    ";
-                }
-                else
-                {
-                    output_judge = pr.name + "          ";
-                }
-                for (int i = 0; i < pr.performance.Length; i++)
-                {
-                    if (action_type == "smash")
+                    string[] row = new string[pr.performance.Length+1];
+                    row[0] = pr.name;
+                    for (int i = 1; i <= pr.performance.Length; i++)
                     {
-                        output_judge = output_judge + pr.performance[i] + "         ";
+                        row[i] = EncodeString(pr.performance[i-1].ToString());
                     }
-                    else if (action_type == "lob")
+                    using (StreamWriter sw = new StreamWriter(filePath, true, System.Text.Encoding.UTF8))
                     {
-                        output_judge = output_judge + pr.performance[i] + "          ";
+                        sw.WriteLine(string.Join(delimiter, row));
                     }
-                    //action_type == serve
-                    else
-                    {
-                        output_judge = output_judge + pr.performance[i] + "              ";
-                    }
+                    //sb.AppendLine(EncodeString(string.Join(delimiter, row)));
                 }
-                //output_judge = output_judge + DateTime.Now.ToString("HH:mm:ss(yyyy/MM/dd)");
-                using (System.IO.StreamWriter file = new System.IO.StreamWriter(filePath, true))
-                {
-                    file.WriteLine(output_judge);
-                }
-            }
 
-            MessageBox.Show($"已將 {this.className} {this.week} {this.action_type} 的結果輸出至桌面", "輸出完成");
+                //File.WriteAllText(filePath, sb.ToString());
+                MessageBox.Show($"已將 {this.className} {this.week} {this.action_type} 的結果輸出至桌面", "輸出完成");
+            }
+            else {
+                MessageBox.Show($"{this.className} {this.week} {actionChinese} 的資料是空白的", "錯誤");
+            }
+        }
+        private string EncodeString(string input)
+        {
+            return Encoding.GetEncoding(950).GetString(Encoding.Convert(Encoding.Unicode, Encoding.GetEncoding(950), Encoding.Unicode.GetBytes(input)));
         }
 
         private void ClassLoaded(object sender, RoutedEventArgs e)

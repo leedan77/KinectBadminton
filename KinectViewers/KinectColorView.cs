@@ -112,7 +112,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                         this.colorBitmap.Unlock();
 
                         if (converting)
-                        {                            
+                        {
                             video_converter.ColorViewToAVI(this.colorBitmap);
                         }
                     }

@@ -83,6 +83,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         /// </summary>
         private KinectColorView kinectColorView = null;
         
+        
         public MenuUserControl()
         {
             // initialize the components (controls) of the window
@@ -109,6 +110,17 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             this.DataContext = this;
             this.kinectColorbox.DataContext = this.kinectColorView;
             this.kinectBodybox.DataContext = this.kinectBodyView;
+        }
+
+        private void RefreshKinectSensor()
+        {
+            this.kinectSensor.Close();
+            this.kinectSensor = null;
+            this.kinectSensor = KinectSensor.GetDefault();
+            this.kinectSensor.IsAvailableChanged += this.Sensor_IsAvailableChanged;
+            this.kinectSensor.Open();
+            this.KinectStatusText = this.kinectSensor.IsAvailable ? Properties.Resources.RunningStatusText
+                                                            : Properties.Resources.NoSensorStatusText;
         }
 
         /// <summary>
@@ -402,25 +414,21 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             this.kinectBodyView = new KinectBodyView(this.kinectSensor, this.motion);
 
             this.converting = true;
-            this.kinectBodybox.DataContext = this.kinectBodyView;
+            //this.kinectBodybox.DataContext = this.kinectBodyView;
             string name = new DirectoryInfo(System.IO.Path.GetDirectoryName(filePath)).Name;
             TwoArgDelegate bodyConvert = new TwoArgDelegate(this.BodyConvertClip);
             AsyncCallback callback = new AsyncCallback(myCallbackMethod);
             IAsyncResult result = bodyConvert.BeginInvoke(filePath, name, callback, null);
-            //result.AsyncWaitHandle.WaitOne();
-            //bodyConvert.EndInvoke(result);
-            //result.AsyncWaitHandle.Close();
-            //bodyConvert.BeginInvoke(filePath, nameBox.Text, null, null);
         }
+
         private void myCallbackMethod(IAsyncResult result)
         {
-            //Console.WriteLine(this.kinectBodyView.Video.Count);
+            
         }
-
-
-
+        
         private void ConvertColor(String filePath)
         {
+            Console.WriteLine(this.kinectBodyView.Video.Count);
             this.kinectBodybox.DataContext = null;
             this.kinectColorbox.DataContext = null;
             this.kinectColorView = new KinectColorView(this.kinectSensor);
@@ -456,6 +464,17 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                         if (nowFrame > prevFrame)
                         {
                             playback.Pause();
+                            //while (bodyConverting)
+                            //{
+                            //    Console.WriteLine(".");
+                            //}
+                            //NoArgDelegate convert = new NoArgDelegate(ConvertVideo);
+                            //IAsyncResult result = convert.BeginInvoke(null, null);
+                            //Thread.Sleep(0);
+                            //result.AsyncWaitHandle.WaitOne();
+                            //convert.EndInvoke(result);
+                            //result.AsyncWaitHandle.Close();
+                            //Console.WriteLine(this.kinectBodyView.newDataRecieved);
                             Thread.Sleep(40);
                             playback.Resume();
                             Console.WriteLine(nowFrame);
