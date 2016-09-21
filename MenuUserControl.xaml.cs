@@ -190,7 +190,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             // set the status text
             this.KinectStatusText = this.kinectSensor.IsAvailable ? Properties.Resources.RunningStatusText
                                                             : Properties.Resources.SensorNotAvailableStatusText;
-            Console.WriteLine(this.kinectStatusText);
+            //Console.WriteLine(this.kinectStatusText);
         }
 
         /// <summary>
@@ -389,7 +389,11 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private void ConvertButton_Click(object sender, RoutedEventArgs e)
         {
-            if (classList.SelectedItem as string == "---" || classList.SelectedItem as string == "新增班級")
+            if (this.kinectStatusText == "Running"/*"Kinect not available!"*/)
+            {
+                MessageBox.Show("請先移除Kinect裝置", "錯誤");
+            }
+            else if (classList.SelectedItem as string == "---" || classList.SelectedItem as string == "新增班級")
             {
                 MessageBox.Show("請選擇班級名稱", "錯誤");
             }

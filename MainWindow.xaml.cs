@@ -434,12 +434,13 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             ccw.ShowDialog();
         }
 
-        private void ToggleButton_Checked(object sender, RoutedEventArgs e)
+        private void ToggleButtonLeft_Checked(object sender, RoutedEventArgs e)
         {
             if (leftColorRadio.IsChecked == true)
             {
                 student_color_or_body = "color";
-                string path = cur + dataBasePath + $"\\student\\{action_type}\\{this.className}\\{week}\\{StudentFileName}\\{student_color_or_body}.avi";
+                string path = cur + dataBasePath + $"\\student\\{this.className}\\{week}\\{action_type}\\{StudentFileName}\\{student_color_or_body}.avi";
+                //Console.WriteLine(path);
                 if (File.Exists(path))
                 {
                     resetUri(MediaPlayer_left, path);
@@ -452,7 +453,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             else if (leftBodyRadio.IsChecked == true)
             {
                 student_color_or_body = "body";
-                string path = cur + dataBasePath + $"\\student\\{action_type}\\{this.className}\\{week}\\{StudentFileName}\\{student_color_or_body}.avi";
+                string path = cur + dataBasePath + $"\\student\\{this.className}\\{week}\\{action_type}\\{StudentFileName}\\{student_color_or_body}.avi";
+                //Console.WriteLine(path);
                 if (File.Exists(path))
                 {
                     resetUri(MediaPlayer_left, path);
@@ -462,6 +464,10 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     MessageBox.Show("請先重新選擇欲播放的項目", "沒有該檔案");
                 }
             }
+        }
+
+        private void ToggleButtonRight_Checked(object sender, RoutedEventArgs e)
+        {
             if (rightBodyRadio.IsChecked == true)
             {
                 coach_color_or_body = "body";
@@ -473,7 +479,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 coach_color_or_body = "color";
                 string path = cur + dataBasePath + $"\\coach\\{action_type}\\{CoachFileName}\\{coach_color_or_body}.avi";
                 resetUri(MediaPlayer_right, path);
-
             }
         }
 

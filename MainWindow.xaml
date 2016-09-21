@@ -77,10 +77,10 @@
                         <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="1" HorizontalAlignment="Center" Orientation="Horizontal">
                             <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
                                 <Viewbox Height="40" Margin="0, 0, 0, 0">
-                                    <RadioButton x:Name="leftColorRadio" GroupName="left" Grid.Row="0" HorizontalAlignment="Center" Margin="0, 10, 25, 10" IsChecked="True" Click="ToggleButton_Checked">彩色</RadioButton>
+                                    <RadioButton x:Name="leftColorRadio" GroupName="left" Grid.Row="0" HorizontalAlignment="Center" Margin="0, 10, 25, 10" IsChecked="True" Click="ToggleButtonLeft_Checked">彩色</RadioButton>
                                 </Viewbox>
                                 <Viewbox Height="40">
-                                    <RadioButton x:Name="leftBodyRadio" GroupName="left" Grid.Row="0" HorizontalAlignment="Center" Margin="0, 10, 0, 10" Click="ToggleButton_Checked" Content="骨架"/>
+                                    <RadioButton x:Name="leftBodyRadio" GroupName="left" Grid.Row="0" HorizontalAlignment="Center" Margin="0, 10, 0, 10" Click="ToggleButtonLeft_Checked" Content="骨架"/>
                                 </Viewbox>
                             </StackPanel>
                             <ComboBox x:Name="classList" HorizontalAlignment="Center" Margin="50,0,0,0" VerticalAlignment="Center" Width="70" Loaded="ClassLoaded" SelectionChanged="ClassSelectionChanged"/>
@@ -89,10 +89,10 @@
                         </StackPanel>
                         <StackPanel Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" HorizontalAlignment="Left" Orientation="Horizontal">
                             <Viewbox Height="40" Margin="200, 0, 0, 0">
-                                <RadioButton x:Name="rightColorRadio" GroupName="right" Grid.Row="0" HorizontalAlignment="Center" Margin="0, 10, 50, 10" IsChecked="True" Click="ToggleButton_Checked">彩色</RadioButton>
+                                <RadioButton x:Name="rightColorRadio" GroupName="right" Grid.Row="0" HorizontalAlignment="Center" Margin="0, 10, 50, 10" IsChecked="True" Click="ToggleButtonRight_Checked">彩色</RadioButton>
                             </Viewbox>
                             <Viewbox Height="40">
-                                <RadioButton x:Name="rightBodyRadio" GroupName="right" Grid.Row="0" HorizontalAlignment="Center" Margin="25, 10, 0, 10" Click="ToggleButton_Checked" Content="骨架"/>
+                                <RadioButton x:Name="rightBodyRadio" GroupName="right" Grid.Row="0" HorizontalAlignment="Center" Margin="25, 10, 0, 10" Click="ToggleButtonRight_Checked" Content="骨架"/>
                             </Viewbox>
                         </StackPanel>
                         <Grid Grid.Row="1" Grid.Column="0" Margin="30 0 30 0">
