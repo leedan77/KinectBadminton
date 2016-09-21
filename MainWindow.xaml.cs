@@ -445,10 +445,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 {
                     resetUri(MediaPlayer_left, path);
                 }
-                else
-                {
-                    MessageBox.Show("請先重新選擇欲播放的項目", "沒有該檔案");
-                }
             }
             else if (leftBodyRadio.IsChecked == true)
             {
@@ -458,10 +454,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 if (File.Exists(path))
                 {
                     resetUri(MediaPlayer_left, path);
-                }
-                else
-                {
-                    MessageBox.Show("請先重新選擇欲播放的項目", "沒有該檔案");
                 }
             }
         }
