@@ -68,29 +68,13 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private List<Monitors.Monitor.CriticalPoint> studentJudgement;
         private List<Monitors.Monitor.CriticalPoint> coachJudgement;
-        private String[] smashGoals = {"側身", "手肘抬高", "手肘轉向前", "手腕發力", "收拍"};
-        private String[] serveGoals = { "重心腳在左腳", "重心腳移到右腳", "轉腰", "手腕發力", "肩膀向前" };
-        private String[] lobGoals = { "持拍立腕", "右腳跨步", "腳跟著地", "手腕發力" };
 
         private double rightVideoDuration = 0;
         private double leftVideoDuration = 0;
         
         public static string nowSelectedName = string.Empty;
         private string prevSeletedName = string.Empty;
-
-        public struct Goals
-        {
-            public String[] smashGoals;
-            public String[] serveGoals;
-            public String[] lobGoals;
-            public Goals(String[] smash, String[] serve, String[] lob)
-            {
-                smashGoals = smash;
-                serveGoals = serve;
-                lobGoals = lob;
-            }
-        }
-        private Goals goals;
+        
 
         private String studentFileName;
         private String StudentFileName
@@ -137,7 +121,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             this.action_type = "lob";
             this.student_color_or_body = "color";
             this.coach_color_or_body = "color";
-            this.goals = new Goals(this.smashGoals, this.serveGoals, this.lobGoals);
 
             MediaPlayer_left.ScrubbingEnabled = true;
             MediaPlayer_right.ScrubbingEnabled = true;
@@ -218,8 +201,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private void coach_Button_Click(object sender, RoutedEventArgs e)
         {
             MediaPlayer_right.Pause();
-            Console.WriteLine(this.coachJudgement.Count);
-            Console.WriteLine(this.coachJudgement[(int)(sender as Button).Tag - 1].portion);
             double positionInMillisecond = this.rightVideoDuration * this.coachJudgement[(int)(sender as Button).Tag - 1].portion;
             MediaPlayer_right.Position = new TimeSpan(0, 0, 0, 0, (int)positionInMillisecond);
         }
@@ -251,7 +232,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 this.coachJudgement = JsonConvert.DeserializeObject<List<Monitors.Monitor.CriticalPoint>>(rawJsonData);
             else if (person_type == "student")
                 this.studentJudgement = JsonConvert.DeserializeObject<List<Monitors.Monitor.CriticalPoint>>(rawJsonData);
-
+            
 
             if (person_type == "coach")
             {
@@ -614,7 +595,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
             // ... Set SelectedItem as Window Title.
             week = comboBox.SelectedItem as string;
-            //Console.WriteLine(week);
         }
         private void ReadRecordJson(string className, string week, string action_type, String name, int[] performance)
         {
@@ -678,6 +658,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     classList.SelectedIndex = classList.Items.IndexOf(nowSelectedName);
                     prevSeletedName = nowSelectedName;
                 }
+
             }
                 //if (!(string.Compare(this.className, classNameControl) == 0) && classNameControl != "---" && classNameControl != "新增班級")
                 //{
@@ -789,6 +770,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         {
             string cur = Environment.CurrentDirectory;
             string relatePath = $"\\..\\..\\..\\data\\student";
+            Directory.CreateDirectory(cur + relatePath);
             DirectoryInfo dirInfo = new DirectoryInfo(cur + relatePath);
             ArrayList list = new ArrayList();
             foreach (DirectoryInfo d in dirInfo.GetDirectories())

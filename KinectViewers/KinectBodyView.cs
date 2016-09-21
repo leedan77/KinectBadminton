@@ -331,7 +331,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 if (converting)
                 {
                     this.videoConverter.BodyViewToAVI(this.imageSource);
-                    Console.WriteLine("get");
                 }
             }
         }

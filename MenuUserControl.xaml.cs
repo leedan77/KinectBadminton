@@ -60,6 +60,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private delegate void TwoArgDelegate(string arg1, string arg2);
 
+        private delegate int MakeVideoDelegate(string arg1, string arg2);
+
         /// <summary> Active Kinect sensor </summary>
         private KinectSensor kinectSensor = null;
 
@@ -251,12 +253,12 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private void RecordStopButton_Click(object sender, RoutedEventArgs e)
         {
             this.recordingStop = true;
-            Console.WriteLine(this.auto_convert);
+            /*Console.WriteLine(this.auto_convert);
             if (!string.IsNullOrEmpty(this.auto_convert))
             {
                 ConvertBody(this.auto_convert);
             }
-            this.auto_convert = null;
+            this.auto_convert = null;*/
         }
 
         /// <summary>
@@ -403,9 +405,19 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             this.kinectBodybox.DataContext = this.kinectBodyView;
             string name = new DirectoryInfo(System.IO.Path.GetDirectoryName(filePath)).Name;
             TwoArgDelegate bodyConvert = new TwoArgDelegate(this.BodyConvertClip);
-            bodyConvert.BeginInvoke(filePath, name, null, null);
+            AsyncCallback callback = new AsyncCallback(myCallbackMethod);
+            IAsyncResult result = bodyConvert.BeginInvoke(filePath, name, callback, null);
+            //result.AsyncWaitHandle.WaitOne();
+            //bodyConvert.EndInvoke(result);
+            //result.AsyncWaitHandle.Close();
             //bodyConvert.BeginInvoke(filePath, nameBox.Text, null, null);
         }
+        private void myCallbackMethod(IAsyncResult result)
+        {
+            //Console.WriteLine(this.kinectBodyView.Video.Count);
+        }
+
+
 
         private void ConvertColor(String filePath)
         {
@@ -457,6 +469,15 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             }
             Thread.Sleep(40);
             int videoCount = makeVideo("body", personName);
+
+            //MakeVideoDelegate mv = new MakeVideoDelegate(makeVideo);
+            //IAsyncResult result = mv.BeginInvoke("body", personName, null, null);
+            //Thread.Sleep(0);
+            //result.AsyncWaitHandle.WaitOne();
+            //int videoCount = mv.EndInvoke(result);
+            //result.AsyncWaitHandle.Close();
+
+
             this.converting = false;
             this.kinectBodyView.converting = false;
             this.kinectBodyView.Judge(personName, this.idenity, this.handedness, this.className,  this.week, videoCount);
@@ -478,6 +499,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             else
                 this.Dispatcher.BeginInvoke(new OneArgDelegate(ConvertColor), filePath);
         }
+
         private void ColorConvertClip(string filePath, string personName)
         {
             using (KStudioClient client = KStudio.CreateClient())
@@ -510,14 +532,15 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             }
 
             // Update the UI after the convert playback task has completed
-            makeVideo("color", personName);
+            //makeVideo("color", personName);
+            MakeVideoDelegate mv = new MakeVideoDelegate(makeVideo);
+            mv.BeginInvoke("color", personName, null, null);
             this.converting = false;
             this.kinectColorView.converting = false;
             this.kinectColorView.Dispose();
             this.Dispatcher.BeginInvoke(new NoArgDelegate(UpdateState));
         }
-
-
+        
         /// <summary>
         /// Launches the OpenFileDialog window to help user find/select an event file for playback
         /// </summary>

@@ -157,27 +157,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             {
                 var parent = this.Owner as MainWindow;
                 String selectedItem = MenuListBox.SelectedItem.ToString();
-                /*if (this.menuType == "coach")
-                {
-                    parent.RightVideoChoosen(selectedItem);
-                    parent.LoadJudgement(selectedItem, ActionType, menuType, experiment, week, false, "");
-                    this.Close();
-                }
-                else if (this.menuType == "student")
-                {
-                    if (string.IsNullOrWhiteSpace(this.classNameBox.Text))
-                    {
-                        //Console.WriteLine(this.classNameBox.Text);
-                        MessageBox.Show("請先輸入班級名稱", "名稱");
-                    }
-                    else
-                    {
-                        //Console.WriteLine(this.classNameBox.Text);
-                        parent.LeftVideoChoosen(selectedItem);
-                        parent.LoadJudgement(selectedItem, ActionType, menuType, experiment, week, output_record, this.classNameBox.Text);
-                        this.Close();
-                    }
-                }*/
                 if (this.menuType == "coach")
                     parent.RightVideoChoosen(selectedItem);
                 else if (this.menuType == "student")

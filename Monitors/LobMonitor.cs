@@ -13,7 +13,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
         private double spineShoulderBaseDiff = 0;
         private double initAnkleRightZ = 0;
         private double initAnkleLeftZ = 0;
-        private String[] goals = { "持拍立腕", "慣用腳跨步", "腳跟著地", "手腕發力" };
+        private double initHandRightSpineMidXDiff = 0;
+        private double initHandLeftSpineMidXDiff = 0;
+        private String[] goals = { "持拍立腕", "慣用腳跨步", "手腕轉動", "腳跟著地", "手腕發力" };
 
         public LobMonitor(List<Frames> frameList, String handedness, int videoCount)
         {
@@ -30,20 +32,25 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
             nowFrame = FromKeyExist();
             GenerateCompareData(nowFrame);
             nowFrame = CheckWristUp(nowFrame);
+            nowFrame = CheckWristTurnAndStepForward(nowFrame);
             //nowFrame = CheckWristTurn(nowFrame);
-            nowFrame = CheckStepForward(nowFrame);
+            //nowFrame = CheckStepForward(nowFrame);
             nowFrame = CheckFootGroundAndWristForce(nowFrame);
         }
 
         public override void GenerateCompareData(int nowFrame)
         {
             int spineShoulderBaseCount = 0;
+            int handSpineMidCount = 0;
             for (int i = nowFrame; i < this.FrameList.Count; i++)
             {
                 Point3D spineShoulder = this.FrameList[i].jointDict[JointType.SpineShoulder];
                 Point3D spineBase = this.FrameList[i].jointDict[JointType.SpineBase];
                 Point3D ankleRight = this.FrameList[i].jointDict[JointType.AnkleRight];
                 Point3D ankleLeft = this.FrameList[i].jointDict[JointType.AnkleLeft];
+                Point3D handRight = this.FrameList[i].jointDict[JointType.HandRight];
+                Point3D handLeft = this.FrameList[i].jointDict[JointType.HandLeft];
+                Point3D spineMid = this.FrameList[i].jointDict[JointType.SpineMid];
                 Vector3 spineShoulderBaseVec = new Vector3(spineShoulder, spineBase);
                 if (spineShoulder.X != 0)
                 {
@@ -54,8 +61,16 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
                     this.initAnkleRightZ = ankleRight.Z;
                 if (ankleLeft.Z != 0 && this.initAnkleLeftZ == 0)
                     this.initAnkleLeftZ = ankleLeft.Z;
+                if(handSpineMidCount < 3)
+                {
+                    this.initHandRightSpineMidXDiff += Math.Abs(handRight.X - spineMid.X);
+                    this.initHandLeftSpineMidXDiff += Math.Abs(handLeft.X - spineMid.X);
+                    handSpineMidCount++;
+                }
             }
             this.spineShoulderBaseDiff /= spineShoulderBaseCount;
+            this.initHandRightSpineMidXDiff /= 3;
+            this.initHandLeftSpineMidXDiff /= 3;
         }
 
         private int CheckWristUp(int nowFrame)
@@ -70,7 +85,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
                     Point3D handTipRight = this.FrameList[i].jointDict[JointType.HandTipRight];
                     double handTipHandYDiff = handTipRight.Y - handRight.Y;
                     steadyCount++;
-                    if (handTipHandYDiff <= 0.01)
+                    if (handTipHandYDiff <= -0.01)
                     {
                         if (i < errorFrame + 5)
                             steadyCount = i - errorFrame;
@@ -86,7 +101,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
                     double handTipHandYDiff = handTipLeft.Y - handLeft.Y;
                     Debug(i, handTipHandYDiff);
                     steadyCount++;
-                    if (handTipHandYDiff <= 0.01)
+                    if (handTipHandYDiff <= -0.01)
                     {
                         if (i < errorFrame + 5)
                             steadyCount = i - errorFrame;
@@ -99,18 +114,90 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
             return this.FrameList.Count;
         }
 
-        private int CheckWristTurn(int nowFrame)
+        private int CheckWristTurnAndStepForward(int nowFrame)
         {
-            double nowThumbHandXDiff = 0;
-            double prevThumbHandXDiff = 0;
+            bool wristTurned = false;
+            bool steppedForward = false;
+            int cp = 0;
+
             for (int i = nowFrame; i < this.FrameList.Count; i++)
             {
-                Point3D handTipRight = this.FrameList[i].jointDict[JointType.HandTipRight];
-                Point3D handRight = this.FrameList[i].jointDict[JointType.HandRight];
-                nowThumbHandXDiff = handTipRight.X - handRight.X;
-                if(prevThumbHandXDiff < 0 && nowThumbHandXDiff > 0)
-                    return Record(i, "手腕轉動");
-                prevThumbHandXDiff = nowThumbHandXDiff;
+                Point3D spineMid = this.FrameList[i].jointDict[JointType.SpineMid];
+                if (this.handedness == "right" && !wristTurned)
+                {
+                    Point3D handRight = this.FrameList[i].jointDict[JointType.HandRight];
+                    if (handRight.X - spineMid.X < this.initHandRightSpineMidXDiff / 5)
+                    {
+                        cp = i;
+                        wristTurned = true;
+                        Record(i, "手腕轉動");
+                    }
+                }
+                else if (this.handedness == "left" && !wristTurned)
+                {
+                    Point3D handLeft = this.FrameList[i].jointDict[JointType.HandRight];
+                    if (spineMid.X - handLeft.X > this.initHandLeftSpineMidXDiff / 3.5)
+                    {
+                        cp = i;
+                        wristTurned = true;
+                        Record(i, "手腕轉動");
+                    }
+                }
+
+                if (this.handedness == "right" && !steppedForward)
+                {
+                    Point3D ankleRight = this.FrameList[i].jointDict[JointType.AnkleRight];
+                    double stepSpineRatio = (this.initAnkleRightZ - ankleRight.Z) / this.spineShoulderBaseDiff;
+                    if (stepSpineRatio > 0.75)
+                    {
+                        cp = i;
+                        steppedForward = true;
+                        Record(i, "慣用腳跨步");
+                    }
+                }
+                else if(this.handedness == "left" && !steppedForward)
+                {
+                    Point3D ankleLeft = this.FrameList[i].jointDict[JointType.AnkleLeft];
+                    double stepSpineRatio = (this.initAnkleRightZ - ankleLeft.Z) / this.spineShoulderBaseDiff;
+                    if (stepSpineRatio > 0.75)
+                    {
+                        cp = i;
+                        steppedForward = true;
+                        Record(i, "慣用腳跨步");
+                    }
+                }
+                if(wristTurned && steppedForward)
+                {
+                    return cp;
+                }
+            }
+            return this.FrameList.Count;
+        }
+
+        private int CheckWristTurn(int nowFrame)
+        {
+            
+            for (int i = nowFrame; i < this.FrameList.Count; i++)
+            {
+                Point3D spineMid = this.FrameList[i].jointDict[JointType.SpineMid];
+                Point3D spineShoulder = this.FrameList[i].jointDict[JointType.SpineShoulder];
+                Point3D spineBase = this.FrameList[i].jointDict[JointType.SpineBase];
+                if (this.handedness == "right")
+                {
+                    Point3D handRight = this.FrameList[i].jointDict[JointType.HandRight];
+                    if (handRight.X - spineMid.X< this.initHandRightSpineMidXDiff / 5)
+                    {
+                        return Record(i, "手腕轉動");
+                    }
+                }
+                else if(this.handedness == "left")
+                {
+                    Point3D handLeft = this.FrameList[i].jointDict[JointType.HandRight];
+                    if (spineMid.X - handLeft.X > this.initHandLeftSpineMidXDiff / 5)
+                    {
+                        return Record(i, "手腕轉動");
+                    }
+                }
             }
             return this.FrameList.Count;
         }
