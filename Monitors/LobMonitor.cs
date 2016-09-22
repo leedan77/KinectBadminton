@@ -85,30 +85,33 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
                     Point3D handTipRight = this.FrameList[i].jointDict[JointType.HandTipRight];
                     double handTipHandYDiff = handTipRight.Y - handRight.Y;
                     steadyCount++;
-                    if (handTipHandYDiff <= -0.01)
+                    if (handTipHandYDiff <= 0.01)
                     {
                         if (i < errorFrame + 5)
                             steadyCount = i - errorFrame;
                         errorFrame = i;
                     }
-                    if (steadyCount > 2)
-                        return Record(i - 2, "持拍立腕");
+                    Point3D ankleRight = this.FrameList[i].jointDict[JointType.AnkleRight];
+                    double stepSpineRatio = (this.initAnkleRightZ - ankleRight.Z) / this.spineShoulderBaseDiff;
+                    if (steadyCount > 2 && stepSpineRatio <= 0.75)
+                        return Record(i, "持拍立腕");
                 }
                 else
                 {
                     Point3D handLeft = this.FrameList[i].jointDict[JointType.HandLeft];
                     Point3D handTipLeft = this.FrameList[i].jointDict[JointType.HandTipLeft];
                     double handTipHandYDiff = handTipLeft.Y - handLeft.Y;
-                    Debug(i, handTipHandYDiff);
                     steadyCount++;
-                    if (handTipHandYDiff <= -0.01)
+                    if (handTipHandYDiff <= 0.01)
                     {
                         if (i < errorFrame + 5)
                             steadyCount = i - errorFrame;
                         errorFrame = i;
                     }
-                    if (steadyCount > 2)
-                        return Record(i - 2, "持拍立腕");
+                    Point3D ankleLeft = this.FrameList[i].jointDict[JointType.AnkleLeft];
+                    double stepSpineRatio = (this.initAnkleRightZ - ankleLeft.Z) / this.spineShoulderBaseDiff;
+                    if (steadyCount > 2 && stepSpineRatio <= 0.75)
+                        return Record(i, "持拍立腕");
                 }
             }
             return this.FrameList.Count;
@@ -126,7 +129,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
                 if (this.handedness == "right" && !wristTurned)
                 {
                     Point3D handRight = this.FrameList[i].jointDict[JointType.HandRight];
-                    if (handRight.X - spineMid.X < this.initHandRightSpineMidXDiff / 3.5)
+                    if (handRight.X - spineMid.X < this.initHandRightSpineMidXDiff / 6)
                     {
                         cp = i;
                         wristTurned = true;
@@ -136,7 +139,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
                 else if (this.handedness == "left" && !wristTurned)
                 {
                     Point3D handLeft = this.FrameList[i].jointDict[JointType.HandLeft];
-                    if (spineMid.X - handLeft.X < this.initHandLeftSpineMidXDiff / 3.5)
+                    if (spineMid.X - handLeft.X < this.initHandLeftSpineMidXDiff / 6)
                     {
                         cp = i;
                         wristTurned = true;
@@ -266,6 +269,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
                     prevAnkleRight = ankleRight;
 
                     nowResult = CheckSide(elbowRight, wristRight, handTipRight);
+                    Debug(i, nowResult);
                     if (nowResult < 0 && prevResult > 0 && handTipRight.X > spineShoulder.X && !WristForced)
                     {
                         recordFrame = Record(i, "手腕發力");

@@ -46,7 +46,7 @@
         </dragablz:TabablzControl.InterTabController>
 
 
-        <TabItem x:Name="Main" Header="Main">
+        <TabItem x:Name="Main" Header="主畫面">
             <Grid Background="#bfb8ae">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="18*"/>
@@ -232,7 +232,7 @@
             </Grid>
         </TabItem>
 
-        <TabItem x:Name="Record" Header="Record" HorizontalAlignment="Left" Width="52">
+        <TabItem x:Name="Record" Header="錄製/評分" HorizontalAlignment="Left" Width="52">
             <local:MenuUserControl />
         </TabItem>
     </dragablz:TabablzControl>
