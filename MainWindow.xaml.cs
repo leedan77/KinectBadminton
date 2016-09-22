@@ -425,6 +425,11 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 if (File.Exists(path))
                 {
                     resetUri(MediaPlayer_left, path);
+                    MediaPlayer_left.Stop();
+                    MediaPlayer_left.Position = new TimeSpan(0, 0, 0, 0, 0);
+                    this.leftPlaying = false;
+                    this.leftPausing = true;
+                    MediaLeftControlUpdateState();
                 }
             }
             else if (leftBodyRadio.IsChecked == true)
@@ -434,6 +439,11 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 if (File.Exists(path))
                 {
                     resetUri(MediaPlayer_left, path);
+                    MediaPlayer_left.Stop();
+                    MediaPlayer_left.Position = new TimeSpan(0, 0, 0, 0, 0);
+                    this.leftPlaying = false;
+                    this.leftPausing = true;
+                    MediaLeftControlUpdateState();
                 }
             }
         }
@@ -445,12 +455,22 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 coach_color_or_body = "body";
                 string path = cur + dataBasePath + $"\\coach\\{action_type}\\{CoachFileName}\\{coach_color_or_body}.avi";
                 resetUri(MediaPlayer_right, path);
+                MediaPlayer_right.Stop();
+                MediaPlayer_right.Position = new TimeSpan(0, 0, 0, 0, 0);
+                this.rightPlaying = false;
+                this.rightPausing = true;
+                MediaRightControlUpdateState();
             }
             else if (rightColorRadio.IsChecked == true)
             {
                 coach_color_or_body = "color";
                 string path = cur + dataBasePath + $"\\coach\\{action_type}\\{CoachFileName}\\{coach_color_or_body}.avi";
                 resetUri(MediaPlayer_right, path);
+                MediaPlayer_right.Stop();
+                MediaPlayer_right.Position = new TimeSpan(0, 0, 0, 0, 0);
+                this.rightPlaying = false;
+                this.rightPausing = true;
+                MediaRightControlUpdateState();
             }
         }
 
