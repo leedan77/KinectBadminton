@@ -378,6 +378,10 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 this.ConvertButton.IsEnabled = true;
 
                 // after converting resume the view
+                this.kinectColorView = null;
+                this.kinectBodyView = null;
+                this.kinectColorView = new KinectColorView(this.kinectSensor);
+                this.kinectBodyView = new KinectBodyView(this.kinectSensor, this.motion);
                 this.kinectColorbox.DataContext = this.kinectColorView;
                 this.kinectBodybox.DataContext = this.kinectBodyView;
             }
