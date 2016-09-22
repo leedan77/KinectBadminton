@@ -46,9 +46,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private string handedness = "right";
         private string className = string.Empty;
         private string week = "week1";
-
-        private string auto_convert = null;
-
+        private string studentNameConvert = string.Empty;
         /// <summary> Delegate to use for placing a job with no arguments onto the Dispatcher </summary>
         private delegate void NoArgDelegate();
 
@@ -265,12 +263,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private void RecordStopButton_Click(object sender, RoutedEventArgs e)
         {
             this.recordingStop = true;
-            /*Console.WriteLine(this.auto_convert);
-            if (!string.IsNullOrEmpty(this.auto_convert))
-            {
-                ConvertBody(this.auto_convert);
-            }
-            this.auto_convert = null;*/
         }
 
         /// <summary>
@@ -370,9 +362,10 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             //idenity == student
             else
             {
-                if (string.IsNullOrWhiteSpace(nameBox.Text) || nameBox.Text == "please enter your neme here !")
+                string newStudentName = Microsoft.VisualBasic.Interaction.InputBox("請輸入學員名稱", "新增錄影", "", -1, -1);
+                if (string.IsNullOrWhiteSpace(newStudentName))
                 {
-                    MessageBox.Show("please enter your name", "Error");
+                    MessageBox.Show("學員名稱不可為空白", "錯誤");
                 }
                 else if(classList.SelectedItem as string == "---" || classList.SelectedItem as string == "新增班級")
                 {
@@ -380,7 +373,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 }
                 else
                 {
-                    string folderName = nameBox.Text + "_" + DateTime.Now.ToString("HH-mm-ss(yyyy-MM-dd)");
+                    string folderName = newStudentName + "_" + DateTime.Now.ToString("HH-mm-ss(yyyy-MM-dd)");
                     //Console.WriteLine(folderName);
                     string cur = Environment.CurrentDirectory;
                     string relativePath = $"\\..\\..\\..\\data\\student\\{this.className}\\{this.week}\\{this.motion}\\";
@@ -398,7 +391,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     }
                 }
             }
-            this.auto_convert = fileName;
             return fileName;
         }
 
@@ -408,13 +400,31 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             {
                 MessageBox.Show("請先移除Kinect裝置", "錯誤");
             }
-            else if (classList.SelectedItem as string == "---" || classList.SelectedItem as string == "新增班級")
-            {
-                MessageBox.Show("請選擇班級名稱", "錯誤");
-            }
             else
             {
-                string filePath = this.OpenFileForConvert();
+                string filePath = null;
+                if (this.idenity == "student")
+                {
+                    if (classList.SelectedItem as string == "---" || classList.SelectedItem as string == "新增班級")
+                    {
+                        MessageBox.Show("請選擇班級名稱", "錯誤");
+                    }
+                    else if (this.studentNameConvert == "---" || String.IsNullOrEmpty(this.studentNameConvert))
+                    {
+                        MessageBox.Show("請選擇學員資料夾", "錯誤");
+                    }
+                    else
+                    {
+                        string cur = Environment.CurrentDirectory;
+                        string relatePath = $"\\..\\..\\..\\data\\student\\{this.className}\\{this.week}\\{this.motion}\\{this.studentNameConvert}\\{this.studentNameConvert}.xef";
+                        filePath = cur + relatePath;
+                    }
+                }
+                //idenity == coach
+                else
+                {
+                    filePath = this.OpenFileForConvert();
+                }
                 if (!string.IsNullOrEmpty(filePath))
                 {
                     ConvertBody(filePath);
@@ -430,9 +440,10 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
             this.converting = true;
             //this.kinectBodybox.DataContext = this.kinectBodyView;
-            string name = new DirectoryInfo(System.IO.Path.GetDirectoryName(filePath)).Name;
             UpdateState();
             Console.WriteLine($"main: {Thread.CurrentThread.ManagedThreadId}");
+            //string name = new DirectoryInfo(System.IO.Path.GetDirectoryName(filePath)).Name;
+            string name = this.studentNameConvert;
             TwoArgDelegate bodyConvert = new TwoArgDelegate(this.BodyConvertClip);
             AsyncCallback callback = new AsyncCallback(myCallbackMethod);
             IAsyncResult result = bodyConvert.BeginInvoke(filePath, name, callback, null);
@@ -451,7 +462,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
             this.converting = true;
             this.kinectColorbox.DataContext = this.kinectColorView;
-            string name = new DirectoryInfo(System.IO.Path.GetDirectoryName(filePath)).Name;
+            //string name = new DirectoryInfo(System.IO.Path.GetDirectoryName(filePath)).Name;
+            string name = this.studentNameConvert;
             TwoArgDelegate colorConvert = new TwoArgDelegate(this.ColorConvertClip);
             colorConvert.BeginInvoke(filePath, name, null, null);
             //colorConvert.BeginInvoke(filePath, nameBox.Text, null, null);
@@ -665,6 +677,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 this.motion = "lob";
             else
                 this.motion = "serve";
+            NameUpdateState();
         }
 
         private void HandednessRadio_Click(object sender, RoutedEventArgs e)
@@ -723,6 +736,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             // ... Set SelectedItem as Window Title.
             week = comboBox.SelectedItem as string;
             //Console.WriteLine(week);
+            NameUpdateState();
             MainWindow.weekFromControl = week;
         }
 
@@ -771,6 +785,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 }
                 if (!classNameExist)
                 {
+                    string cur = Environment.CurrentDirectory;
+                    string relatePath = $"\\..\\..\\..\\data\\student\\{newClassName}";
+                    Directory.CreateDirectory(cur + relatePath);
                     ArrayList list = new ArrayList();
                     foreach (string s in comboBox.Items)
                     {
@@ -784,11 +801,53 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             }
             else
                 this.className = comboBox.SelectedItem as string;
+            NameUpdateState();
             MainWindow.classNameControl = comboBox.SelectedItem as String;
         }
 
+        private void studentNameList_Loaded(object sender, RoutedEventArgs e)
+        {
+            string cur = Environment.CurrentDirectory;
+            string relatePath = $"\\..\\..\\..\\data\\student\\{this.className}\\{this.week}\\{this.motion}";
+            if (!Directory.Exists(cur + relatePath))
+            {
+                Directory.CreateDirectory(cur + relatePath);
+            }
+            DirectoryInfo dirInfo = new DirectoryInfo(cur + relatePath);
+            ArrayList list = new ArrayList();
+            list.Add("---");
+            foreach (DirectoryInfo d in dirInfo.GetDirectories())
+            {
+                list.Add(d.Name);
+            }
+            var comboBox = sender as ComboBox;
+            comboBox.ItemsSource = list;
+            comboBox.SelectedIndex = 0;
+        }
 
+        private void studentNameList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var comboBox = sender as ComboBox;
+            this.studentNameConvert = comboBox.SelectedItem as string;
+            Console.WriteLine(this.studentNameConvert);
+        }
+
+        private void NameUpdateState()
+        {
+            string cur = Environment.CurrentDirectory;
+            string relatePath = $"\\..\\..\\..\\data\\student\\{this.className}\\{this.week}\\{this.motion}";
+            Directory.CreateDirectory(cur + relatePath);
+            DirectoryInfo dirInfo = new DirectoryInfo(cur + relatePath);
+            ArrayList list = new ArrayList();
+            foreach (DirectoryInfo d in dirInfo.GetDirectories())
+            {
+                list.Add(d.Name);
+            }
+            if (dirInfo.GetDirectories().Length == 0)
+                studentNameList.IsEnabled = false;
+            else
+                studentNameList.IsEnabled = true;
+            studentNameList.ItemsSource = list;
+        }
     }
-
-
 }
