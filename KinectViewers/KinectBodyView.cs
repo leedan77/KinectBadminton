@@ -165,8 +165,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
             // open the reader for the body frames
             this.bodyFrameReader = kinectSensor.BodyFrameSource.OpenReader();
-
-            Console.WriteLine("ddd");
+            
             this.bodyFrameReader.FrameArrived += this.Reader_BodyFrameArrived;
 
             // get the coordinate mapper
@@ -260,7 +259,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         public void Judge(String name, String person_type, String handedness, String experiment, String week, int videoCount)
         {
-            //create path
             string path = null;
             if (person_type == "student")
             {
@@ -335,7 +333,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 if (converting)
                 {
                     n++;
-                    Console.WriteLine("..." + n);
                     this.videoConverter.BodyViewToAVI(this.imageSource);
                 }
             }

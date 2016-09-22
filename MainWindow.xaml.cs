@@ -735,7 +735,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 }
 
                 //File.WriteAllText(filePath, sb.ToString());
-                MessageBox.Show($"已將 {this.className} {this.week} {this.action_type} 的結果輸出至桌面", "輸出完成");
+                MessageBox.Show($"已將 {this.className} {this.week} {actionChinese} 的結果輸出至桌面", "輸出完成");
             }
             else {
                 MessageBox.Show($"{this.className} {this.week} {actionChinese} 的資料是空白的", "錯誤");
@@ -769,6 +769,10 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             {
                 list.Add(d.Name);
             }
+            if (dirInfo.GetDirectories().Length == 0)
+                classList.IsEnabled = false;
+            else
+                classList.IsEnabled = true;
             classList.ItemsSource = list;
             if(selectecClass != -1)
                 classList.SelectedIndex = selectecClass;

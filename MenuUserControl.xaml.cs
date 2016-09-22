@@ -428,7 +428,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         
         private void ConvertColor(String filePath)
         {
-            Console.WriteLine(this.kinectBodyView.Video.Count);
             this.kinectBodybox.DataContext = null;
             this.kinectColorbox.DataContext = null;
             this.kinectColorView = new KinectColorView(this.kinectSensor);
