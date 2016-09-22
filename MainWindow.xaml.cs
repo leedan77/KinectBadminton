@@ -215,7 +215,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             this.StudentFileName = selectedItem;
         }
 
-        public void LoadJudgement(string name, string action_type, string person_type, string className, string week, bool output_txt)
+        public void LoadJudgement(string name, string action_type, string person_type, string className, string week, bool record)
         {
             //String judgementDir = "../../../data/" + person_type + "/" + action_type + "/" + name + "/judgement.json";
             String judgementDir = null;
@@ -307,10 +307,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     grid.Children.Add(button);
                     stuGrid.Children.Add(grid);
                 }
-                if (output_txt)
+                if (record)
                 {
                     ReadRecordJson(className, week, action_type, name, correct);
-                    //Output_TXT(experiment, week, action_type, class_name, name, correct);
                 }
             }
         }
@@ -596,9 +595,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private void ReadRecordJson(string className, string week, string action_type, String name, int[] performance)
         {
             String cur = Environment.CurrentDirectory;
-            String directory = $"\\..\\..\\..\\data\\{className}\\{week}\\{action_type}\\";
+            String directory = $"\\..\\..\\..\\data\\student\\{className}\\{week}\\{action_type}";
             Directory.CreateDirectory(cur + directory);
-            String filePath = $"{cur}\\..\\..\\..\\data\\{className}\\{week}\\{action_type}\\class_record.json";
+            String filePath = $"{cur}\\{directory}\\class_record.json";
             List<PersonalRecord> recordList = new List<PersonalRecord>();
             string encodeName = EncodeString(name);
             PersonalRecord pr = new PersonalRecord(encodeName, performance);
@@ -668,11 +667,11 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                        
         }
 
-        private void Output_txt_Click(object sender, RoutedEventArgs e)
+        private void OutputCSVClick(object sender, RoutedEventArgs e)
         {
 
             String cur = Environment.CurrentDirectory;
-            String jsonFilePath = $"{cur}\\..\\..\\..\\data\\{this.className}\\{this.week}\\{this.action_type}\\class_record.json";
+            String jsonFilePath = $"{cur}\\..\\..\\..\\data\\student\\{this.className}\\{this.week}\\{this.action_type}\\class_record.json";
             List<PersonalRecord> recordList = new List<PersonalRecord>();
             string[] smashGoals = new string[] { "姓名", "側身", "手肘抬高", "手肘轉向前", "手腕發力", "收拍" };
             string[] serveGoals = new string[] { "姓名", "重心腳在慣用腳", "重心轉移至非慣用腳", "轉腰", "手腕發力", "手肘向前" };
@@ -704,38 +703,59 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
                 string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
 
-                string filename = DateTime.Now.ToString("yyyy-MM-dd");
-                string filePath = $"{desktopPath}\\{this.className}_{filename}.csv";
+                string fileName = $"{this.className}_{this.week}_{actionChinese}.csv";
+                string filePath = $"{desktopPath}\\{fileName}";
 
-                
-                FileStream fileStream = new FileStream(filePath, FileMode.Create);
-                fileStream.Close();
-                using (StreamWriter sw = new StreamWriter(filePath, false, System.Text.Encoding.UTF8))
+                bool cancel = false;
+                if (File.Exists(filePath))
                 {
-                    sw.WriteLine(string.Join(delimiter, title));
-                }
-                //sb.AppendLine(string.Join(delimiter, title));
-
-                foreach (PersonalRecord pr in recordList)
-                {
-                    string[] row = new string[pr.performance.Length+1];
-                    row[0] = pr.name;
-                    for (int i = 1; i <= pr.performance.Length; i++)
+                    MessageBoxResult messageBoxResult = MessageBox.Show(
+                    $"{fileName} 已經存在，確定要複寫嗎？", "確認", MessageBoxButton.YesNo);
+                    if (messageBoxResult == MessageBoxResult.No)
                     {
-                        row[i] = EncodeString(pr.performance[i-1].ToString());
+                        cancel = true;
                     }
-                    using (StreamWriter sw = new StreamWriter(filePath, true, System.Text.Encoding.UTF8))
-                    {
-                        sw.WriteLine(string.Join(delimiter, row));
-                    }
-                    //sb.AppendLine(EncodeString(string.Join(delimiter, row)));
                 }
 
-                //File.WriteAllText(filePath, sb.ToString());
-                MessageBox.Show($"已將 {this.className} {this.week} {actionChinese} 的結果輸出至桌面", "輸出完成");
+                if (!cancel)
+                {
+                    try
+                    {
+                        FileStream fileStream = new FileStream(filePath, FileMode.Create);
+                        fileStream.Close();
+                        using (StreamWriter sw = new StreamWriter(filePath, false, System.Text.Encoding.UTF8))
+                        {
+                            sw.WriteLine(string.Join(delimiter, title));
+                        }
+                        //sb.AppendLine(string.Join(delimiter, title));
+
+                        foreach (PersonalRecord pr in recordList)
+                        {
+                            string[] row = new string[pr.performance.Length + 1];
+                            row[0] = pr.name;
+                            for (int i = 1; i <= pr.performance.Length; i++)
+                            {
+                                row[i] = EncodeString(pr.performance[i - 1].ToString());
+                            }
+                            using (StreamWriter sw = new StreamWriter(filePath, true, System.Text.Encoding.UTF8))
+                            {
+                                sw.WriteLine(string.Join(delimiter, row));
+                            }
+                            //sb.AppendLine(EncodeString(string.Join(delimiter, row)));
+                        }
+
+                        //File.WriteAllText(filePath, sb.ToString());
+                        MessageBox.Show($"已將 {fileName} 的結果輸出至桌面", "輸出完成");
+                    }
+                    catch
+                    {
+                        MessageBox.Show($"無法輸出 {fileName} 的結果，可能因為檔案正在使用中 ", "錯誤");
+                    }
+                }
             }
-            else {
-                MessageBox.Show($"{this.className} {this.week} {actionChinese} 的資料是空白的", "錯誤");
+            else
+            {
+                MessageBox.Show($"{this.className} {this.week} {actionChinese} 的評分紀錄是空白的", "錯誤");
             }
         }
         private string EncodeString(string input)

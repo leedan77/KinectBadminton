@@ -124,7 +124,7 @@
                                 <Image x:Name="StopLeftButton" Source="Images/stop-circle.png"  MouseLeftButtonDown="StopLeftButton_Click" Margin="8" />
                             </StackPanel>
                             <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Grid.Column="2">
-                                <Button x:Name="Output_txt" Content="輸出" Click="Output_txt_Click" Margin="10" Padding="5" />
+                                <Button x:Name="Output_txt" Content="輸出" Click="OutputCSVClick" Margin="10" Padding="5" />
                             </StackPanel>
                             <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Grid.ColumnSpan="3" Margin="129,0">
                                 <TextBlock x:Name="LeftMediaLabel" Text="00:000" Margin="0, 12, 0, 0"/>

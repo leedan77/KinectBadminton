@@ -109,14 +109,14 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             {
                 Grid grid = new Grid();
                 grid.Width = 80;
-                CheckBox output_txtCheck = new CheckBox
+                CheckBox recordCheck = new CheckBox
                 {
                     Content = "紀錄",
                     VerticalAlignment = VerticalAlignment.Center,
                     HorizontalAlignment = HorizontalAlignment.Center,
                 };
-                output_txtCheck.Click += new RoutedEventHandler(OutputTXT_Click);
-                grid.Children.Add(output_txtCheck);
+                recordCheck.Click += new RoutedEventHandler(RecordClick);
+                grid.Children.Add(recordCheck);
                 outputGrid.Children.Add(grid);
             }
         }
@@ -137,14 +137,21 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         {
             if (MenuListBox.SelectedItem != null)
             {
-                MessageBoxResult messageBoxResult = MessageBox.Show(
-                    $"刪除後無法還原，包含 {MenuListBox.SelectedItem.ToString()} {this.actionTypeChinese} 的彩色及骨架影片", 
-                    "Delete Confirmation", MessageBoxButton.YesNo);
-                if (messageBoxResult == MessageBoxResult.Yes)
+                try
                 {
-                    string path = cur + this.MenuType + $"\\{MenuListBox.SelectedItem.ToString()}";
-                    Directory.Delete(path, true);
-                    this.MenuType = this.menuType;
+                    MessageBoxResult messageBoxResult = MessageBox.Show(
+                    $"刪除後無法還原，包含 {MenuListBox.SelectedItem.ToString()} {this.actionTypeChinese} 的彩色及骨架影片",
+                    "Delete Confirmation", MessageBoxButton.YesNo);
+                    if (messageBoxResult == MessageBoxResult.Yes)
+                    {
+                        string path = cur + this.MenuType + $"\\{MenuListBox.SelectedItem.ToString()}";
+                        Directory.Delete(path, true);
+                        this.MenuType = this.menuType;
+                    }
+                }
+                catch
+                {
+                    MessageBox.Show("無法刪除，可能因為影片正在播放中", "錯誤");
                 }
             }
             else
@@ -168,19 +175,16 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 MessageBox.Show("請先選擇欲播放的項目", "選單");
         }
 
-        private void OutputTXT_Click(object sender, RoutedEventArgs e)
+        private void RecordClick(object sender, RoutedEventArgs e)
         {
-            //Console.WriteLine(output_record);
             var checkbox = sender as CheckBox;
             if (checkbox.IsChecked == true)
             {
                 output_record = true;
-                //Console.WriteLine(output_record);
             }
             else
             {
                 output_record = false;
-                //Console.WriteLine(output_record);
             }
         }
     }
