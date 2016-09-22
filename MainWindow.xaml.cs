@@ -62,6 +62,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         //for week in main to change same as record 
         public static string weekFromControl;
         public static string classNameControl;
+        public static string actionTypeControl;
 
         public int coachVideoCount = 0;
         public int studentVideoCount = 0;
@@ -372,6 +373,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             if (RightTimelineSlider.IsMouseCaptureWithin)
             {
                 MediaPlayer_right.Pause();
+                this.rightPlaying = false;
+                this.rightPausing = true;
+                MediaRightControlUpdateState();
                 int SliderValue = (int)RightTimelineSlider.Value;
                 TimeSpan ts = new TimeSpan(0, 0, 0, 0, SliderValue);
                 MediaPlayer_right.Position = ts;
@@ -383,6 +387,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             if (LeftTimelineSlider.IsMouseCaptureWithin)
             {
                 MediaPlayer_left.Pause();
+                this.leftPlaying = false;
+                this.leftPausing = true;
+                MediaLeftControlUpdateState();
                 int SliderValue = (int)LeftTimelineSlider.Value;
                 TimeSpan ts = new TimeSpan(0, 0, 0, 0, SliderValue);
                 MediaPlayer_left.Position = ts;
@@ -662,7 +669,15 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     var comboBox = this.week_main;
                     comboBox.SelectedItem = week;
                     // ... Set SelectedItem as Window Title.
-                    //Console.WriteLine("combobox     "+comboBox.SelectedItem as string);
+                    //Console.WriteLine("combobox     "+comboBox.SelectedItem as string);                 
+                }
+                if (!(string.Compare(this.className, classNameControl) == 0) && classNameControl != "請選擇" && classNameControl != "新增班級")
+                {
+                    this.className = classNameControl;
+                    // ... Get the ComboBox.
+                    //要先update;
+                    var comboBox = this.classList;
+                    comboBox.SelectedItem = this.className;
                 }
             }
             else
@@ -673,7 +688,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     classList.SelectedIndex = classList.Items.IndexOf(nowSelectedName);
                     prevSeletedName = nowSelectedName;
                 }
-
             }
                 //if (!(string.Compare(this.className, classNameControl) == 0) && classNameControl != "請選擇" && classNameControl != "新增班級")
                 //{

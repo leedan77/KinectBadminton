@@ -255,6 +255,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     OneArgDelegate recording = new OneArgDelegate(this.RecordClip);
                     recording.BeginInvoke(filePath, null, null);
                 }
+                NameUpdateState();
             }
             else
             {
@@ -749,6 +750,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 this.motion = "lob";
             else
                 this.motion = "serve";
+            MainWindow.actionTypeControl = this.motion;
+            //Console.WriteLine(MainWindow.actionTypeControl);
             NameUpdateState();
         }
 
@@ -904,7 +907,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         {
             var comboBox = sender as ComboBox;
             this.studentNameConvert = comboBox.SelectedItem as string;
-            Console.WriteLine(this.studentNameConvert);
+            //Console.WriteLine(this.studentNameConvert);
         }
 
         private void NameUpdateState()
