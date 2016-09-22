@@ -62,7 +62,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         //for week in main to change same as record 
         public static string weekFromControl;
         public static string classNameControl;
-        public static string actionTypeControl;
+        public static string actionTypeControl = "lob";
 
         public int coachVideoCount = 0;
         public int studentVideoCount = 0;
@@ -483,10 +483,12 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private void ActionSwitch_Click(object sender, RoutedEventArgs e)
         {
+            //Console.WriteLine("in ActionSwitch_Click");
             clearUserBtns();
             clearCoachBtns();
             if (lobRadio.IsChecked == true)
             {
+                //Console.WriteLine("aa");
                 action_type = "lob";
                 string path = cur + dataBasePath + $"\\coach\\{action_type}\\{CoachFileName}\\{coach_color_or_body}.avi";
                 if(File.Exists(path))
@@ -505,6 +507,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             }
             else if (serveRadio.IsChecked == true)
             {
+                //Console.WriteLine("bb");
                 action_type = "serve";
                 string path = cur + dataBasePath + $"\\coach\\{action_type}\\{CoachFileName}\\{coach_color_or_body}.avi";
                 if (File.Exists(path))
@@ -521,6 +524,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             }
             else if (smashRadio.IsChecked == true)
             {
+                //Console.WriteLine("CC");
                 action_type = "smash";
                 string path = cur + dataBasePath + $"\\coach\\{action_type}\\{CoachFileName}\\{coach_color_or_body}.avi";
                 if (File.Exists(path))
@@ -688,6 +692,34 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     classList.SelectedIndex = classList.Items.IndexOf(nowSelectedName);
                     prevSeletedName = nowSelectedName;
                 }
+                if (!(string.Compare(this.action_type, actionTypeControl) == 0))
+                {
+                    /*Console.WriteLine("if");
+                    Console.WriteLine("this.action_type    " + this.action_type);
+                    Console.WriteLine("actionTypeControl   " + actionTypeControl);*/
+                    this.action_type = actionTypeControl;
+                    if (this.action_type == "lob")
+                    {
+                        this.lobRadio.IsChecked = true;
+                        ActionSwitch_Click(this.lobRadio, null);
+                    }
+                    else if (this.action_type == "serve")
+                    {
+                        this.serveRadio.IsChecked = true;
+                        ActionSwitch_Click(this.serveRadio, null);
+                    }
+                    else if (this.action_type == "smash")
+                    {
+                        this.smashRadio.IsChecked = true;
+                        ActionSwitch_Click(this.smashRadio, null);
+                    }
+                }
+                /*else
+                {
+                    Console.WriteLine("else");
+                    Console.WriteLine("this.action_type    " + this.action_type);
+                    Console.WriteLine("actionTypeControl   " + actionTypeControl);
+                }*/
             }
                 //if (!(string.Compare(this.className, classNameControl) == 0) && classNameControl != "請選擇" && classNameControl != "新增班級")
                 //{
