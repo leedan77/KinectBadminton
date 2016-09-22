@@ -313,18 +313,57 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             Console.WriteLine($"update: {Thread.CurrentThread.ManagedThreadId}");
             if (this.isRecording)
             {
+                this.studentRadio.IsEnabled = false;
+                this.coachRadio.IsEnabled = false;
+                this.lobRadio.IsEnabled = false;
+                this.serveRadio.IsEnabled = false;
+                this.smashRadio.IsEnabled = false;
+                this.classList.IsEnabled = false;
+                this.week_control.IsEnabled = false;
+                this.lefthandedRadio.IsEnabled = false;
+                this.righthandedRadio.IsEnabled = false;
+                this.studentNameList.IsEnabled = false;
+                this.ResetButton.IsEnabled = false;
+
                 this.RecordButton.IsEnabled = false;
                 this.RecordStopButton.IsEnabled = true;
                 this.ConvertButton.IsEnabled = false;
             }
             else if (this.converting)
             {
+                this.studentRadio.IsEnabled = false;
+                this.coachRadio.IsEnabled = false;
+                this.lobRadio.IsEnabled = false;
+                this.serveRadio.IsEnabled = false;
+                this.smashRadio.IsEnabled = false;
+                this.classList.IsEnabled = false;
+                this.week_control.IsEnabled = false;
+                this.lefthandedRadio.IsEnabled = false;
+                this.righthandedRadio.IsEnabled = false;
+                this.studentNameList.IsEnabled = false;
+                this.ResetButton.IsEnabled = false;
+
+
                 this.RecordButton.IsEnabled = false;
                 this.RecordStopButton.IsEnabled = false;
                 this.ConvertButton.IsEnabled = false;
             }
             else
             {
+                this.studentRadio.IsEnabled = true;
+                this.coachRadio.IsEnabled = true;
+                this.lobRadio.IsEnabled = true;
+                this.serveRadio.IsEnabled = true;
+                this.smashRadio.IsEnabled = true;
+                this.classList.IsEnabled = true;
+                this.week_control.IsEnabled = true;
+                this.lefthandedRadio.IsEnabled = true;
+                this.righthandedRadio.IsEnabled = true;
+                this.studentNameList.IsEnabled = true;
+                this.ResetButton.IsEnabled = true;
+
+                this.PlayBackLabel.Content = string.Empty;
+                this.PlayBackLabel.Visibility = Visibility.Hidden;
                 this.RecordPlaybackStatusText = string.Empty;
                 this.RecordButton.IsEnabled = true;
                 this.RecordStopButton.IsEnabled = false;
@@ -452,6 +491,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             {
                 name = new DirectoryInfo(System.IO.Path.GetDirectoryName(filePath)).Name;
             }
+            this.PlayBackLabel.Content = $"正在對{name}進行評分，並製作彩色及骨架影片...";
+            this.PlayBackLabel.Visibility = Visibility.Visible;
             TwoArgDelegate bodyConvert = new TwoArgDelegate(this.BodyConvertClip);
             AsyncCallback callback = new AsyncCallback(myCallbackMethod);
             IAsyncResult result = bodyConvert.BeginInvoke(filePath, name, callback, null);
