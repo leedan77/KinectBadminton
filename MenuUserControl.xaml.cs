@@ -822,22 +822,25 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private void studentNameList_Loaded(object sender, RoutedEventArgs e)
         {
-            string cur = Environment.CurrentDirectory;
-            string relatePath = $"\\..\\..\\..\\data\\student\\{this.className}\\{this.week}\\{this.motion}";
-            if (!Directory.Exists(cur + relatePath))
+            if (!(classList.SelectedItem as string == "---") && !(classList.SelectedItem as string == "新增班級"))
             {
-                Directory.CreateDirectory(cur + relatePath);
+                string cur = Environment.CurrentDirectory;
+                string relatePath = $"\\..\\..\\..\\data\\student\\{this.className}\\{this.week}\\{this.motion}";
+                if (!Directory.Exists(cur + relatePath))
+                {
+                    Directory.CreateDirectory(cur + relatePath);
+                }
+                DirectoryInfo dirInfo = new DirectoryInfo(cur + relatePath);
+                ArrayList list = new ArrayList();
+                list.Add("---");
+                foreach (DirectoryInfo d in dirInfo.GetDirectories())
+                {
+                    list.Add(d.Name);
+                }
+                var comboBox = sender as ComboBox;
+                comboBox.ItemsSource = list;
+                comboBox.SelectedIndex = 0;
             }
-            DirectoryInfo dirInfo = new DirectoryInfo(cur + relatePath);
-            ArrayList list = new ArrayList();
-            list.Add("---");
-            foreach (DirectoryInfo d in dirInfo.GetDirectories())
-            {
-                list.Add(d.Name);
-            }
-            var comboBox = sender as ComboBox;
-            comboBox.ItemsSource = list;
-            comboBox.SelectedIndex = 0;
         }
 
         private void studentNameList_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -849,7 +852,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private void NameUpdateState()
         {
-            if (!(classList.SelectedItem as string == "---") || !(classList.SelectedItem as string == "新增班級"))
+            if (!(classList.SelectedItem as string == "---") && !(classList.SelectedItem as string == "新增班級"))
             {
                 string cur = Environment.CurrentDirectory;
                 string relatePath = $"\\..\\..\\..\\data\\student\\{this.className}\\{this.week}\\{this.motion}";
