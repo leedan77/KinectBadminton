@@ -561,6 +561,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         
         private void ConvertColor(String filePath)
         {
+            Thread.Sleep(100);
             this.kinectBodybox.DataContext = null;
             this.kinectColorbox.DataContext = null;
             this.kinectColorView = new KinectColorView(this.kinectSensor);
@@ -624,10 +625,11 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private void BodyConvertDone(string personName, string filePath, int totalFrame)
         {
             int videoCount = makeVideo("body", personName);
-            double loseFrameRate = 1 - (double)videoCount / (totalFrame);
+            double loseFrameRate = 1 - (double)totalFrame / videoCount;
             if (loseFrameRate > 0.06)
             {
                 this.bodyConvertBad = true;
+                Console.WriteLine("body bad");
                 //MessageBox.Show("骨架影片Lose frame嚴重。建議改善方式：將程式關閉並重新開啟", "建議");
             }
             this.converting = false;
@@ -692,10 +694,12 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private void ColorConvertDone(string personName, int totalFrame)
         {
             int videoCount = makeVideo("color", personName);
-            double loseFrameRate = 1 - (double)videoCount / (totalFrame);
+            double loseFrameRate = 1 - (double)totalFrame / videoCount;
+            Console.WriteLine(loseFrameRate);
             if (loseFrameRate > 0.06)
             {
                 this.ColorConvertBad = true;
+                Console.WriteLine("color bad");
                 //MessageBox.Show("彩色影片Lose frame嚴重。建議改善方式：將程式關閉並重新開啟", "建議");
             }
             this.converting = false;
