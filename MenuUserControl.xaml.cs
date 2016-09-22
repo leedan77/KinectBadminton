@@ -409,10 +409,10 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             }
             else
             {
-                string filePath = this.OpenFileForConvert();
+                //string filePath = this.OpenFileForConvert();
                 string cur = Environment.CurrentDirectory;
                 string relatePath = $"\\..\\..\\..\\data\\student\\{this.className}\\{this.week}\\{this.motion}\\{this.studentNameConvert}\\{this.studentNameConvert}.xef";
-                //string filePath = cur + relatePath;
+                string filePath = cur + relatePath;
                 if (!string.IsNullOrEmpty(filePath))
                 {
                     ConvertBody(filePath);
