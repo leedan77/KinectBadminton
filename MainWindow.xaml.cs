@@ -702,16 +702,22 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private void OutputCSVClick(object sender, RoutedEventArgs e)
         {
-
+            bool outputTotalPoints = false;
+            MessageBoxResult messageBoxResultTP = MessageBox.Show(
+                    $"是否輸出總分？", "確認", MessageBoxButton.YesNo);
+            if (messageBoxResultTP == MessageBoxResult.Yes)
+            {
+                outputTotalPoints = true;
+            }
             String cur = Environment.CurrentDirectory;
             String jsonFilePath = $"{cur}\\..\\..\\..\\data\\student\\{this.className}\\{this.week}\\{this.action_type}\\class_record.json";
             List<PersonalRecord> recordList = new List<PersonalRecord>();
-            string[] smashGoals = new string[] { "姓名", "側身", "手肘抬高", "手肘轉向前", "手腕發力", "收拍" };
-            string[] serveGoals = new string[] { "姓名", "重心腳在慣用腳", "重心轉移至非慣用腳", "轉腰", "手腕發力", "手肘向前" };
-            string[] lobGoals = new string[] { "姓名", "持拍立腕", "慣用腳跨步", "手腕轉動", "腳跟著地", "手腕發力" };
+            List<string> smashGoals = new List<string>(new string[] { "姓名", "側身", "手肘抬高", "手肘轉向前", "手腕發力", "收拍"});
+            List<string> serveGoals = new List<string>(new string[] { "姓名", "重心腳在慣用腳", "重心轉移至非慣用腳", "轉腰", "手腕發力", "手肘向前"});
+            List<string> lobGoals = new List<string>(new string[] { "姓名", "持拍立腕", "慣用腳跨步", "手腕轉動", "腳跟著地", "手腕發力"});
             string delimiter = ",";
             //StringBuilder sb = new StringBuilder();
-            string[] title = new string[] { };
+            List<string> title = new List<string>();
             string actionChinese = string.Empty;
             if (this.action_type == "smash")
             {
@@ -728,6 +734,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 actionChinese = "挑球";
                 title = lobGoals;
             }
+            if (outputTotalPoints)
+                title.Add("總分");
 
             if (File.Exists(jsonFilePath))
             {
@@ -758,26 +766,27 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                         fileStream.Close();
                         using (StreamWriter sw = new StreamWriter(filePath, false, System.Text.Encoding.UTF8))
                         {
-                            sw.WriteLine(string.Join(delimiter, title));
+                            sw.WriteLine(string.Join(delimiter, title.ToArray()));
                         }
-                        //sb.AppendLine(string.Join(delimiter, title));
-
                         foreach (PersonalRecord pr in recordList)
                         {
-                            string[] row = new string[pr.performance.Length + 1];
-                            row[0] = pr.name;
+                            List<string> row = new List<string>();
+                            row.Add(pr.name);
+                            double totalPoint = 0;
                             for (int i = 1; i <= pr.performance.Length; i++)
                             {
-                                row[i] = EncodeString(pr.performance[i - 1].ToString());
+                                totalPoint += pr.performance[i-1];
+                                row.Add(pr.performance[i - 1].ToString());
+                            }
+                            if (outputTotalPoints)
+                            {
+                                row.Add(Math.Round((totalPoint / pr.performance.Length) * 100, 2).ToString());
                             }
                             using (StreamWriter sw = new StreamWriter(filePath, true, System.Text.Encoding.UTF8))
                             {
-                                sw.WriteLine(string.Join(delimiter, row));
+                                sw.WriteLine(string.Join(delimiter, row.ToArray()));
                             }
-                            //sb.AppendLine(EncodeString(string.Join(delimiter, row)));
                         }
-
-                        //File.WriteAllText(filePath, sb.ToString());
                         MessageBox.Show($"已將 {fileName} 的結果輸出至桌面", "輸出完成");
                     }
                     catch
