@@ -64,7 +64,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 {
                     return $"\\..\\..\\..\\data\\{menuType}\\{ActionType}";
                 }
-                //return $"\\..\\..\\..\\data\\{menuType}\\{action_type}";
             }
             set
             {
@@ -79,7 +78,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 DirectoryInfo[] subDir = dirInfo.GetDirectories();
                 foreach (DirectoryInfo d in subDir)
                 {
-                    list.Add(d.Name);
+                    if (File.Exists($"{d.FullName}\\judgement.json")) 
+                        list.Add(d.Name);
                 }
                 MenuListBox.ItemsSource = list;
             }

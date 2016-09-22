@@ -526,7 +526,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             this.kinectColorView = new KinectColorView(this.kinectSensor);
 
             this.converting = true;
-            this.kinectColorbox.DataContext = this.kinectColorView;
+            //this.kinectColorbox.DataContext = this.kinectColorView;
             string name;
             if (this.idenity == "student")
             {
