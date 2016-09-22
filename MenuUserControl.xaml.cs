@@ -202,8 +202,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private void Sensor_IsAvailableChanged(object sender, IsAvailableChangedEventArgs e)
         {
             // set the status text
-            //this.KinectStatusText = this.kinectSensor.IsAvailable ? Properties.Resources.RunningStatusText
-            //                                                : Properties.Resources.SensorNotAvailableStatusText;
+            this.KinectStatusText = this.kinectSensor.IsAvailable ? Properties.Resources.RunningStatusText
+                                                            : Properties.Resources.SensorNotAvailableStatusText;
+            //Console.WriteLine(this.kinectStatusText);
         }
 
         /// <summary>
@@ -244,7 +245,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private void RecordButton_Click(object sender, RoutedEventArgs e)
         {
             string filePath = this.SaveRecordingAs();
-
             if (!string.IsNullOrEmpty(filePath))
             {
                 this.isRecording = true;
@@ -307,7 +307,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
                 client.DisconnectFromService();
             }
-
             // Update UI after the background recording task has completed
             this.recordingStop = false;
             this.isRecording = false;
@@ -374,6 +373,10 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 {
                     MessageBox.Show("please enter your name", "Error");
                 }
+                else if(classList.SelectedItem as string == "---" || classList.SelectedItem as string == "新增班級")
+                {
+                    MessageBox.Show("請選擇班級名稱", "錯誤");
+                }
                 else
                 {
                     string folderName = nameBox.Text + "_" + DateTime.Now.ToString("HH-mm-ss(yyyy-MM-dd)");
@@ -400,10 +403,21 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private void ConvertButton_Click(object sender, RoutedEventArgs e)
         {
-            string filePath = this.OpenFileForConvert();
-            if (!string.IsNullOrEmpty(filePath))
+            if (this.kinectStatusText == "Running"/*"Kinect not available!"*/)
             {
-                ConvertBody(filePath);
+                MessageBox.Show("請先移除Kinect裝置", "錯誤");
+            }
+            else if (classList.SelectedItem as string == "---" || classList.SelectedItem as string == "新增班級")
+            {
+                MessageBox.Show("請選擇班級名稱", "錯誤");
+            }
+            else
+            {
+                string filePath = this.OpenFileForConvert();
+                if (!string.IsNullOrEmpty(filePath))
+                {
+                    ConvertBody(filePath);
+                }
             }
         }
 
