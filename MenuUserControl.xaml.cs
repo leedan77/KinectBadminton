@@ -399,23 +399,27 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             {
                 MessageBox.Show("請先移除Kinect裝置", "錯誤");
             }
-            else if (classList.SelectedItem as string == "---" || classList.SelectedItem as string == "新增班級")
-            {
-                MessageBox.Show("請選擇班級名稱", "錯誤");
-            }
-            else if (this.studentNameConvert == "---" || String.IsNullOrEmpty(this.studentNameConvert))
-            {
-                MessageBox.Show("請選擇學員資料夾", "錯誤");
-            }
             else
             {
                 string filePath = null;
                 if (this.idenity == "student")
                 {
-                    string cur = Environment.CurrentDirectory;
-                    string relatePath = $"\\..\\..\\..\\data\\student\\{this.className}\\{this.week}\\{this.motion}\\{this.studentNameConvert}\\{this.studentNameConvert}.xef";
-                    filePath = cur + relatePath;
+                    if (classList.SelectedItem as string == "---" || classList.SelectedItem as string == "新增班級")
+                    {
+                        MessageBox.Show("請選擇班級名稱", "錯誤");
+                    }
+                    else if (this.studentNameConvert == "---" || String.IsNullOrEmpty(this.studentNameConvert))
+                    {
+                        MessageBox.Show("請選擇學員資料夾", "錯誤");
+                    }
+                    else
+                    {
+                        string cur = Environment.CurrentDirectory;
+                        string relatePath = $"\\..\\..\\..\\data\\student\\{this.className}\\{this.week}\\{this.motion}\\{this.studentNameConvert}\\{this.studentNameConvert}.xef";
+                        filePath = cur + relatePath;
+                    }
                 }
+                //idenity == coach
                 else
                 {
                     filePath = this.OpenFileForConvert();
