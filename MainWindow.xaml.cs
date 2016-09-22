@@ -675,7 +675,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 }
 
             }
-                //if (!(string.Compare(this.className, classNameControl) == 0) && classNameControl != "---" && classNameControl != "新增班級")
+                //if (!(string.Compare(this.className, classNameControl) == 0) && classNameControl != "請選擇" && classNameControl != "新增班級")
                 //{
                 //    this.className = classNameControl;
                 //    // ... Get the ComboBox.

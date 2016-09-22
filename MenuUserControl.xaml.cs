@@ -242,16 +242,23 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         /// <param name="e">event arguments</param>
         private void RecordButton_Click(object sender, RoutedEventArgs e)
         {
-            string filePath = this.SaveRecordingAs();
-            if (!string.IsNullOrEmpty(filePath))
+            if(this.kinectStatusText == "Running")
             {
-                this.isRecording = true;
-                this.RecordPlaybackStatusText = Properties.Resources.RecordingInProgressText;
-                this.UpdateState();
+                string filePath = this.SaveRecordingAs();
+                if (!string.IsNullOrEmpty(filePath))
+                {
+                    this.isRecording = true;
+                    this.RecordPlaybackStatusText = Properties.Resources.RecordingInProgressText;
+                    this.UpdateState();
 
-                // Start running the recording asynchronously
-                OneArgDelegate recording = new OneArgDelegate(this.RecordClip);
-                recording.BeginInvoke(filePath, null, null);
+                    // Start running the recording asynchronously
+                    OneArgDelegate recording = new OneArgDelegate(this.RecordClip);
+                    recording.BeginInvoke(filePath, null, null);
+                }
+            }
+            else
+            {
+                MessageBox.Show("請先連接Kinect才能進行錄製", "錯誤");
             }
         }
 
@@ -373,6 +380,10 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 this.kinectColorbox.DataContext = this.kinectColorView;
                 this.kinectBodybox.DataContext = this.kinectBodyView;
             }
+            //if(this.kinectStatusText != "Running")
+            //{
+            //    this.RecordButton.IsEnabled = false;
+            //}
         }
 
         /// <summary>
@@ -401,33 +412,38 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             //idenity == student
             else
             {
-                string newStudentName = Microsoft.VisualBasic.Interaction.InputBox("請輸入學員名稱", "新增錄影", "", -1, -1);
-                if (string.IsNullOrWhiteSpace(newStudentName))
-                {
-                    MessageBox.Show("學員名稱不可為空白", "錯誤");
-                }
-                else if(classList.SelectedItem as string == "---" || classList.SelectedItem as string == "新增班級")
+                
+                if(classList.SelectedItem as string == "請選擇" || classList.SelectedItem as string == "新增班級")
                 {
                     MessageBox.Show("請選擇班級名稱", "錯誤");
                 }
                 else
                 {
-                    string folderName = newStudentName + "_" + DateTime.Now.ToString("HH-mm-ss(yyyy-MM-dd)");
-                    //Console.WriteLine(folderName);
-                    string cur = Environment.CurrentDirectory;
-                    string relativePath = $"\\..\\..\\..\\data\\student\\{this.className}\\{this.week}\\{this.motion}\\";
-                    string filePath = cur + relativePath + folderName;
-                    if (Directory.Exists(filePath))
+                    string newStudentName = Microsoft.VisualBasic.Interaction.InputBox("請輸入學員名稱", "新增錄影", "", -1, -1);
+                    if (string.IsNullOrWhiteSpace(newStudentName))
                     {
-                        MessageBox.Show("The folder has existed", "Error");
+                        MessageBox.Show("學員名稱不可為空白", "錯誤");
                     }
                     else
                     {
-                        //Directory.CreateDirectory(filePath);
-                        SaveFileDialog dlg = new SaveFileDialog();
-                        dlg.FileName = filePath + "\\" + folderName + ".xef";
-                        fileName = dlg.FileName;
+                        string folderName = newStudentName + "_" + DateTime.Now.ToString("HH-mm-ss(yyyy-MM-dd)");
+                        //Console.WriteLine(folderName);
+                        string cur = Environment.CurrentDirectory;
+                        string relativePath = $"\\..\\..\\..\\data\\student\\{this.className}\\{this.week}\\{this.motion}\\";
+                        string filePath = cur + relativePath + folderName;
+                        if (Directory.Exists(filePath))
+                        {
+                            MessageBox.Show("The folder has existed", "Error");
+                        }
+                        else
+                        {
+                            //Directory.CreateDirectory(filePath);
+                            SaveFileDialog dlg = new SaveFileDialog();
+                            dlg.FileName = filePath + "\\" + folderName + ".xef";
+                            fileName = dlg.FileName;
+                        }
                     }
+                    
                 }
             }
             return fileName;
@@ -444,11 +460,11 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 string filePath = null;
                 if (this.idenity == "student")
                 {
-                    if (classList.SelectedItem as string == "---" || classList.SelectedItem as string == "新增班級")
+                    if (classList.SelectedItem as string == "請選擇" || classList.SelectedItem as string == "新增班級")
                     {
                         MessageBox.Show("請選擇班級名稱", "錯誤");
                     }
-                    else if (this.studentNameConvert == "---" || String.IsNullOrEmpty(this.studentNameConvert))
+                    else if (this.studentNameConvert == "請選擇" || String.IsNullOrEmpty(this.studentNameConvert))
                     {
                         MessageBox.Show("請選擇學員資料夾", "錯誤");
                     }
@@ -806,7 +822,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             }
             DirectoryInfo dirInfo = new DirectoryInfo(cur + relatePath);
             ArrayList list = new ArrayList();
-            list.Add("---");
+            list.Add("請選擇");
             foreach (DirectoryInfo d in dirInfo.GetDirectories())
             {
                 list.Add(d.Name);
@@ -863,7 +879,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private void studentNameList_Loaded(object sender, RoutedEventArgs e)
         {
-            if (!(classList.SelectedItem as string == "---") && !(classList.SelectedItem as string == "新增班級"))
+            if (!(classList.SelectedItem as string == "請選擇") && !(classList.SelectedItem as string == "新增班級"))
             {
                 string cur = Environment.CurrentDirectory;
                 string relatePath = $"\\..\\..\\..\\data\\student\\{this.className}\\{this.week}\\{this.motion}";
@@ -873,7 +889,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 }
                 DirectoryInfo dirInfo = new DirectoryInfo(cur + relatePath);
                 ArrayList list = new ArrayList();
-                list.Add("---");
+                list.Add("請選擇");
                 foreach (DirectoryInfo d in dirInfo.GetDirectories())
                 {
                     list.Add(d.Name);
@@ -893,7 +909,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private void NameUpdateState()
         {
-            if (!(classList.SelectedItem as string == "---") && !(classList.SelectedItem as string == "新增班級"))
+            if (!(classList.SelectedItem as string == "請選擇") && !(classList.SelectedItem as string == "新增班級"))
             {
                 string cur = Environment.CurrentDirectory;
                 string relatePath = $"\\..\\..\\..\\data\\student\\{this.className}\\{this.week}\\{this.motion}";
