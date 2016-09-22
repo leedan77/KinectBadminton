@@ -443,7 +443,15 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             UpdateState();
             Console.WriteLine($"main: {Thread.CurrentThread.ManagedThreadId}");
             //string name = new DirectoryInfo(System.IO.Path.GetDirectoryName(filePath)).Name;
-            string name = this.studentNameConvert;
+            string name;
+            if (this.idenity == "student")
+            {
+                name = this.studentNameConvert;
+            }
+            else
+            {
+                name = new DirectoryInfo(System.IO.Path.GetDirectoryName(filePath)).Name;
+            }
             TwoArgDelegate bodyConvert = new TwoArgDelegate(this.BodyConvertClip);
             AsyncCallback callback = new AsyncCallback(myCallbackMethod);
             IAsyncResult result = bodyConvert.BeginInvoke(filePath, name, callback, null);
@@ -462,8 +470,15 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
             this.converting = true;
             this.kinectColorbox.DataContext = this.kinectColorView;
-            //string name = new DirectoryInfo(System.IO.Path.GetDirectoryName(filePath)).Name;
-            string name = this.studentNameConvert;
+            string name;
+            if (this.idenity == "student")
+            {
+                name = this.studentNameConvert;
+            }
+            else
+            {
+                name = new DirectoryInfo(System.IO.Path.GetDirectoryName(filePath)).Name;
+            }
             TwoArgDelegate colorConvert = new TwoArgDelegate(this.ColorConvertClip);
             colorConvert.BeginInvoke(filePath, name, null, null);
             //colorConvert.BeginInvoke(filePath, nameBox.Text, null, null);
@@ -834,20 +849,23 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private void NameUpdateState()
         {
-            string cur = Environment.CurrentDirectory;
-            string relatePath = $"\\..\\..\\..\\data\\student\\{this.className}\\{this.week}\\{this.motion}";
-            Directory.CreateDirectory(cur + relatePath);
-            DirectoryInfo dirInfo = new DirectoryInfo(cur + relatePath);
-            ArrayList list = new ArrayList();
-            foreach (DirectoryInfo d in dirInfo.GetDirectories())
+            if (!(classList.SelectedItem as string == "---") || !(classList.SelectedItem as string == "新增班級"))
             {
-                list.Add(d.Name);
+                string cur = Environment.CurrentDirectory;
+                string relatePath = $"\\..\\..\\..\\data\\student\\{this.className}\\{this.week}\\{this.motion}";
+                Directory.CreateDirectory(cur + relatePath);
+                DirectoryInfo dirInfo = new DirectoryInfo(cur + relatePath);
+                ArrayList list = new ArrayList();
+                foreach (DirectoryInfo d in dirInfo.GetDirectories())
+                {
+                    list.Add(d.Name);
+                }
+                if (dirInfo.GetDirectories().Length == 0)
+                    studentNameList.IsEnabled = false;
+                else
+                    studentNameList.IsEnabled = true;
+                studentNameList.ItemsSource = list;
             }
-            if (dirInfo.GetDirectories().Length == 0)
-                studentNameList.IsEnabled = false;
-            else
-                studentNameList.IsEnabled = true;
-            studentNameList.ItemsSource = list;
         }
     }
 }
