@@ -298,8 +298,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             }
         }
 
-
-        private int n = 0;
         /// <summary>
         /// Handles the body frame data arriving from the sensor and updates the associated gesture detector object for each body
         /// </summary>
@@ -307,6 +305,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         /// <param name="e">event arguments</param>
         private void Reader_BodyFrameArrived(object sender, BodyFrameArrivedEventArgs e)
         {
+            //Console.WriteLine($"body: {Thread.CurrentThread.ManagedThreadId}");
             bool dataReceived = false;
 
             using (BodyFrame bodyFrame = e.FrameReference.AcquireFrame())
@@ -332,7 +331,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 this.UpdateBodyFrame(this.bodies);
                 if (converting)
                 {
-                    n++;
                     this.videoConverter.BodyViewToAVI(this.imageSource);
                 }
             }

@@ -238,7 +238,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             if (person_type == "coach")
             {
                 textBlock2.Text = name;
-                
+                coachGrid.Children.Clear();
                 for (int i = 0; i < this.coachJudgement.Count; ++i)
                 {
                     Grid grid = new Grid();
@@ -265,6 +265,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             else if(person_type == "student")
             {
                 textBlock1.Text = name;
+                stuGrid.Children.Clear();
                 int[] correct = new int[this.studentJudgement.Count];
                 for (int i = 0; i < this.studentJudgement.Count; i++)
                 {
@@ -421,7 +422,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             {
                 student_color_or_body = "color";
                 string path = cur + dataBasePath + $"\\student\\{this.className}\\{week}\\{action_type}\\{StudentFileName}\\{student_color_or_body}.avi";
-                //Console.WriteLine(path);
                 if (File.Exists(path))
                 {
                     resetUri(MediaPlayer_left, path);
@@ -431,7 +431,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             {
                 student_color_or_body = "body";
                 string path = cur + dataBasePath + $"\\student\\{this.className}\\{week}\\{action_type}\\{StudentFileName}\\{student_color_or_body}.avi";
-                //Console.WriteLine(path);
                 if (File.Exists(path))
                 {
                     resetUri(MediaPlayer_left, path);
@@ -758,6 +757,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 MessageBox.Show($"{this.className} {this.week} {actionChinese} 的評分紀錄是空白的", "錯誤");
             }
         }
+
         private string EncodeString(string input)
         {
             return Encoding.GetEncoding(950).GetString(Encoding.Convert(Encoding.Unicode, Encoding.GetEncoding(950), Encoding.Unicode.GetBytes(input)));

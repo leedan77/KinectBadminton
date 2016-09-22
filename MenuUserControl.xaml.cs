@@ -318,6 +318,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         /// </summary>
         private void UpdateState()
         {
+            Console.WriteLine($"update: {Thread.CurrentThread.ManagedThreadId}");
             if (this.isRecording)
             {
                 this.RecordButton.IsEnabled = false;
@@ -430,6 +431,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             this.converting = true;
             //this.kinectBodybox.DataContext = this.kinectBodyView;
             string name = new DirectoryInfo(System.IO.Path.GetDirectoryName(filePath)).Name;
+            UpdateState();
+            Console.WriteLine($"main: {Thread.CurrentThread.ManagedThreadId}");
             TwoArgDelegate bodyConvert = new TwoArgDelegate(this.BodyConvertClip);
             AsyncCallback callback = new AsyncCallback(myCallbackMethod);
             IAsyncResult result = bodyConvert.BeginInvoke(filePath, name, callback, null);
@@ -437,7 +440,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private void myCallbackMethod(IAsyncResult result)
         {
-            
+            Console.WriteLine($"callback: {Thread.CurrentThread.ManagedThreadId}");
         }
         
         private void ConvertColor(String filePath)
@@ -470,6 +473,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 {
                     playback.LoopCount = 0;
                     playback.Start();
+                    Console.WriteLine($"convert: {Thread.CurrentThread.ManagedThreadId}");
                     while (playback.State == KStudioPlaybackState.Playing)
                     {
                         this.kinectBodyView.converting = true;
@@ -477,17 +481,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                         if (nowFrame > prevFrame)
                         {
                             playback.Pause();
-                            //while (bodyConverting)
-                            //{
-                            //    Console.WriteLine(".");
-                            //}
-                            //NoArgDelegate convert = new NoArgDelegate(ConvertVideo);
-                            //IAsyncResult result = convert.BeginInvoke(null, null);
-                            //Thread.Sleep(0);
-                            //result.AsyncWaitHandle.WaitOne();
-                            //convert.EndInvoke(result);
-                            //result.AsyncWaitHandle.Close();
-                            //Console.WriteLine(this.kinectBodyView.newDataRecieved);
                             Thread.Sleep(40);
                             playback.Resume();
                             Console.WriteLine(nowFrame);
@@ -500,32 +493,31 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 client.DisconnectFromService();
             }
             Thread.Sleep(40);
+            this.Dispatcher.BeginInvoke(new TwoArgDelegate(BodyConvertDone), personName, filePath);
+        }
+
+        private void BodyConvertDone(string personName, string filePath)
+        {
             int videoCount = makeVideo("body", personName);
-
-            //MakeVideoDelegate mv = new MakeVideoDelegate(makeVideo);
-            //IAsyncResult result = mv.BeginInvoke("body", personName, null, null);
-            //Thread.Sleep(0);
-            //result.AsyncWaitHandle.WaitOne();
-            //int videoCount = mv.EndInvoke(result);
-            //result.AsyncWaitHandle.Close();
-
-
             this.converting = false;
             this.kinectBodyView.converting = false;
-            this.kinectBodyView.Judge(personName, this.idenity, this.handedness, this.className,  this.week, videoCount);
+            this.kinectBodyView.Judge(personName, this.idenity, this.handedness, this.className, this.week, videoCount);
             this.kinectBodyView.Dispose();
+
             string path = null;
             if (this.idenity == "student")
             {
-                path = @"..\..\..\data\" + this.idenity + @"\" + this.className + @"\" + this.week + @"\" + this.motion + @"\" + personName + @"\color.avi";
+                path = $"{Environment.CurrentDirectory}\\..\\..\\..\\data\\student\\{this.className}\\{this.week}\\{this.motion}\\{personName}\\color.avi";
+                //path = @"..\..\..\data\" + this.idenity + @"\" + this.className + @"\" + this.week + @"\" + this.motion + @"\" + personName + @"\color.avi";
             }
-            else if(this.idenity == "coach")
+            else if (this.idenity == "coach")
             {
-                path = @"..\..\..\data\" + this.idenity + @"\" + this.motion + @"\" + personName + @"\color.avi";
+
+                path = $"{Environment.CurrentDirectory}\\..\\..\\..\\data\\coach\\{this.motion}\\{personName}\\color.avi";
+                //path = @"..\..\..\data\" + this.idenity + @"\" + this.motion + @"\" + personName + @"\color.avi";
             }
             if (File.Exists(path))
             {
-                Thread.Sleep(1000);
                 this.Dispatcher.BeginInvoke(new NoArgDelegate(UpdateState));
             }
             else
@@ -562,15 +554,16 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
                 client.DisconnectFromService();
             }
+            this.Dispatcher.BeginInvoke(new OneArgDelegate(ColorConvertDone), personName);
+            this.Dispatcher.BeginInvoke(new NoArgDelegate(UpdateState));
+        }
 
-            // Update the UI after the convert playback task has completed
-            //makeVideo("color", personName);
-            MakeVideoDelegate mv = new MakeVideoDelegate(makeVideo);
-            mv.BeginInvoke("color", personName, null, null);
+        private void ColorConvertDone(string personName)
+        {
+            makeVideo("color", personName);
             this.converting = false;
             this.kinectColorView.converting = false;
             this.kinectColorView.Dispose();
-            this.Dispatcher.BeginInvoke(new NoArgDelegate(UpdateState));
         }
         
         /// <summary>

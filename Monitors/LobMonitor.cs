@@ -126,7 +126,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
                 if (this.handedness == "right" && !wristTurned)
                 {
                     Point3D handRight = this.FrameList[i].jointDict[JointType.HandRight];
-                    if (handRight.X - spineMid.X < this.initHandRightSpineMidXDiff / 5)
+                    if (handRight.X - spineMid.X < this.initHandRightSpineMidXDiff / 3.5)
                     {
                         cp = i;
                         wristTurned = true;
@@ -135,8 +135,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
                 }
                 else if (this.handedness == "left" && !wristTurned)
                 {
-                    Point3D handLeft = this.FrameList[i].jointDict[JointType.HandRight];
-                    if (spineMid.X - handLeft.X > this.initHandLeftSpineMidXDiff / 3.5)
+                    Point3D handLeft = this.FrameList[i].jointDict[JointType.HandLeft];
+                    if (spineMid.X - handLeft.X < this.initHandLeftSpineMidXDiff / 3.5)
                     {
                         cp = i;
                         wristTurned = true;
