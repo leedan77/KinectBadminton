@@ -108,10 +108,10 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                                                             : Properties.Resources.NoSensorStatusText;
 
             // create the Body visualizer
-            this.kinectBodyView = new KinectBodyView(this.kinectSensor, this.motion, MainWindow.MediaPlayerSize);
+            this.kinectBodyView = new KinectBodyView(this.kinectSensor, this.motion, MainWindow.MediaPlayerSize, this);
             //new add
             // create the Color visualizer
-            this.kinectColorView = new KinectColorView(this.kinectSensor, MainWindow.MediaPlayerSize);
+            this.kinectColorView = new KinectColorView(this.kinectSensor, MainWindow.MediaPlayerSize, this);
             this.DataContext = this;
             this.kinectColorbox.DataContext = this.kinectColorView;
             this.kinectBodybox.DataContext = this.kinectBodyView;
@@ -413,8 +413,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 // after converting resume the view
                 this.kinectColorView = null;
                 this.kinectBodyView = null;
-                this.kinectColorView = new KinectColorView(this.kinectSensor, MainWindow.MediaPlayerSize);
-                this.kinectBodyView = new KinectBodyView(this.kinectSensor, this.motion, MainWindow.MediaPlayerSize);
+                this.kinectColorView = new KinectColorView(this.kinectSensor, MainWindow.MediaPlayerSize, this);
+                this.kinectBodyView = new KinectBodyView(this.kinectSensor, this.motion, MainWindow.MediaPlayerSize, this);
                 this.kinectColorbox.DataContext = this.kinectColorView;
                 this.kinectBodybox.DataContext = this.kinectBodyView;
             }
@@ -531,7 +531,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         {
             this.kinectBodybox.DataContext = null;
             this.kinectColorbox.DataContext = null;
-            this.kinectBodyView = new KinectBodyView(this.kinectSensor, this.motion, MainWindow.MediaPlayerSize);
+            this.kinectBodyView = new KinectBodyView(this.kinectSensor, this.motion, MainWindow.MediaPlayerSize, this);
 
             this.converting = true;
             //this.kinectBodybox.DataContext = this.kinectBodyView;
@@ -565,7 +565,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             this.kinectBodybox.DataContext = null;
             this.kinectColorbox.DataContext = null;
             //Console.WriteLine($"menu: {MainWindow.MediaPlayerSize.Width}");
-            this.kinectColorView = new KinectColorView(this.kinectSensor, MainWindow.MediaPlayerSize);
+            //this.kinectColorView = new KinectColorView(this.kinectSensor, MainWindow.MediaPlayerSize, this);
 
             this.converting = true;
             //this.kinectColorbox.DataContext = this.kinectColorView;
@@ -585,9 +585,10 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         /// <summary>Plays back a .xef file to the Kinect sensor</summary>
         /// <param name="filePath">Full path to the .xef file that should be played back to the sensor</param
         /// <param name="personName">The name of tester in the video</param>
+        public bool convertLock = false;
         private void BodyConvertClip(string filePath, string personName)
         {
-
+            
             int nowFrame = 0;
             int prevFrame = 0;
             int totalFrame = 0;
@@ -606,11 +607,15 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                         nowFrame = (int)(playback.CurrentRelativeTime.TotalMilliseconds / 33.33);
                         if (nowFrame > prevFrame)
                         {
-                            totalFrame++;
                             playback.Pause();
-                            Thread.Sleep(40);
+                            while (this.convertLock)
+                            {
+
+                            }
+                            Thread.Sleep(5);
                             playback.Resume();
                             Console.WriteLine(nowFrame);
+                            totalFrame = nowFrame;
                         }
                         prevFrame = nowFrame;
                     }
@@ -626,7 +631,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private void BodyConvertDone(string personName, string filePath, int totalFrame)
         {
             int videoCount = makeVideo("body", personName);
-            double loseFrameRate = 1 - (double)totalFrame / videoCount;
+            double loseFrameRate = 1 - (double)videoCount/totalFrame;
             if (loseFrameRate > 0.06)
             {
                 this.bodyConvertBad = true;
@@ -635,6 +640,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             }
             this.converting = false;
             this.kinectBodyView.converting = false;
+            this.kinectBodyView.SaveJointData(personName, this.idenity, this.handedness, this.className, this.week);
             this.kinectBodyView.Judge(personName, this.idenity, this.handedness, this.className, this.week, videoCount);
             this.kinectBodyView.Dispose();
 
@@ -665,6 +671,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 int nowFrame = 0;
                 int prevFrame = 0;
                 // Create the playback object
+                
                 using (KStudioPlayback playback = client.CreatePlayback(filePath))
                 {                   
                     playback.LoopCount = 0;
@@ -673,13 +680,19 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     while (playback.State == KStudioPlaybackState.Playing)
                     {
                         nowFrame = (int)(playback.CurrentRelativeTime.TotalMilliseconds / 33.33);
+                        //Console.WriteLine()
                         if(nowFrame > prevFrame)
                         {
-                            totalFrame++;
                             playback.Pause();
-                            Thread.Sleep(100);
+                            while (this.convertLock)
+                            {
+
+                            }
+                            Thread.Sleep(50);
+                            //Thread.Sleep(100);
                             playback.Resume();
-                            Console.WriteLine(nowFrame); 
+                            Console.WriteLine(nowFrame);
+                            totalFrame = prevFrame;
                         }
                         prevFrame = nowFrame;
                     }
@@ -695,7 +708,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private void ColorConvertDone(string personName, int totalFrame)
         {
             int videoCount = makeVideo("color", personName);
-            double loseFrameRate = 1 - (double)totalFrame / videoCount;
+            double loseFrameRate = 1 - (double)videoCount/totalFrame;
             Console.WriteLine(loseFrameRate);
             if (loseFrameRate > 0.06)
             {

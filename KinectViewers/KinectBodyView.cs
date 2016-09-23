@@ -52,7 +52,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private List<Frames> frameList = new List<Frames>();
         //test angle
         public double angle = 0;
-
+        public MenuUserControl muc;
 
         /// <summary> Reader for body frames </summary>
         private BodyFrameReader bodyFrameReader = null;
@@ -145,18 +145,19 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         /// </summary>
         private List<Pen> bodyColors;
 
-        private VideoConverter videoConverter;
+        public VideoConverter videoConverter;
         private List<Image<Bgr, byte>> video = new List<Image<Bgr, byte>>();
         public bool converting = false;
 
-        private String type;
+        private string type;
 
         /// <summary>
         /// Initializes a new instance of the KinectBodyView class
         /// </summary>
         /// <param name="kinectSensor">Active instance of the KinectSensor</param>
-        public KinectBodyView(KinectSensor kinectSensor, String type, System.Drawing.Size videoSize)
+        public KinectBodyView(KinectSensor kinectSensor, string type, System.Drawing.Size videoSize, MenuUserControl muc)
         {
+            this.muc = muc;
             //Console.WriteLine($"body: {videoSize.Width}");
             this.type = type;
             if (kinectSensor == null)
@@ -256,47 +257,70 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 this.bodyFrameReader.FrameArrived -= Reader_BodyFrameArrived;
                 this.bodyFrameReader.Dispose();
                 this.bodyFrameReader = null;
+                //this.videoConverter = null;
             }
         }
 
-        public void Judge(String name, String person_type, String handedness, String experiment, String week, int videoCount)
+        public void SaveJointData(string name, string person_type, string handedness, string className, string week)
         {
-            string path = null;
+            string filePath = string.Empty;
             if (person_type == "student")
             {
-                path = "../../../data/" + person_type + "/" + experiment + "/" + week + "/" + this.type + "/" + name + "/judgement.json";
+                filePath = $"{Environment.CurrentDirectory}\\..\\..\\..\\data\\{person_type}\\{className}\\{week}\\{this.type}\\{name}\\joints.json";
+                //path = "../../../data/" + person_type + "/" + className + "/" + week + "/" + this.type + "/" + name + "/judgement.json";
             }
             //idenity == coach
             else
             {
-                path = "../../../data/" + person_type + "/" + this.type + "/" + name + "/judgement.json";
+                filePath = $"{Environment.CurrentDirectory}\\..\\..\\..\\data\\{person_type}\\{this.type}\\{name}\\joints.json";
+                //path = "../../../data/" + person_type + "/" + this.type + "/" + name + "/judgement.json";
             }
+            string judgeResult = JsonConvert.SerializeObject(this.frameList);
+            File.WriteAllText(filePath, judgeResult);
+        }
+
+        public void Judge(string name, string person_type, string handedness, string className, string week, int videoCount)
+        {
+            string path = null;
+            List<Frames> fl;
+
+            if (person_type == "student")
+            {
+                path = $"{Environment.CurrentDirectory}\\..\\..\\..\\data\\{person_type}\\{className}\\{week}\\{this.type}\\{name}";
+                //path = "../../../data/" + person_type + "/" + className + "/" + week + "/" + this.type + "/" + name + "/judgement.json";
+            }
+            //idenity == coach
+            else
+            {
+                path = $"{Environment.CurrentDirectory}\\..\\..\\..\\data\\{person_type}\\{this.type}\\{name}";
+                //path = "../../../data/" + person_type + "/" + this.type + "/" + name + "/judgement.json";
+            }
+
+            String rawJsonData = File.ReadAllText($"{path}\\joints.json");
+            fl = JsonConvert.DeserializeObject<List<Frames>>(rawJsonData);
 
             if (this.type == "smash")
             {
-                SmashMonitor smashMonitor = new SmashMonitor(this.frameList, handedness, videoCount);
+                SmashMonitor smashMonitor = new SmashMonitor(fl, handedness, videoCount);
                 smashMonitor.Start();
                 string judgeResult = JsonConvert.SerializeObject(smashMonitor.GetResult());
-                //File.WriteAllText("../../../data/" + person_type + "/" + this.type + "/" + name + "/judgement.json", judgeResult);
-                File.WriteAllText(path, judgeResult);
+                File.WriteAllText($"{path}\\judgement.json", judgeResult);
             }
 
             else if(this.type == "serve")
             {
-                ServeMonitor serveMonitor = new ServeMonitor(this.frameList, handedness, videoCount);
+                ServeMonitor serveMonitor = new ServeMonitor(fl, handedness, videoCount);
                 serveMonitor.Start();
                 string judgeResult = JsonConvert.SerializeObject(serveMonitor.GetResult());
-                //File.WriteAllText("../../../data/" + person_type + "/" + this.type + "/" + name + "/judgement.json", judgeResult);
-                File.WriteAllText(path, judgeResult);
+                File.WriteAllText($"{path}\\judgement.json", judgeResult);
             }
 
             else if(this.type == "lob")
             {
-                LobMonitor lobMonitor = new LobMonitor(this.frameList, handedness, videoCount);
+                LobMonitor lobMonitor = new LobMonitor(fl, handedness, videoCount);
                 lobMonitor.Start();
                 string judgeResult = JsonConvert.SerializeObject(lobMonitor.GetResult());
-                //File.WriteAllText("../../../data/" + person_type + "/" + this.type + "/" + name + "/judgement.json", judgeResult);
-                File.WriteAllText(path, judgeResult);
+                File.WriteAllText($"{path}\\judgement.json", judgeResult);
             }
         }
 
@@ -307,6 +331,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         /// <param name="e">event arguments</param>
         private void Reader_BodyFrameArrived(object sender, BodyFrameArrivedEventArgs e)
         {
+            this.muc.convertLock = true;
             //Console.WriteLine($"body: {Thread.CurrentThread.ManagedThreadId}");
             bool dataReceived = false;
 
@@ -336,6 +361,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     this.videoConverter.BodyViewToAVI(this.imageSource);
                 }
             }
+            this.muc.convertLock = false;
         }
 
         /// <summary>

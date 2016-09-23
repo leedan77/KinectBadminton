@@ -26,16 +26,18 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         /// </summary>
         private WriteableBitmap colorBitmap = null;
 
-        private VideoConverter video_converter;
+        public VideoConverter video_converter;
         private List<Image<Bgr, byte>> video = new List<Image<Bgr, byte>>();
         public bool converting = false;
+        private MenuUserControl muc;
 
         /// <summary>
         /// Initializes a new instance of the KinectColorView class
         /// </summary>
         /// <param name="kinectSensor">Active instance of the Kinect sensor</param>
-        public KinectColorView(KinectSensor kinectSensor, System.Drawing.Size videoSize)
+        public KinectColorView(KinectSensor kinectSensor, System.Drawing.Size videoSize, MenuUserControl muc)
         {
+            this.muc = muc;
             if (kinectSensor == null)
             {
                 throw new ArgumentNullException("kinectSensor");
@@ -76,6 +78,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 this.colorFrameReader.FrameArrived -= this.Reader_ColorFrameArrived;
                 this.colorFrameReader.Dispose();
                 this.colorFrameReader = null;
+                //this.video_converter = null;
             }
         }
 
@@ -86,6 +89,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         /// <param name="e">event arguments</param>
         private void Reader_ColorFrameArrived(object sender, ColorFrameArrivedEventArgs e)
         {
+            this.muc.convertLock = true;
             // ColorFrame is IDisposable
             //Console.WriteLine(fc++);
             using (ColorFrame colorFrame = e.FrameReference.AcquireFrame())
@@ -118,6 +122,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     }
                 }
             }
+            this.muc.convertLock = false;
         }
 
         public List<Image<Bgr, byte>> Video

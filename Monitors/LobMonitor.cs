@@ -85,7 +85,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
                     Point3D handTipRight = this.FrameList[i].jointDict[JointType.HandTipRight];
                     double handTipHandYDiff = handTipRight.Y - handRight.Y;
                     steadyCount++;
-                    if (handTipHandYDiff <= 0.01)
+                    if (handTipHandYDiff <= -0.01)
                     {
                         if (i < errorFrame + 5)
                             steadyCount = i - errorFrame;
@@ -102,7 +102,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
                     Point3D handTipLeft = this.FrameList[i].jointDict[JointType.HandTipLeft];
                     double handTipHandYDiff = handTipLeft.Y - handLeft.Y;
                     steadyCount++;
-                    if (handTipHandYDiff <= 0.01)
+                    if (handTipHandYDiff <= -0.01)
                     {
                         if (i < errorFrame + 5)
                             steadyCount = i - errorFrame;
@@ -269,7 +269,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
                     prevAnkleRight = ankleRight;
 
                     nowResult = CheckSide(elbowRight, wristRight, handTipRight);
-                    Debug(i, nowResult);
                     if (nowResult < 0 && prevResult > 0 && handTipRight.X > spineShoulder.X && !WristForced)
                     {
                         recordFrame = Record(i, "手腕發力");
