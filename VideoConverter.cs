@@ -27,7 +27,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 BitmapEncoder enc = new BmpBitmapEncoder();
                 enc.Frames.Add(BitmapFrame.Create((BitmapSource)ColorBitmap));
                 enc.Save(outStream);
-                bmp = new System.Drawing.Bitmap(outStream);
+                bmp = new Bitmap(new Bitmap(outStream), 960, 540);
             }
             //Bitmap b = new Bitmap(bmp, (int)(bmp.Width * 0.5), (int)(bmp.Height * 0.5));
             Image<Bgr, byte> img = new Image<Bgr, byte>(bmp);

@@ -732,7 +732,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             List<Image<Bgr, byte>> Video = new List<Image<Bgr, byte>>();
             if (string.Compare(video_type, "body") == 0)
                 Video = this.kinectBodyView.Video;
-                
+
             else if (string.Compare(video_type, "color") == 0)
                 Video = this.kinectColorView.Video;
             int videoCount = Video.Count;
@@ -748,7 +748,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 path = $"{Environment.CurrentDirectory}\\..\\..\\..\\data\\coach\\{this.motion}\\{personName}";
             }
             Directory.CreateDirectory(path);
-
+            Console.WriteLine($"{Video[0].Width} {Video[1].Height}");
             using (VideoWriter vw = new VideoWriter($"{path}\\{video_type}.avi", 30, Video[0].Width, Video[0].Height, true))
             {
                 for (int i = 0; i < Video.Count; i++)
