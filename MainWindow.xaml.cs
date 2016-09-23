@@ -75,6 +75,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         
         public static string nowSelectedName = string.Empty;
         private string prevSeletedName = string.Empty;
+        public static System.Drawing.Size MediaPlayerSize;
         
 
         private String studentFileName;
@@ -125,6 +126,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
             MediaPlayer_left.ScrubbingEnabled = true;
             MediaPlayer_right.ScrubbingEnabled = true;
+            MediaPlayerSize = new System.Drawing.Size((int)MediaPlayer_left.Width, (int)MediaPlayer_right.Height);
         }
 
         void ticktock(object sender, EventArgs e)

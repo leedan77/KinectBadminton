@@ -26,7 +26,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         /// </summary>
         private WriteableBitmap colorBitmap = null;
 
-        private VideoConverter video_converter = new VideoConverter();
+        private VideoConverter video_converter;
         private List<Image<Bgr, byte>> video = new List<Image<Bgr, byte>>();
         public bool converting = false;
 
@@ -34,7 +34,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         /// Initializes a new instance of the KinectColorView class
         /// </summary>
         /// <param name="kinectSensor">Active instance of the Kinect sensor</param>
-        public KinectColorView(KinectSensor kinectSensor)
+        public KinectColorView(KinectSensor kinectSensor, System.Drawing.Size videoSize)
         {
             if (kinectSensor == null)
             {
@@ -52,7 +52,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
             // create the bitmap to display
             this.colorBitmap = new WriteableBitmap(colorFrameDescription.Width, colorFrameDescription.Height, 96.0, 96.0, PixelFormats.Bgr32, null);
-
+            this.video_converter = new VideoConverter(videoSize);
         }
 
         /// <summary>

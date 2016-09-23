@@ -102,7 +102,7 @@
                                 <RowDefinition Height="50"/>
                                 <RowDefinition Height="50"/>
                             </Grid.RowDefinitions>
-                            <Button Style="{StaticResource MyButtonStyle}" Grid.Row="0" Margin="10,0,0.2,44.2" Background="#3a475b" MouseDown="MediaPlayer_left_MouseRightButtonDown" Grid.RowSpan="2">
+                            <Button x:Name="MediaPlayerLeftButton" Style="{StaticResource MyButtonStyle}" Grid.Row="0" Margin="10,0,0.2,44.2" Background="#3a475b" MouseDown="MediaPlayer_left_MouseRightButtonDown" Grid.RowSpan="2">
                                 <MediaElement x:Name="MediaPlayer_left" Grid.Row="0" LoadedBehavior="Manual" HorizontalAlignment="Center" MediaOpened="MediaLeftOpened" MediaEnded="MediaLeftEnded" RenderTransformOrigin="0.5,0.5">
                                     <MediaElement.RenderTransform>
                                         <ScaleTransform ScaleX="-1"/>
@@ -151,7 +151,7 @@
                                 <RowDefinition Height="50"/>
                                 <RowDefinition Height="50"/>
                             </Grid.RowDefinitions>
-                            <Button Style="{StaticResource MyButtonStyle}" Grid.Row="0" Margin="10,0,0.2,49.2" Background="#3a475b" MouseDown="MediaPlayer_right_MouseRightButtonDown" Grid.RowSpan="2">
+                            <Button x:Name="MediaPlayerRightButton" Style="{StaticResource MyButtonStyle}" Grid.Row="0" Margin="10,0,0.2,49.2" Background="#3a475b" MouseDown="MediaPlayer_right_MouseRightButtonDown" Grid.RowSpan="2">
                                 <MediaElement x:Name="MediaPlayer_right" Grid.Row="0" LoadedBehavior="Manual" HorizontalAlignment="Center" MediaOpened="MediaRightOpened" MediaEnded="MediaRightEnded" RenderTransformOrigin="0.5,0.5">
                                     <MediaElement.RenderTransform>
                                         <ScaleTransform ScaleX="-1"/>

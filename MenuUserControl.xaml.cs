@@ -108,10 +108,10 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                                                             : Properties.Resources.NoSensorStatusText;
 
             // create the Body visualizer
-            this.kinectBodyView = new KinectBodyView(this.kinectSensor, this.motion);
+            this.kinectBodyView = new KinectBodyView(this.kinectSensor, this.motion, MainWindow.MediaPlayerSize);
             //new add
             // create the Color visualizer
-            this.kinectColorView = new KinectColorView(this.kinectSensor);
+            this.kinectColorView = new KinectColorView(this.kinectSensor, MainWindow.MediaPlayerSize);
             this.DataContext = this;
             this.kinectColorbox.DataContext = this.kinectColorView;
             this.kinectBodybox.DataContext = this.kinectBodyView;
@@ -413,8 +413,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 // after converting resume the view
                 this.kinectColorView = null;
                 this.kinectBodyView = null;
-                this.kinectColorView = new KinectColorView(this.kinectSensor);
-                this.kinectBodyView = new KinectBodyView(this.kinectSensor, this.motion);
+                this.kinectColorView = new KinectColorView(this.kinectSensor, MainWindow.MediaPlayerSize);
+                this.kinectBodyView = new KinectBodyView(this.kinectSensor, this.motion, MainWindow.MediaPlayerSize);
                 this.kinectColorbox.DataContext = this.kinectColorView;
                 this.kinectBodybox.DataContext = this.kinectBodyView;
             }
@@ -531,7 +531,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         {
             this.kinectBodybox.DataContext = null;
             this.kinectColorbox.DataContext = null;
-            this.kinectBodyView = new KinectBodyView(this.kinectSensor, this.motion);
+            this.kinectBodyView = new KinectBodyView(this.kinectSensor, this.motion, MainWindow.MediaPlayerSize);
 
             this.converting = true;
             //this.kinectBodybox.DataContext = this.kinectBodyView;
@@ -564,7 +564,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             Thread.Sleep(100);
             this.kinectBodybox.DataContext = null;
             this.kinectColorbox.DataContext = null;
-            this.kinectColorView = new KinectColorView(this.kinectSensor);
+            //Console.WriteLine($"menu: {MainWindow.MediaPlayerSize.Width}");
+            this.kinectColorView = new KinectColorView(this.kinectSensor, MainWindow.MediaPlayerSize);
 
             this.converting = true;
             //this.kinectColorbox.DataContext = this.kinectColorView;

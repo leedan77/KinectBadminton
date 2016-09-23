@@ -18,6 +18,11 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
     public sealed class VideoConverter
     {
         private List<Image<Bgr, byte>> video = new List<Image<Bgr, byte>>();
+        private System.Drawing.Size videoSize;
+        public VideoConverter(System.Drawing.Size videoSize)
+        {
+            this.videoSize = videoSize;
+        }
 
         public void ColorViewToAVI(WriteableBitmap ColorBitmap)
         {
@@ -43,6 +48,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             encoder.Frames.Add(BitmapFrame.Create(temp as BitmapSource));
             encoder.Save(ms);
             ms.Flush();
+            //Console.WriteLine(videoSize.Width);
             bmp = new System.Drawing.Bitmap(ms);
             //Bitmap b = new Bitmap(bmp, (int)(bmp.Width * 0.5), (int)(bmp.Height * 0.5));
             Image<Bgr, byte> img = new Image<Bgr, byte>(bmp);

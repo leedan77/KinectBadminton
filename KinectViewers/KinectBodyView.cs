@@ -145,7 +145,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         /// </summary>
         private List<Pen> bodyColors;
 
-        private VideoConverter videoConverter = new VideoConverter();
+        private VideoConverter videoConverter;
         private List<Image<Bgr, byte>> video = new List<Image<Bgr, byte>>();
         public bool converting = false;
 
@@ -155,8 +155,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         /// Initializes a new instance of the KinectBodyView class
         /// </summary>
         /// <param name="kinectSensor">Active instance of the KinectSensor</param>
-        public KinectBodyView(KinectSensor kinectSensor, String type)
+        public KinectBodyView(KinectSensor kinectSensor, String type, System.Drawing.Size videoSize)
         {
+            //Console.WriteLine($"body: {videoSize.Width}");
             this.type = type;
             if (kinectSensor == null)
             {
@@ -230,6 +231,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
             // Create an image source that we can use in our image control
             this.imageSource = new DrawingImage(this.drawingGroup);
+            this.videoConverter = new VideoConverter(videoSize);
         }
 
         /// <summary>
