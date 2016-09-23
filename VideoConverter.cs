@@ -29,6 +29,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 enc.Save(outStream);
                 bmp = new System.Drawing.Bitmap(outStream);
             }
+            //Bitmap b = new Bitmap(bmp, (int)(bmp.Width * 0.5), (int)(bmp.Height * 0.5));
             Image<Bgr, byte> img = new Image<Bgr, byte>(bmp);
             video.Add(img);
         }
@@ -43,6 +44,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             encoder.Save(ms);
             ms.Flush();
             bmp = new System.Drawing.Bitmap(ms);
+            //Bitmap b = new Bitmap(bmp, (int)(bmp.Width * 0.5), (int)(bmp.Height * 0.5));
             Image<Bgr, byte> img = new Image<Bgr, byte>(bmp);
             video.Add(img);
         }

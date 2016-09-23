@@ -238,8 +238,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
             if (person_type == "coach")
             {
-                textBlock2.Text = name;
-                coachGrid.Children.Clear();
+                ClearCoachBlock();
+                textBlock2.Text = name.Split('_')[0];
                 for (int i = 0; i < this.coachJudgement.Count; ++i)
                 {
                     Grid grid = new Grid();
@@ -265,8 +265,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             }
             else if(person_type == "student")
             {
-                textBlock1.Text = name;
-                stuGrid.Children.Clear();
+                ClearStudentBlock();
+                textBlock1.Text = name.Split('_')[0];
                 int[] correct = new int[this.studentJudgement.Count];
                 for (int i = 0; i < this.studentJudgement.Count; i++)
                 {
@@ -425,6 +425,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private void ToggleButtonLeft_Checked(object sender, RoutedEventArgs e)
         {
+            ClearCoachBlock();
+            ClearStudentBlock();
             if (leftColorRadio.IsChecked == true)
             {
                 student_color_or_body = "color";
@@ -483,9 +485,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private void ActionSwitch_Click(object sender, RoutedEventArgs e)
         {
-            //Console.WriteLine("in ActionSwitch_Click");
-            clearUserBtns();
-            clearCoachBtns();
+            ClearCoachBlock();
+            ClearStudentBlock();
             if (lobRadio.IsChecked == true)
             {
                 //Console.WriteLine("aa");
@@ -551,16 +552,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         {
             me.Close();
             me.Source = null; 
-        }
-        
-        private void clearCoachBtns()
-        {
-            coachGrid.Children.Clear();
-        }
-
-        private void clearUserBtns()
-        {
-            stuGrid.Children.Clear();
         }
 
         private void MediaRightControlUpdateState()
@@ -868,6 +859,18 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             classList.ItemsSource = list;
             if(selectecClass != -1)
                 classList.SelectedIndex = selectecClass;
+        }
+
+        private void ClearCoachBlock()
+        {
+            textBlock2.Text = string.Empty;
+            this.coachGrid.Children.Clear();
+        }
+
+        private void ClearStudentBlock()
+        {
+            textBlock1.Text = string.Empty;
+            this.stuGrid.Children.Clear();
         }
     }
 }
