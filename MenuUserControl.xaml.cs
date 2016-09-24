@@ -608,11 +608,11 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                         if (nowFrame > prevFrame)
                         {
                             playback.Pause();
-                            while (this.convertLock)
-                            {
+                            //while (this.convertLock)
+                            //{
 
-                            }
-                            Thread.Sleep(5);
+                            //}
+                            Thread.Sleep(40);
                             playback.Resume();
                             Console.WriteLine(nowFrame);
                             totalFrame = nowFrame;
@@ -684,11 +684,11 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                         if(nowFrame > prevFrame)
                         {
                             playback.Pause();
-                            while (this.convertLock)
-                            {
+                            //while (this.convertLock)
+                            //{
 
-                            }
-                            Thread.Sleep(50);
+                            //}
+                            Thread.Sleep(100);
                             //Thread.Sleep(100);
                             playback.Resume();
                             Console.WriteLine(nowFrame);
