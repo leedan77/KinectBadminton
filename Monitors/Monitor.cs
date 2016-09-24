@@ -48,7 +48,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
 
         public List<Frames> FrameList;
         public List<CriticalPoint> result;
-        public int videoCount = 0;
         public String handedness;
 
         public virtual void Start()
@@ -80,7 +79,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
             for (int i = 0; i < this.result.Count; i++)
             {
                 if (this.result[i].name == criticalPoint)
-                    this.result[i] = new CriticalPoint(criticalPoint, (double)frame / videoCount);
+                    this.result[i] = new CriticalPoint(criticalPoint, (double)frame / this.FrameList.Count);
             }
             //this.result.Add(new CriticalPoint(criticalPoint, (double)frame / videoCount));
             return frame;

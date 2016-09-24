@@ -47,6 +47,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private string className = string.Empty;
         private string week = "week1";
         private string studentNameConvert = string.Empty;
+        private string coachNameConvert = string.Empty;
         /// <summary> Delegate to use for placing a job with no arguments onto the Dispatcher </summary>
         private delegate void NoArgDelegate();
 
@@ -269,6 +270,10 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             }
         }
 
+        private void RecordDone(string fileDir)
+        {
+            this.kinectBodyView.SaveJointData(fileDir);
+        }
         /// <summary>
         /// Handles the user clicking on the Record Stop button
         /// </summary>
@@ -310,12 +315,12 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     }
                     recording.Stop();
                 }
-
                 client.DisconnectFromService();
             }
             // Update UI after the background recording task has completed
             this.recordingStop = false;
             this.isRecording = false;
+            this.Dispatcher.BeginInvoke(new OneArgDelegate(RecordDone), filePath);
             this.Dispatcher.BeginInvoke(new NoArgDelegate(UpdateState));
         }
 
@@ -400,6 +405,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                                 MessageBox.Show($"已刪除 {new FileInfo(this.justConvertFilePath).Name}");
                                 NameUpdateState();
                             }
+                            else
+                                Console.WriteLine(this.justConvertFilePath);
                         }
                     }
                 }
@@ -495,7 +502,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             }
             else
             {
-                string filePath = null;
+                string filePath = string.Empty;
+                string xefPath = string.Empty;
+                string jointJsonPath = string.Empty;
                 if (this.idenity == "student")
                 {
                     if (classList.SelectedItem as string == "請選擇" || classList.SelectedItem as string == "新增班級")
@@ -504,25 +513,47 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     }
                     else if (this.studentNameConvert == "請選擇" || String.IsNullOrEmpty(this.studentNameConvert))
                     {
-                        MessageBox.Show("請選擇學員資料夾", "錯誤");
+                        MessageBox.Show("請選擇名稱", "錯誤");
                     }
                     else
                     {
                         string cur = Environment.CurrentDirectory;
-                        string relatePath = $"\\..\\..\\..\\data\\student\\{this.className}\\{this.week}\\{this.motion}\\{this.studentNameConvert}\\{this.studentNameConvert}.xef";
-                        //Console.WriteLine(this.studentNameConvert);
-                        filePath = cur + relatePath;
+                        filePath = $"{cur}\\..\\..\\..\\data\\student\\{this.className}\\{this.week}\\{this.motion}\\{this.studentNameConvert}";
+                        xefPath = $"{filePath}\\{this.studentNameConvert}.xef";
+                        jointJsonPath = $"{filePath}\\joints.json";
                     }
                 }
                 //idenity == coach
                 else
                 {
-                    filePath = this.OpenFileForConvert();
+                    //filePath = this.OpenFileForConvert();
+                    if (this.coachNameConvert == "請選擇" || String.IsNullOrEmpty(this.coachNameConvert))
+                    {
+                        MessageBox.Show("請選擇名稱", "錯誤");
+                    }
+                    else
+                    {
+                        string cur = Environment.CurrentDirectory;
+                        filePath = $"{cur}\\..\\..\\..\\data\\coach\\{this.motion}\\{this.coachNameConvert}";
+                        xefPath = $"{filePath}\\{this.coachNameConvert}.xef";
+                        jointJsonPath = $"{filePath}\\joints.json";
+                    }
+
                 }
-                if (!string.IsNullOrEmpty(filePath))
+                if (File.Exists(xefPath))
                 {
-                    this.justConvertFilePath = filePath;
-                    ConvertBody(filePath);
+                    this.justConvertFilePath = xefPath;
+                    ConvertBody(xefPath);
+                }
+                else if (File.Exists(jointJsonPath))
+                {
+                    Console.WriteLine("joint json exist");
+                    this.kinectBodyView.Judge(jointJsonPath, this.handedness);
+                }
+                else
+                {
+                    Console.WriteLine(xefPath);
+                    Console.WriteLine(jointJsonPath);
                 }
             }
         }
@@ -636,25 +667,15 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             {
                 this.bodyConvertBad = true;
                 Console.WriteLine("body bad");
-                //MessageBox.Show("骨架影片Lose frame嚴重。建議改善方式：將程式關閉並重新開啟", "建議");
             }
             this.converting = false;
             this.kinectBodyView.converting = false;
-            this.kinectBodyView.SaveJointData(personName, this.idenity, this.handedness, this.className, this.week);
-            this.kinectBodyView.Judge(personName, this.idenity, this.handedness, this.className, this.week, videoCount);
+            this.kinectBodyView.SaveJointData(filePath);
+            this.kinectBodyView.Judge(filePath, this.handedness);
             this.kinectBodyView.Dispose();
-
-            string path = null;
-            if (this.idenity == "student")
-            {
-                path = $"{Environment.CurrentDirectory}\\..\\..\\..\\data\\student\\{this.className}\\{this.week}\\{this.motion}\\{personName}\\color.avi";
-            }
-            else if (this.idenity == "coach")
-            {
-
-                path = $"{Environment.CurrentDirectory}\\..\\..\\..\\data\\coach\\{this.motion}\\{personName}\\color.avi";
-            }
-            if (File.Exists(path))
+            
+            string colorAviPath = $"{Directory.GetParent(filePath).FullName}\\color.avi";
+            if (File.Exists(colorAviPath))
             {
                 this.Dispatcher.BeginInvoke(new NoArgDelegate(UpdateState));
             }
@@ -807,6 +828,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 this.idenity = "coach";
             else
                 this.idenity = "student";
+            NameUpdateState();
         }
 
         private void MotionRadio_Click(object sender, RoutedEventArgs e)
@@ -949,15 +971,38 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private void studentNameList_Loaded(object sender, RoutedEventArgs e)
         {
-            if (!(classList.SelectedItem as string == "請選擇") && !(classList.SelectedItem as string == "新增班級"))
+            string filepath = string.Empty;
+            if (this.idenity == "coach")
+            {
+                string cur = Environment.CurrentDirectory;
+                string relatePath = $"\\..\\..\\..\\data\\coach\\{this.motion}";
+                filepath = cur + relatePath;
+                if (!Directory.Exists(filepath))
+                {
+                    Directory.CreateDirectory(filepath);
+                }
+                DirectoryInfo dirInfo = new DirectoryInfo(filepath);
+                ArrayList list = new ArrayList();
+                list.Add("請選擇");
+                foreach (DirectoryInfo d in dirInfo.GetDirectories())
+                {
+                    list.Add(d.Name);
+                }
+                var comboBox = sender as ComboBox;
+                comboBox.ItemsSource = list;
+                comboBox.SelectedIndex = 0;
+            }
+            //idenity == student
+            else if (!(classList.SelectedItem as string == "請選擇") && !(classList.SelectedItem as string == "新增班級"))
             {
                 string cur = Environment.CurrentDirectory;
                 string relatePath = $"\\..\\..\\..\\data\\student\\{this.className}\\{this.week}\\{this.motion}";
-                if (!Directory.Exists(cur + relatePath))
+                filepath = cur + relatePath;
+                if (!Directory.Exists(filepath))
                 {
-                    Directory.CreateDirectory(cur + relatePath);
+                    Directory.CreateDirectory(filepath);
                 }
-                DirectoryInfo dirInfo = new DirectoryInfo(cur + relatePath);
+                DirectoryInfo dirInfo = new DirectoryInfo(filepath);
                 ArrayList list = new ArrayList();
                 list.Add("請選擇");
                 foreach (DirectoryInfo d in dirInfo.GetDirectories())
@@ -973,23 +1018,46 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private void studentNameList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var comboBox = sender as ComboBox;
-            this.studentNameConvert = comboBox.SelectedItem as string;
+            if (this.idenity == "student")
+            {
+                this.studentNameConvert = comboBox.SelectedItem as string;
+            }
+            //idenity == coach
+            else
+            {
+                this.coachNameConvert = comboBox.SelectedItem as string;
+            }
             //Console.WriteLine(this.studentNameConvert);
         }
 
         private void NameUpdateState()
         {
-            if (!(classList.SelectedItem as string == "請選擇") && !(classList.SelectedItem as string == "新增班級"))
+            if (this.idenity == "student")
+            {
+                this.classList.IsEnabled = true;
+                this.week_control.IsEnabled = true;
+            }
+            else if (this.idenity == "coach")
+            {
+                this.classList.IsEnabled = false;
+                this.week_control.IsEnabled = false;
+            }
+            string filepath = string.Empty;
+            if (this.idenity == "coach")
             {
                 string cur = Environment.CurrentDirectory;
-                string relatePath = $"\\..\\..\\..\\data\\student\\{this.className}\\{this.week}\\{this.motion}";
-                Directory.CreateDirectory(cur + relatePath);
-                DirectoryInfo dirInfo = new DirectoryInfo(cur + relatePath);
+                string relatePath = $"\\..\\..\\..\\data\\coach\\{this.motion}";
+                filepath = cur + relatePath;
+                Console.WriteLine(filepath);
+                Directory.CreateDirectory(filepath);
+                DirectoryInfo dirInfo = new DirectoryInfo(filepath);
                 ArrayList list = new ArrayList();
                 foreach (DirectoryInfo d in dirInfo.GetDirectories())
                 {
-                    Console.WriteLine($"{d.FullName}\\{d.Name}.xef");
-                    if (File.Exists($"{d.FullName}\\{d.Name}.xef"))
+                    string xefPath = $"{d.FullName}\\{d.Name}.xef";
+                    string jointJsonPath = $"{d.FullName}\\joints.json";
+                    //Console.WriteLine(jointJsonPath);
+                    if (File.Exists(xefPath) || File.Exists(jointJsonPath))
                         list.Add(d.Name);
                 }
                 if (dirInfo.GetDirectories().Length == 0)
@@ -998,8 +1066,32 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     studentNameList.IsEnabled = true;
                 studentNameList.ItemsSource = list;
             }
-        }
-
-        
+            else
+            {
+                if (!(classList.SelectedItem as string == "請選擇") && !(classList.SelectedItem as string == "新增班級"))
+                {
+                    string cur = Environment.CurrentDirectory;
+                    string relatePath = $"\\..\\..\\..\\data\\student\\{this.className}\\{this.week}\\{this.motion}";
+                    filepath = cur + relatePath;
+                    Directory.CreateDirectory(filepath);
+                    DirectoryInfo dirInfo = new DirectoryInfo(filepath);
+                    ArrayList list = new ArrayList();
+                    foreach (DirectoryInfo d in dirInfo.GetDirectories())
+                    {
+                        string xefPath = $"{d.FullName}\\{d.Name}.xef";
+                        string jointJsonPath = $"{d.FullName}\\joints.json";
+                        //Console.WriteLine(jointJsonPath);
+                        if (File.Exists(xefPath) || File.Exists(jointJsonPath))
+                            list.Add(d.Name);
+                    }
+                    if (dirInfo.GetDirectories().Length == 0)
+                        studentNameList.IsEnabled = false;
+                    else
+                        studentNameList.IsEnabled = true;
+                    studentNameList.ItemsSource = list;
+                }
+            }
+            
+        }    
     }
 }
