@@ -119,6 +119,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             this.DataContext = this;
             this.kinectColorbox.DataContext = this.kinectColorView;
             this.kinectBodybox.DataContext = this.kinectBodyView;
+
+            client = KStudio.CreateClient();
+            client.ConnectToService();
         }
 
         private void RefreshKinectSensor()
@@ -644,10 +647,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             int nowFrame = 0;
             int prevFrame = 0;
             int totalFrame = 0;
-            using (KStudioClient client = KStudio.CreateClient())
-            {
-
-                client.ConnectToService();
+          
+              
                 using (KStudioPlayback playback = client.CreatePlayback(filePath))
                 {
                     playback.LoopCount = 0;
@@ -674,8 +675,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     playback.Dispose();
                 }
 
-                client.DisconnectFromService();
-            }
+               
+            
             Thread.Sleep(40);
             this.Dispatcher.BeginInvoke(new ThreeArgDelegate(BodyConvertDone), personName, filePath, totalFrame);
         }
@@ -717,9 +718,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private void ColorConvertClip(string filePath, string personName)
         {
             int totalFrame = 0;
-            using (KStudioClient client = KStudio.CreateClient())
-            {
-                client.ConnectToService();
+            
+               
                 int nowFrame = 0;
                 int prevFrame = 0;
                 // Create the playback object
@@ -751,8 +751,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     playback.Dispose();
                 }
 
-                client.DisconnectFromService();
-            }
+             
+        
             this.Dispatcher.BeginInvoke(new StringIntDelegate(ColorConvertDone), personName, totalFrame);
             this.Dispatcher.BeginInvoke(new NoArgDelegate(UpdateState));
         }
