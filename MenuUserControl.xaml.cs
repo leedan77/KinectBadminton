@@ -293,9 +293,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             }
         }
         
-        private void RecordDone(string fileDir)
+        private void RecordDone(string xefFilePath)
         {
-            this.kinectBodyView.SaveJointData(fileDir);
+            this.kinectBodyView.SaveJointData(xefFilePath);
         }
         private void RecordDelegate(string filePath, KStudioClient client, KStudioEventStreamSelectorCollection streamCollection)
         {
@@ -710,8 +710,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             this.Dispatcher.BeginInvoke(new ThreeArgDelegate(BodyConvertDone), personName, filePath, totalFrame);
         }
 
-        private void BodyConvertDone(string personName, string filePath, int totalFrame)
+        private void BodyConvertDone(string personName, string xefFilePath, int totalFrame)
         {
+            Console.WriteLine("body done");
             int videoCount = makeVideo("body", personName);
             double loseFrameRate = 1 - (double)videoCount/totalFrame;
             if (loseFrameRate > 0.06)
@@ -721,17 +722,17 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             }
             this.converting = false;
             this.kinectBodyView.converting = false;
-            this.kinectBodyView.SaveJointData(filePath);
-            this.kinectBodyView.Judge(filePath, this.handedness);
+            this.kinectBodyView.SaveJointData(xefFilePath);
+            this.kinectBodyView.Judge(xefFilePath, this.handedness);
             this.kinectBodyView.Dispose();
             
-            string colorAviPath = $"{Directory.GetParent(filePath).FullName}\\color.avi";
+            string colorAviPath = $"{Directory.GetParent(xefFilePath).FullName}\\color.avi";
             if (File.Exists(colorAviPath))
             {
                 this.Dispatcher.BeginInvoke(new NoArgDelegate(UpdateState));
             }
             else
-                this.Dispatcher.BeginInvoke(new OneArgDelegate(ConvertColor), filePath);
+                this.Dispatcher.BeginInvoke(new OneArgDelegate(ConvertColor), xefFilePath);
         }
 
         private void ColorConvertClip(string filePath, string personName)
