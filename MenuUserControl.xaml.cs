@@ -65,6 +65,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private delegate int MakeVideoDelegate(string arg1, string arg2);
 
+        private delegate void recordDelegate(string arg1, KStudioClient arg2, KStudioEventStreamSelectorCollection arg3);
+
         /// <summary> Active Kinect sensor </summary>
         private KinectSensor kinectSensor = null;
 
@@ -85,6 +87,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         /// Color visualizer
         /// </summary>
         private KinectColorView kinectColorView = null;
+
+        private KStudioClient client = null;
 
         private string justConvertFilePath = string.Empty;
         private bool bodyConvertBad = false;
@@ -210,7 +214,13 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             // set the status text
             this.KinectStatusText = this.kinectSensor.IsAvailable ? Properties.Resources.RunningStatusText
                                                             : Properties.Resources.SensorNotAvailableStatusText;
-            //Console.WriteLine(this.kinectStatusText);
+
+            if (this.kinectStatusText == "Running")
+            {
+                client = KStudio.CreateClient();
+                client.ConnectToService();
+            }
+
         }
 
         /// <summary>
@@ -258,9 +268,22 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     this.RecordPlaybackStatusText = Properties.Resources.RecordingInProgressText;
                     this.UpdateState();
 
+                    KStudioEventStreamSelectorCollection streamCollection = new KStudioEventStreamSelectorCollection();
+                    //streamCollection.Add(KStudioEventStreamDataTypeIds.Ir);
+                    streamCollection.Add(KStudioEventStreamDataTypeIds.Depth);
+                    streamCollection.Add(KStudioEventStreamDataTypeIds.Body);
+                    //streamCollection.Add(KStudioEventStreamDataTypeIds.BodyIndex);
+
+                    //new add
+                    streamCollection.Add(KStudioEventStreamDataTypeIds.UncompressedColor);
+                    this.UpdateState();
+
+                    recordDelegate rd = new recordDelegate(this.RecordDelegate);
+                    rd.BeginInvoke(filePath, client, streamCollection, null, null);
+
                     // Start running the recording asynchronously
-                    OneArgDelegate recording = new OneArgDelegate(this.RecordClip);
-                    recording.BeginInvoke(filePath, null, null);
+                    //OneArgDelegate recording = new OneArgDelegate(this.RecordClip);
+                    //recording.BeginInvoke(filePath, null, null);
                 }
                 NameUpdateState();
             }
@@ -269,10 +292,38 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 MessageBox.Show("請先連接Kinect才能進行錄製", "錯誤");
             }
         }
-
+        
         private void RecordDone(string fileDir)
         {
             this.kinectBodyView.SaveJointData(fileDir);
+        }
+        private void RecordDelegate(string filePath, KStudioClient client, KStudioEventStreamSelectorCollection streamCollection)
+        {
+            using (KStudioRecording recording = client.CreateRecording(filePath, streamCollection))
+            {
+                //recording.StartTimed(this.duration);
+                Console.WriteLine($"before start: {DateTime.Now}");
+                recording.Start();
+                Console.WriteLine($"after start: {DateTime.Now}");
+                bool flag = false;
+                while (recording.State == KStudioRecordingState.Recording && recordingStop == false)
+                {
+                    if (!flag)
+                    {
+
+                        Console.WriteLine($"Start recording: {DateTime.Now}");
+                        flag = true;
+                    }
+                    Thread.Sleep(500);
+                }
+                recording.Stop();
+            }
+
+            //client.DisconnectFromService();
+            //client.Dispose();
+            this.recordingStop = false;
+            this.isRecording = false;
+            this.Dispatcher.BeginInvoke(new NoArgDelegate(UpdateState));
         }
         /// <summary>
         /// Handles the user clicking on the Record Stop button
@@ -639,11 +690,11 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                         if (nowFrame > prevFrame)
                         {
                             playback.Pause();
-                            while (this.convertLock)
-                            {
+                            //while (this.convertLock)
+                            //{
 
-                            }
-                            Thread.Sleep(5);
+                            //}
+                            Thread.Sleep(40);
                             playback.Resume();
                             Console.WriteLine(nowFrame);
                             totalFrame = nowFrame;
@@ -705,11 +756,11 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                         if(nowFrame > prevFrame)
                         {
                             playback.Pause();
-                            while (this.convertLock)
-                            {
+                            //while (this.convertLock)
+                            //{
 
-                            }
-                            Thread.Sleep(50);
+                            //}
+                            Thread.Sleep(100);
                             //Thread.Sleep(100);
                             playback.Resume();
                             Console.WriteLine(nowFrame);
