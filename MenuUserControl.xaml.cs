@@ -756,6 +756,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                         //Console.WriteLine()
                         if(nowFrame > prevFrame)
                         {
+                            Console.WriteLine("hey");
                             playback.Pause();
                             //while (this.convertLock)
                             //{
