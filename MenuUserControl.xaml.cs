@@ -661,11 +661,11 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                         if (nowFrame > prevFrame)
                         {
                             playback.Pause();
-                            //while (this.convertLock)
-                            //{
+                            while (this.convertLock)
+                            {
 
-                            //}
-                            Thread.Sleep(40);
+                            }
+                            Thread.Sleep(5);
                             playback.Resume();
                             Console.WriteLine(nowFrame);
                             totalFrame = nowFrame;
@@ -731,17 +731,17 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     this.kinectColorView.converting = true;
                     while (playback.State == KStudioPlaybackState.Playing)
                     {
+                     
                         nowFrame = (int)(playback.CurrentRelativeTime.TotalMilliseconds / 33.33);
                         //Console.WriteLine()
                         if(nowFrame > prevFrame)
                         {
                             playback.Pause();
-                            //while (this.convertLock)
-                            //{
+                            while (this.convertLock)
+                            {
 
-                            //}
-                            Thread.Sleep(100);
-                            //Thread.Sleep(100);
+                            }
+                            Thread.Sleep(10);
                             playback.Resume();
                             Console.WriteLine(nowFrame);
                             totalFrame = prevFrame;
