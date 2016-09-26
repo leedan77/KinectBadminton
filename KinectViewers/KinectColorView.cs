@@ -89,9 +89,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         /// <param name="e">event arguments</param>
         private void Reader_ColorFrameArrived(object sender, ColorFrameArrivedEventArgs e)
         {
-            
-            // ColorFrame is IDisposable
-            //Console.WriteLine(fc++);
             using (ColorFrame colorFrame = e.FrameReference.AcquireFrame())
             {
                 if (colorFrame != null)
@@ -124,7 +121,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     this.muc.convertLock = false;
                 }
             }
-            
         }
 
         public List<Image<Bgr, byte>> Video

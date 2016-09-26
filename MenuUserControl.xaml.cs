@@ -40,13 +40,13 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private bool converting = false;
 
-        private string idenity = "student";
+        private string identity = "student";
 
         private string motion = "lob";
-        private string handedness = "right";
+        private string handedness = string.Empty;
         private string className = string.Empty;
         private string week = "week1";
-        private string studentNameConvert = string.Empty;
+        private string convertName = string.Empty;
         /// <summary> Delegate to use for placing a job with no arguments onto the Dispatcher </summary>
         private delegate void NoArgDelegate();
 
@@ -64,7 +64,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private delegate int MakeVideoDelegate(string arg1, string arg2);
 
-        private delegate void recordDelegate(string arg1, KStudioClient arg2, KStudioEventStreamSelectorCollection arg3);
+        private delegate void RecordDelegate(KStudioClient arg2, KStudioEventStreamSelectorCollection arg3);
+
+        private delegate void IntDelegate(int arg1);
 
         /// <summary> Active Kinect sensor </summary>
         private KinectSensor kinectSensor = null;
@@ -88,10 +90,12 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private KinectColorView kinectColorView = null;
 
         private KStudioClient client = null;
-
-        private string justConvertFilePath = string.Empty;
+        
         private bool bodyConvertBad = false;
         private bool ColorConvertBad = false;
+        private string xefFilePath = string.Empty;
+        private string jointsJsonPath = string.Empty;
+        private string frontDataPath = string.Empty;
 
         public MenuUserControl()
         {
@@ -219,8 +223,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
             if (this.kinectStatusText == "Running")
             {
-                client = KStudio.CreateClient();
-                client.ConnectToService();
+                this.client = KStudio.CreateClient();
+                this.client.ConnectToService();
             }
 
         }
@@ -263,8 +267,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         {
             if(this.kinectStatusText == "Running")
             {
-                string filePath = this.SaveRecordingAs();
-                if (!string.IsNullOrEmpty(filePath))
+                LoadXefJointsPath();
+                if (!string.IsNullOrEmpty(this.xefFilePath))
                 {
                     this.isRecording = true;
                     this.RecordPlaybackStatusText = Properties.Resources.RecordingInProgressText;
@@ -280,12 +284,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     streamCollection.Add(KStudioEventStreamDataTypeIds.UncompressedColor);
                     this.UpdateState();
 
-                    recordDelegate rd = new recordDelegate(this.RecordDelegate);
-                    rd.BeginInvoke(filePath, client, streamCollection, null, null);
-
-                    // Start running the recording asynchronously
-                    //OneArgDelegate recording = new OneArgDelegate(this.RecordClip);
-                    //recording.BeginInvoke(filePath, null, null);
+                    RecordDelegate rd = new RecordDelegate(this.RecordClip);
+                    rd.BeginInvoke(this.client, streamCollection, null, null);
                 }
                 NameUpdateState();
             }
@@ -294,10 +294,14 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 MessageBox.Show("請先連接Kinect才能進行錄製", "錯誤");
             }
         }
-
-        private void RecordDelegate(string filePath, KStudioClient client, KStudioEventStreamSelectorCollection streamCollection)
+        
+        private void RecordDone()
         {
-            using (KStudioRecording recording = client.CreateRecording(filePath, streamCollection))
+            this.kinectBodyView.SaveJointData(this.jointsJsonPath);
+        }
+        private void RecordClip(KStudioClient client, KStudioEventStreamSelectorCollection streamCollection)
+        {
+            using (KStudioRecording recording = client.CreateRecording(this.xefFilePath, streamCollection))
             {
                 //recording.StartTimed(this.duration);
                 Console.WriteLine($"before start: {DateTime.Now}");
@@ -308,7 +312,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 {
                     if (!flag)
                     {
-
                         Console.WriteLine($"Start recording: {DateTime.Now}");
                         flag = true;
                     }
@@ -321,6 +324,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             //client.Dispose();
             this.recordingStop = false;
             this.isRecording = false;
+            this.Dispatcher.BeginInvoke(new NoArgDelegate(RecordDone));
             this.Dispatcher.BeginInvoke(new NoArgDelegate(UpdateState));
         }
 
@@ -333,53 +337,12 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         {
             this.recordingStop = true;
         }
-
-        /// <summary>
-        /// Records a new .xef file
-        /// </summary>
-        /// <param name="filePath">Full path to where the file should be saved to</param>
-        private void RecordClip(string filePath)
-        {
-            using (KStudioClient client = KStudio.CreateClient())
-            {
-                client.ConnectToService();
-
-                // Specify which streams should be recorded
-                KStudioEventStreamSelectorCollection streamCollection = new KStudioEventStreamSelectorCollection();
-                streamCollection.Add(KStudioEventStreamDataTypeIds.Ir);
-                streamCollection.Add(KStudioEventStreamDataTypeIds.Depth);
-                streamCollection.Add(KStudioEventStreamDataTypeIds.Body);
-                //streamCollection.Add(KStudioEventStreamDataTypeIds.BodyIndex);
-
-                //new add
-                streamCollection.Add(KStudioEventStreamDataTypeIds.UncompressedColor);
-
-                // Create the recording object
-                using (KStudioRecording recording = client.CreateRecording(filePath, streamCollection))
-                {
-                    //recording.StartTimed(this.duration);
-                    recording.Start();
-                    while (recording.State == KStudioRecordingState.Recording && recordingStop == false)
-                    {
-                        Thread.Sleep(500);
-                    }
-                    recording.Stop();
-                }
-
-                client.DisconnectFromService();
-            }
-            // Update UI after the background recording task has completed
-            this.recordingStop = false;
-            this.isRecording = false;
-            this.Dispatcher.BeginInvoke(new NoArgDelegate(UpdateState));
-        }
-
+        
         /// <summary>
         /// Enables/Disables the record and playback buttons in the UI
         /// </summary>
         private void UpdateState()
         {
-            Console.WriteLine($"update: {Thread.CurrentThread.ManagedThreadId}");
             if (this.isRecording)
             {
                 this.studentRadio.IsEnabled = false;
@@ -419,12 +382,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             }
             else
             {
-                if (this.bodyConvertBad || this.ColorConvertBad)
-                {
-                    MessageBox.Show("影片轉檔Lose frame嚴重。建議：先刪除檔案並將程式關閉重啟。", "建議");
-                    this.bodyConvertBad = false;
-                    this.ColorConvertBad = false;
-                }
+                
                 this.studentRadio.IsEnabled = true;
                 this.coachRadio.IsEnabled = true;
                 this.lobRadio.IsEnabled = true;
@@ -439,24 +397,44 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
                 if (this.PlayBackLabel.Visibility == Visibility.Visible)
                 {
-                    MessageBoxResult messageBoxResult1 = MessageBox.Show(
-                    $".xef檔佔據大量儲存空間，是否刪除？",
-                    "確認", MessageBoxButton.YesNo);
-                    if (messageBoxResult1 == MessageBoxResult.Yes)
+                    if (this.bodyConvertBad || this.ColorConvertBad)
                     {
-                        MessageBoxResult messageBoxResult2 = MessageBox.Show(
-                        $"刪除後無法復原，包含重新評分與製作彩色及骨架影片。",
-                        "確認", MessageBoxButton.YesNo);
-                        if (messageBoxResult2 == MessageBoxResult.Yes)
+                        MessageBox.Show("影片轉檔Lose frame嚴重，請重新轉檔。建議：將程式關閉重新開啟。", "轉檔失敗");
+                        this.bodyConvertBad = false;
+                        this.ColorConvertBad = false;
+                        if (File.Exists($"{this.frontDataPath}\\color.avi"))
                         {
-                            if (File.Exists(this.justConvertFilePath))
+                            File.Delete($"{this.frontDataPath}\\color.avi");
+                        }
+                        if (File.Exists($"{this.frontDataPath}\\body.avi"))
+                        {
+                            File.Delete($"{this.frontDataPath}\\body.avi");
+                        }
+                    }
+                    else
+                    {
+                        MessageBoxResult messageBoxResult1 = MessageBox.Show(
+                            $".xef檔佔據大量儲存空間，是否刪除？",
+                            "確認", MessageBoxButton.YesNo);
+                        if (messageBoxResult1 == MessageBoxResult.Yes)
+                        {
+                            MessageBoxResult messageBoxResult2 = MessageBox.Show(
+                            $"刪除後無法復原，包含重新製作彩色及骨架影片。",
+                            "確認", MessageBoxButton.YesNo);
+                            if (messageBoxResult2 == MessageBoxResult.Yes)
                             {
-                                File.Delete(this.justConvertFilePath);
-                                MessageBox.Show($"已刪除 {new FileInfo(this.justConvertFilePath).Name}");
-                                NameUpdateState();
+                                if (File.Exists(this.xefFilePath))
+                                {
+                                    File.Delete(this.xefFilePath);
+                                    MessageBox.Show($"已刪除 {new FileInfo(this.xefFilePath).Name}");
+                                    NameUpdateState();
+                                }
+                                else
+                                    Console.WriteLine(this.xefFilePath);
                             }
                         }
                     }
+                    
                 }
                 this.PlayBackLabel.Content = string.Empty;
                 this.PlayBackLabel.Visibility = Visibility.Hidden;
@@ -483,27 +461,25 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         /// Launches the SaveFileDialog window to help user create a new recording file
         /// </summary>
         /// <returns>File path to use when recording a new event file</returns>
-        private string SaveRecordingAs()
+        private void LoadXefJointsPath()
         {
-            string fileName = string.Empty;
-
-            if (idenity == "coach")
+            string fileDir = string.Empty;
+            string newName = string.Empty;
+            if (identity == "coach")
             {
-                SaveFileDialog dlg = new SaveFileDialog();
-                dlg.FileName = "recordAndPlaybackBasics.xef";
-                dlg.DefaultExt = Properties.Resources.XefExtension;
-                dlg.AddExtension = true;
-                dlg.Filter = Properties.Resources.EventFileDescription + " " + Properties.Resources.EventFileFilter;
-                dlg.CheckPathExists = true;
-                bool? result = dlg.ShowDialog();
-
-                if (result == true)
+                newName = Microsoft.VisualBasic.Interaction.InputBox("請輸入選手名稱", "新增錄影", "", -1, -1);
+                if (string.IsNullOrWhiteSpace(newName))
                 {
-                    fileName = dlg.FileName;
+                    MessageBox.Show("選手名稱不可為空白", "錯誤");
+                }
+                else
+                {
+                    string fileName = newName + "_" + DateTime.Now.ToString("HH-mm-ss(yyyy-MM-dd)");
+                    string cur = Environment.CurrentDirectory;
+                    fileDir = $"{cur}\\..\\..\\..\\data\\coach\\{this.motion}\\xefjoints";
                 }
             }
-            //idenity == student
-            else
+            else if(this.identity == "student")
             {
                 
                 if(classList.SelectedItem as string == "請選擇" || classList.SelectedItem as string == "新增班級")
@@ -512,77 +488,85 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 }
                 else
                 {
-                    string newStudentName = Microsoft.VisualBasic.Interaction.InputBox("請輸入學員名稱", "新增錄影", "", -1, -1);
-                    if (string.IsNullOrWhiteSpace(newStudentName))
+                    newName = Microsoft.VisualBasic.Interaction.InputBox("請輸入學員名稱", "新增錄影", "", -1, -1);
+                    if (string.IsNullOrWhiteSpace(newName))
                     {
                         MessageBox.Show("學員名稱不可為空白", "錯誤");
                     }
                     else
                     {
-                        string folderName = newStudentName + "_" + DateTime.Now.ToString("HH-mm-ss(yyyy-MM-dd)");
-                        //Console.WriteLine(folderName);
+                        string fileName = newName + "_" + DateTime.Now.ToString("HH-mm-ss(yyyy-MM-dd)");
                         string cur = Environment.CurrentDirectory;
-                        string relativePath = $"\\..\\..\\..\\data\\student\\{this.className}\\{this.week}\\{this.motion}\\";
-                        string filePath = cur + relativePath + folderName;
-                        if (Directory.Exists(filePath))
-                        {
-                            MessageBox.Show("The folder has existed", "Error");
-                        }
-                        else
-                        {
-                            //Directory.CreateDirectory(filePath);
-                            SaveFileDialog dlg = new SaveFileDialog();
-                            dlg.FileName = filePath + "\\" + folderName + ".xef";
-                            fileName = dlg.FileName;
-                        }
+                        fileDir = $"{cur}\\..\\..\\..\\data\\student\\{this.className}\\{this.week}\\{this.motion}\\xefjoints";
                     }
-                    
                 }
             }
-            return fileName;
+            this.xefFilePath = $"{fileDir}\\{newName}.xef";
+            this.jointsJsonPath = $"{fileDir}\\{newName}.json";
         }
 
         private void ConvertButton_Click(object sender, RoutedEventArgs e)
         {
+            bool selectSuccess = false;
             if (this.kinectStatusText == "Running"/*"Kinect not available!"*/)
             {
                 MessageBox.Show("請先移除Kinect裝置", "錯誤");
             }
             else
             {
-                string filePath = null;
-                if (this.idenity == "student")
+                if (this.identity == "student")
                 {
                     if (classList.SelectedItem as string == "請選擇" || classList.SelectedItem as string == "新增班級")
                     {
                         MessageBox.Show("請選擇班級名稱", "錯誤");
                     }
-                    else if (this.studentNameConvert == "請選擇" || String.IsNullOrEmpty(this.studentNameConvert))
+                    else if (String.IsNullOrEmpty(this.convertName))
                     {
-                        MessageBox.Show("請選擇學員資料夾", "錯誤");
+                        MessageBox.Show("請選擇名稱", "錯誤");
                     }
                     else
                     {
-                        string cur = Environment.CurrentDirectory;
-                        string relatePath = $"\\..\\..\\..\\data\\student\\{this.className}\\{this.week}\\{this.motion}\\{this.studentNameConvert}\\{this.studentNameConvert}.xef";
-                        //Console.WriteLine(this.studentNameConvert);
-                        filePath = cur + relatePath;
+                        selectSuccess = true;
                     }
+                    string cur = Environment.CurrentDirectory;
+                    this.frontDataPath = $"{cur}\\..\\..\\..\\data\\student\\{this.className}\\{this.week}\\{this.motion}\\{this.convertName}";
                 }
-                //idenity == coach
+                else if (this.identity == "coach")
+                {
+                    //filePath = this.OpenFileForConvert();
+                    if (String.IsNullOrEmpty(this.convertName))
+                    {
+                        MessageBox.Show("請選擇名稱", "錯誤");
+                    }
+                    else
+                    {
+                        selectSuccess = true;
+                    }
+                    string cur = Environment.CurrentDirectory;
+                    this.frontDataPath = $"{cur}\\..\\..\\..\\data\\coach\\{this.motion}\\{this.convertName}";
+                }
+                if (string.IsNullOrEmpty(this.handedness))
+                {
+                    MessageBox.Show("請選擇慣用手", "錯誤");
+                }
                 else
                 {
-                    filePath = this.OpenFileForConvert();
-                }
-                if (!string.IsNullOrEmpty(filePath))
-                {
-                    this.justConvertFilePath = filePath;
-                    ConvertBody(filePath);
+                    if (selectSuccess)
+                    {
+                        if (File.Exists(this.xefFilePath))
+                        {
+                            ConvertBody();
+                        }
+                        else if (File.Exists(this.jointsJsonPath))
+                        {
+                            this.kinectBodyView.Judge(this.jointsJsonPath, this.handedness);
+                        }
+                    }
                 }
             }
         }
 
-        private void ConvertBody(String filePath)
+        private void ConvertBody()
         {
             this.kinectBodybox.DataContext = null;
             this.kinectColorbox.DataContext = null;
@@ -591,131 +575,88 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             this.converting = true;
             //this.kinectBodybox.DataContext = this.kinectBodyView;
             UpdateState();
-            Console.WriteLine($"main: {Thread.CurrentThread.ManagedThreadId}");
-            //string name = new DirectoryInfo(System.IO.Path.GetDirectoryName(filePath)).Name;
-            string name;
-            if (this.idenity == "student")
-            {
-                name = this.studentNameConvert;
-            }
-            else
-            {
-                name = new DirectoryInfo(System.IO.Path.GetDirectoryName(filePath)).Name;
-            }
-            this.PlayBackLabel.Content = $"正在對{name.Split('_')[0]}進行評分，並製作彩色及骨架影片...";
+            this.PlayBackLabel.Content = $"正在對{this.convertName.Split('_')[0]}進行評分，並製作彩色及骨架影片...";
             this.PlayBackLabel.Visibility = Visibility.Visible;
-            TwoArgDelegate bodyConvert = new TwoArgDelegate(this.BodyConvertClip);
-            AsyncCallback callback = new AsyncCallback(myCallbackMethod);
-            IAsyncResult result = bodyConvert.BeginInvoke(filePath, name, callback, null);
-        }
-
-        private void myCallbackMethod(IAsyncResult result)
-        {
-            Console.WriteLine($"callback: {Thread.CurrentThread.ManagedThreadId}");
+            NoArgDelegate bodyConvert = new NoArgDelegate(BodyConvertClip);
+            bodyConvert.BeginInvoke(null, null);
         }
         
-        private void ConvertColor(String filePath)
+        private void ConvertColor()
         {
-            Thread.Sleep(100);
             this.kinectBodybox.DataContext = null;
             this.kinectColorbox.DataContext = null;
-            //Console.WriteLine($"menu: {MainWindow.MediaPlayerSize.Width}");
             //this.kinectColorView = new KinectColorView(this.kinectSensor, MainWindow.MediaPlayerSize, this);
 
             this.converting = true;
             //this.kinectColorbox.DataContext = this.kinectColorView;
-            string name;
-            if (this.idenity == "student")
-            {
-                name = this.studentNameConvert;
-            }
-            else
-            {
-                name = new DirectoryInfo(System.IO.Path.GetDirectoryName(filePath)).Name;
-            }
-            TwoArgDelegate colorConvert = new TwoArgDelegate(this.ColorConvertClip);
-            colorConvert.BeginInvoke(filePath, name, null, null);
+            NoArgDelegate colorConvert = new NoArgDelegate(ColorConvertClip);
+            colorConvert.BeginInvoke(null, null);
         }
 
         /// <summary>Plays back a .xef file to the Kinect sensor</summary>
         /// <param name="filePath">Full path to the .xef file that should be played back to the sensor</param
         /// <param name="personName">The name of tester in the video</param>
         public bool convertLock = false;
-        private void BodyConvertClip(string filePath, string personName)
+        private void BodyConvertClip()
         {
-            
             int nowFrame = 0;
             int prevFrame = 0;
             int totalFrame = 0;
-          
-              
-                using (KStudioPlayback playback = client.CreatePlayback(filePath))
+            using (KStudioPlayback playback = client.CreatePlayback(this.xefFilePath))
+            {
+                playback.LoopCount = 0;
+                playback.Start();
+                while (playback.State == KStudioPlaybackState.Playing)
                 {
-                    playback.LoopCount = 0;
-                    playback.Start();
-                    Console.WriteLine($"convert: {Thread.CurrentThread.ManagedThreadId}");
-                    while (playback.State == KStudioPlaybackState.Playing)
+                    this.kinectBodyView.converting = true;
+                    nowFrame = (int)(playback.CurrentRelativeTime.TotalMilliseconds / 33.33);
+                    if (nowFrame > prevFrame)
                     {
-                        this.kinectBodyView.converting = true;
-                        nowFrame = (int)(playback.CurrentRelativeTime.TotalMilliseconds / 33.33);
-                        if (nowFrame > prevFrame)
+                        playback.Pause();
+                        while (this.convertLock)
                         {
-                            playback.Pause();
-                            while (this.convertLock)
-                            {
 
-                            }
-                            Thread.Sleep(5);
-                            playback.Resume();
-                            Console.WriteLine(nowFrame);
-                            totalFrame = nowFrame;
                         }
-                        prevFrame = nowFrame;
+                        Thread.Sleep(5);
+                        playback.Resume();
+                        Console.WriteLine(nowFrame);
+                        totalFrame = nowFrame;
                     }
-                    playback.Dispose();
+                    prevFrame = nowFrame;
                 }
-
-               
-            
+                playback.Dispose();
+            }
             Thread.Sleep(40);
-            this.Dispatcher.BeginInvoke(new ThreeArgDelegate(BodyConvertDone), personName, filePath, totalFrame);
+            this.Dispatcher.BeginInvoke(new IntDelegate(BodyConvertDone), totalFrame);
         }
 
-        private void BodyConvertDone(string personName, string filePath, int totalFrame)
+        private void BodyConvertDone(int totalFrame)
         {
-            int videoCount = makeVideo("body", personName);
+
+            int videoCount = makeVideo("body");
             double loseFrameRate = 1 - (double)videoCount/totalFrame;
-            if (loseFrameRate > 0.06)
+            if (loseFrameRate > 0.045)
             {
                 this.bodyConvertBad = true;
-                Console.WriteLine("body bad");
-                //MessageBox.Show("骨架影片Lose frame嚴重。建議改善方式：將程式關閉並重新開啟", "建議");
             }
             this.converting = false;
             this.kinectBodyView.converting = false;
-            this.kinectBodyView.SaveJointData(personName, this.idenity, this.handedness, this.className, this.week);
-            this.kinectBodyView.Judge(personName, this.idenity, this.handedness, this.className, this.week, videoCount);
+            this.kinectBodyView.SaveJointData(this.jointsJsonPath);
+            this.kinectBodyView.Judge(this.jointsJsonPath, this.handedness);
             this.kinectBodyView.Dispose();
-
-            string path = null;
-            if (this.idenity == "student")
-            {
-                path = $"{Environment.CurrentDirectory}\\..\\..\\..\\data\\student\\{this.className}\\{this.week}\\{this.motion}\\{personName}\\color.avi";
-            }
-            else if (this.idenity == "coach")
-            {
-
-                path = $"{Environment.CurrentDirectory}\\..\\..\\..\\data\\coach\\{this.motion}\\{personName}\\color.avi";
-            }
-            if (File.Exists(path))
+            
+            string colorAviPath = $"{Directory.GetParent(this.xefFilePath).FullName}\\color.avi";
+            if (File.Exists(colorAviPath))
             {
                 this.Dispatcher.BeginInvoke(new NoArgDelegate(UpdateState));
             }
             else
-                this.Dispatcher.BeginInvoke(new OneArgDelegate(ConvertColor), filePath);
+            {
+                this.Dispatcher.BeginInvoke(new NoArgDelegate(ConvertColor));
+            }
         }
 
-        private void ColorConvertClip(string filePath, string personName)
+        private void ColorConvertClip()
         {
             int totalFrame = 0;
             
@@ -724,7 +665,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 int prevFrame = 0;
                 // Create the playback object
                 
-                using (KStudioPlayback playback = client.CreatePlayback(filePath))
+                using (KStudioPlayback playback = client.CreatePlayback(this.xefFilePath))
                 {                   
                     playback.LoopCount = 0;
                     playback.Start();
@@ -733,7 +674,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     {
                      
                         nowFrame = (int)(playback.CurrentRelativeTime.TotalMilliseconds / 33.33);
-                        //Console.WriteLine()
                         if(nowFrame > prevFrame)
                         {
                             playback.Pause();
@@ -750,23 +690,20 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     }
                     playback.Dispose();
                 }
-
-             
-        
-            this.Dispatcher.BeginInvoke(new StringIntDelegate(ColorConvertDone), personName, totalFrame);
+            this.Dispatcher.BeginInvoke(new IntDelegate(ColorConvertDone), totalFrame);
             this.Dispatcher.BeginInvoke(new NoArgDelegate(UpdateState));
         }
 
-        private void ColorConvertDone(string personName, int totalFrame)
+        private void ColorConvertDone(int totalFrame)
         {
-            int videoCount = makeVideo("color", personName);
+            string fileName = System.IO.Path.GetFileNameWithoutExtension(this.xefFilePath);
+            string fileDir = $"{Directory.GetParent(Directory.GetParent(this.xefFilePath).FullName).FullName}\\{fileName}";
+            int videoCount = makeVideo("color");
             double loseFrameRate = 1 - (double)videoCount/totalFrame;
             Console.WriteLine(loseFrameRate);
-            if (loseFrameRate > 0.06)
+            if (loseFrameRate > 0.045)
             {
                 this.ColorConvertBad = true;
-                Console.WriteLine("color bad");
-                //MessageBox.Show("彩色影片Lose frame嚴重。建議改善方式：將程式關閉並重新開啟", "建議");
             }
             this.converting = false;
             this.kinectColorView.converting = false;
@@ -793,7 +730,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             return fileName;
         }
 
-        private int makeVideo(string video_type, string personName)
+        private int makeVideo(string video_type)
         {
             List<Image<Bgr, byte>> Video = new List<Image<Bgr, byte>>();
             if (string.Compare(video_type, "body") == 0)
@@ -803,19 +740,10 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 Video = this.kinectColorView.Video;
             int videoCount = Video.Count;
             Console.WriteLine($"video count: {Video.Count}");
-            string path = null;
-            if (this.idenity == "student")
-            {
-                path = $"{Environment.CurrentDirectory}\\..\\..\\..\\data\\student\\{this.className}\\{this.week}\\{this.motion}\\{personName}";
-            }
-            //idenity == coach
-            else if (this.idenity == "coach")
-            {
-                path = $"{Environment.CurrentDirectory}\\..\\..\\..\\data\\coach\\{this.motion}\\{personName}";
-            }
-            Directory.CreateDirectory(path);
-            Console.WriteLine($"{Video[0].Width} {Video[1].Height}");
-            using (VideoWriter vw = new VideoWriter($"{path}\\{video_type}.avi", 30, Video[0].Width, Video[0].Height, true))
+            if (!Directory.Exists(this.frontDataPath))
+                Directory.CreateDirectory(this.frontDataPath);
+
+            using (VideoWriter vw = new VideoWriter($"{this.frontDataPath}\\{video_type}.avi", 30, Video[0].Width, Video[0].Height, true))
             {
                 for (int i = 0; i < Video.Count; i++)
                 {
@@ -856,9 +784,10 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private void IdentiyButton_Checked(object sender, RoutedEventArgs e)
         {
             if (coachRadio.IsChecked == true)
-                this.idenity = "coach";
+                this.identity = "coach";
             else
-                this.idenity = "student";
+                this.identity = "student";
+            NameUpdateState();
         }
 
         private void MotionRadio_Click(object sender, RoutedEventArgs e)
@@ -870,7 +799,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             else
                 this.motion = "serve";
             MainWindow.actionTypeControl = this.motion;
-            //Console.WriteLine(MainWindow.actionTypeControl);
             NameUpdateState();
         }
 
@@ -881,20 +809,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             else
                 this.handedness = "right";
         }
-
-        //private void ExperimentButton_Checked(object sender, RoutedEventArgs e)
-        //{
-        //    if (experimentalRadio.IsChecked == true)
-        //    {
-        //        experiment = "experimental";
-        //        //Console.WriteLine(experiment);
-        //    }
-        //    else
-        //    {
-        //        experiment = "control";
-        //        //Console.WriteLine(experiment);
-        //    }
-        //}
 
         private void ComboBox_Loaded_Control(object sender, RoutedEventArgs e)
         {
@@ -924,12 +838,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private void ComboBox_SelectionChanged_Control(object sender, SelectionChangedEventArgs e)
         {
-            // ... Get the ComboBox.
             var comboBox = sender as ComboBox;
-
-            // ... Set SelectedItem as Window Title.
             week = comboBox.SelectedItem as string;
-            //Console.WriteLine(week);
             NameUpdateState();
             MainWindow.weekFromControl = week;
         }
@@ -1001,57 +911,91 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private void studentNameList_Loaded(object sender, RoutedEventArgs e)
         {
-            if (!(classList.SelectedItem as string == "請選擇") && !(classList.SelectedItem as string == "新增班級"))
-            {
-                string cur = Environment.CurrentDirectory;
-                string relatePath = $"\\..\\..\\..\\data\\student\\{this.className}\\{this.week}\\{this.motion}";
-                if (!Directory.Exists(cur + relatePath))
-                {
-                    Directory.CreateDirectory(cur + relatePath);
-                }
-                DirectoryInfo dirInfo = new DirectoryInfo(cur + relatePath);
-                ArrayList list = new ArrayList();
-                list.Add("請選擇");
-                foreach (DirectoryInfo d in dirInfo.GetDirectories())
-                {
-                    list.Add(d.Name);
-                }
-                var comboBox = sender as ComboBox;
-                comboBox.ItemsSource = list;
-                comboBox.SelectedIndex = 0;
-            }
+            NameUpdateState();
         }
 
         private void studentNameList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var comboBox = sender as ComboBox;
-            this.studentNameConvert = comboBox.SelectedItem as string;
-            //Console.WriteLine(this.studentNameConvert);
+
+            this.convertName = comboBox.SelectedItem as string;
+
+            string cur = Environment.CurrentDirectory;
+            string parentDir = string.Empty;
+            if (this.identity == "coach")
+            {
+                parentDir = $"{cur}\\..\\..\\..\\data\\coach\\{this.motion}";
+            }
+            else if(this.identity == "student")
+            {
+                parentDir = $"{cur}\\..\\..\\..\\data\\student\\{this.className}\\{this.week}\\{this.motion}";
+            }
+            this.xefFilePath = $"{parentDir}\\xefjoints\\{comboBox.SelectedItem as string}.xef";
+            this.jointsJsonPath = $"{parentDir}\\xefjoints\\{comboBox.SelectedItem as string}.json";
         }
 
         private void NameUpdateState()
         {
-            if (!(classList.SelectedItem as string == "請選擇") && !(classList.SelectedItem as string == "新增班級"))
+            if (this.identity == "student")
+            {
+                this.classList.IsEnabled = true;
+                this.week_control.IsEnabled = true;
+            }
+            else if (this.identity == "coach")
+            {
+                this.classList.IsEnabled = false;
+                this.week_control.IsEnabled = false;
+            }
+            if (this.identity == "coach")
             {
                 string cur = Environment.CurrentDirectory;
-                string relatePath = $"\\..\\..\\..\\data\\student\\{this.className}\\{this.week}\\{this.motion}";
-                Directory.CreateDirectory(cur + relatePath);
-                DirectoryInfo dirInfo = new DirectoryInfo(cur + relatePath);
+                string fileDir = $"{cur}\\..\\..\\..\\data\\coach\\{this.motion}\\xefjoints";
+                //Directory.CreateDirectory(filePath);
+                DirectoryInfo dirInfo = new DirectoryInfo(fileDir);
                 ArrayList list = new ArrayList();
-                foreach (DirectoryInfo d in dirInfo.GetDirectories())
+                if (Directory.Exists(fileDir))
                 {
-                    Console.WriteLine($"{d.FullName}\\{d.Name}.xef");
-                    if (File.Exists($"{d.FullName}\\{d.Name}.xef"))
-                        list.Add(d.Name);
+                    foreach (FileInfo f in dirInfo.GetFiles())
+                    {
+                        string name = System.IO.Path.GetFileNameWithoutExtension(f.FullName);
+                        if (!list.Contains(name))
+                            list.Add(name);
+                    }
                 }
-                if (dirInfo.GetDirectories().Length == 0)
+                
+                if (list.Count == 0)
                     studentNameList.IsEnabled = false;
                 else
                     studentNameList.IsEnabled = true;
                 studentNameList.ItemsSource = list;
             }
-        }
+            else if(this.identity == "student")
+            {
+                if (!(classList.SelectedItem as string == "請選擇") && !(classList.SelectedItem as string == "新增班級"))
+                {
+                    string cur = Environment.CurrentDirectory;
+                    string fileDir = $"{cur}\\..\\..\\..\\data\\student\\{this.className}\\{this.week}\\{this.motion}\\xefjoints";
+                    DirectoryInfo dirInfo = new DirectoryInfo(fileDir);
+                    ArrayList list = new ArrayList();
+                    if (Directory.Exists(fileDir))
+                    {
+                        foreach (FileInfo f in dirInfo.GetFiles())
+                        {
+                            string name = System.IO.Path.GetFileNameWithoutExtension(f.FullName);
 
-        
+                            if (!list.Contains(name))
+                                list.Add(name);
+                        }
+                    }
+                    
+                    if (list.Count == 0)
+                        studentNameList.IsEnabled = false;
+                    else
+                        studentNameList.IsEnabled = true;
+                    studentNameList.ItemsSource = list;
+                }
+            }
+            
+        }    
     }
 }

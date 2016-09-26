@@ -158,7 +158,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         public KinectBodyView(KinectSensor kinectSensor, string type, System.Drawing.Size videoSize, MenuUserControl muc)
         {
             this.muc = muc;
-            //Console.WriteLine($"body: {videoSize.Width}");
             this.type = type;
             if (kinectSensor == null)
             {
@@ -261,66 +260,42 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             }
         }
 
-        public void SaveJointData(string name, string person_type, string handedness, string className, string week)
+        public void SaveJointData(string jointsJsonPath)
         {
-            string filePath = string.Empty;
-            if (person_type == "student")
-            {
-                filePath = $"{Environment.CurrentDirectory}\\..\\..\\..\\data\\{person_type}\\{className}\\{week}\\{this.type}\\{name}\\joints.json";
-                //path = "../../../data/" + person_type + "/" + className + "/" + week + "/" + this.type + "/" + name + "/judgement.json";
-            }
-            //idenity == coach
-            else
-            {
-                filePath = $"{Environment.CurrentDirectory}\\..\\..\\..\\data\\{person_type}\\{this.type}\\{name}\\joints.json";
-                //path = "../../../data/" + person_type + "/" + this.type + "/" + name + "/judgement.json";
-            }
+            string fileDir = Directory.GetParent(jointsJsonPath).FullName;
+            Directory.CreateDirectory(fileDir);
             string judgeResult = JsonConvert.SerializeObject(this.frameList);
-            File.WriteAllText(filePath, judgeResult);
+            File.WriteAllText(jointsJsonPath, judgeResult);
         }
 
-        public void Judge(string name, string person_type, string handedness, string className, string week, int videoCount)
+        public void Judge(string jointJsonPath, string handedness)
         {
-            string path = null;
+            string dir = $"{Directory.GetParent(Directory.GetParent(jointJsonPath).FullName).FullName}\\{Path.GetFileNameWithoutExtension(jointJsonPath)}";
             List<Frames> fl;
-
-            if (person_type == "student")
-            {
-                path = $"{Environment.CurrentDirectory}\\..\\..\\..\\data\\{person_type}\\{className}\\{week}\\{this.type}\\{name}";
-                //path = "../../../data/" + person_type + "/" + className + "/" + week + "/" + this.type + "/" + name + "/judgement.json";
-            }
-            //idenity == coach
-            else
-            {
-                path = $"{Environment.CurrentDirectory}\\..\\..\\..\\data\\{person_type}\\{this.type}\\{name}";
-                //path = "../../../data/" + person_type + "/" + this.type + "/" + name + "/judgement.json";
-            }
-
-            String rawJsonData = File.ReadAllText($"{path}\\joints.json");
+            String rawJsonData = File.ReadAllText($"{jointJsonPath}");
             fl = JsonConvert.DeserializeObject<List<Frames>>(rawJsonData);
-
             if (this.type == "smash")
-            {
-                SmashMonitor smashMonitor = new SmashMonitor(fl, handedness, videoCount);
+            { 
+                SmashMonitor smashMonitor = new SmashMonitor(fl, handedness);
                 smashMonitor.Start();
                 string judgeResult = JsonConvert.SerializeObject(smashMonitor.GetResult());
-                File.WriteAllText($"{path}\\judgement.json", judgeResult);
+                File.WriteAllText($"{dir}\\judgement.json", judgeResult);
             }
 
             else if(this.type == "serve")
             {
-                ServeMonitor serveMonitor = new ServeMonitor(fl, handedness, videoCount);
+                ServeMonitor serveMonitor = new ServeMonitor(fl, handedness);
                 serveMonitor.Start();
                 string judgeResult = JsonConvert.SerializeObject(serveMonitor.GetResult());
-                File.WriteAllText($"{path}\\judgement.json", judgeResult);
+                File.WriteAllText($"{dir}\\judgement.json", judgeResult);
             }
 
             else if(this.type == "lob")
             {
-                LobMonitor lobMonitor = new LobMonitor(fl, handedness, videoCount);
+                LobMonitor lobMonitor = new LobMonitor(fl, handedness);
                 lobMonitor.Start();
                 string judgeResult = JsonConvert.SerializeObject(lobMonitor.GetResult());
-                File.WriteAllText($"{path}\\judgement.json", judgeResult);
+                File.WriteAllText($"{dir}\\judgement.json", judgeResult);
             }
         }
 
@@ -331,7 +306,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         /// <param name="e">event arguments</param>
         private void Reader_BodyFrameArrived(object sender, BodyFrameArrivedEventArgs e)
         {
-           
             //Console.WriteLine($"body: {Thread.CurrentThread.ManagedThreadId}");
             bool dataReceived = false;
 
@@ -363,7 +337,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 }
                 this.muc.convertLock = false;
             }
-            
         }
 
         /// <summary>

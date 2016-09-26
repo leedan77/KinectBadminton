@@ -17,11 +17,11 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
         private double initHandLeftSpineMidXDiff = 0;
         private String[] goals = { "持拍立腕", "慣用腳跨步", "手腕轉動", "腳跟著地", "手腕發力" };
 
-        public LobMonitor(List<Frames> frameList, String handedness, int videoCount)
+        public LobMonitor(List<Frames> frameList, String handedness)
         {
+            Console.WriteLine("123");
             this.FrameList = frameList;
             this.result = new List<CriticalPoint>();
-            this.videoCount = videoCount;
             this.handedness = handedness;
             initCriticalPoints(goals);
         }
