@@ -261,24 +261,27 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             }
         }
 
-        public void SaveJointData(string xefFileDir)
+        public void SaveJointData(string jointsJsonPath)
         {
-            string filePath = $"{Directory.GetParent(xefFileDir).FullName}\\joints.json";
+            string fileDir = Directory.GetParent(jointsJsonPath).FullName;
+            Directory.CreateDirectory(fileDir);
             string judgeResult = JsonConvert.SerializeObject(this.frameList);
-            File.WriteAllText(filePath, judgeResult);
+            File.WriteAllText(jointsJsonPath, judgeResult);
         }
 
-        public void Judge(string xefFileDir, string handedness)
+        public void Judge(string jointJsonPath, string handedness)
         {
-            string dir = Directory.GetParent(xefFileDir).FullName;
+            Console.WriteLine("a");
+            string dir = $"{Directory.GetParent(Directory.GetParent(jointJsonPath).FullName).FullName}\\{Path.GetFileNameWithoutExtension(jointJsonPath)}";
             List<Frames> fl;
-            Console.WriteLine(dir);
-
-            String rawJsonData = File.ReadAllText($"{dir}\\joints.json");
+            
+            Console.WriteLine(jointJsonPath);
+            String rawJsonData = File.ReadAllText($"{jointJsonPath}");
             fl = JsonConvert.DeserializeObject<List<Frames>>(rawJsonData);
 
+            Console.WriteLine("b");
             if (this.type == "smash")
-            {
+            { 
                 SmashMonitor smashMonitor = new SmashMonitor(fl, handedness);
                 smashMonitor.Start();
                 string judgeResult = JsonConvert.SerializeObject(smashMonitor.GetResult());
@@ -299,6 +302,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 lobMonitor.Start();
                 string judgeResult = JsonConvert.SerializeObject(lobMonitor.GetResult());
                 File.WriteAllText($"{dir}\\judgement.json", judgeResult);
+                Console.WriteLine("c");
             }
         }
 

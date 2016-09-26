@@ -427,8 +427,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private void ToggleButtonLeft_Checked(object sender, RoutedEventArgs e)
         {
-            ClearCoachBlock();
-            ClearStudentBlock();
+            //ClearCoachBlock();
+            //ClearStudentBlock();
             if (leftColorRadio.IsChecked == true)
             {
                 student_color_or_body = "color";

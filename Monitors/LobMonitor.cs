@@ -19,6 +19,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
 
         public LobMonitor(List<Frames> frameList, String handedness)
         {
+            Console.WriteLine("123");
             this.FrameList = frameList;
             this.result = new List<CriticalPoint>();
             this.handedness = handedness;
