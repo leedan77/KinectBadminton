@@ -331,7 +331,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         /// <param name="e">event arguments</param>
         private void Reader_BodyFrameArrived(object sender, BodyFrameArrivedEventArgs e)
         {
-            this.muc.convertLock = true;
+           
             //Console.WriteLine($"body: {Thread.CurrentThread.ManagedThreadId}");
             bool dataReceived = false;
 
@@ -339,6 +339,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             {
                 if (bodyFrame != null)
                 {
+                    this.muc.convertLock = true;
                     if (this.bodies == null)
                     {
                         // creates an array of 6 bodies, which is the max number of bodies that Kinect can track simultaneously
@@ -360,8 +361,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                 {
                     this.videoConverter.BodyViewToAVI(this.imageSource);
                 }
+                this.muc.convertLock = false;
             }
-            this.muc.convertLock = false;
+            
         }
 
         /// <summary>

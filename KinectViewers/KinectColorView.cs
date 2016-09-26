@@ -89,13 +89,14 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         /// <param name="e">event arguments</param>
         private void Reader_ColorFrameArrived(object sender, ColorFrameArrivedEventArgs e)
         {
-            this.muc.convertLock = true;
+            
             // ColorFrame is IDisposable
             //Console.WriteLine(fc++);
             using (ColorFrame colorFrame = e.FrameReference.AcquireFrame())
             {
                 if (colorFrame != null)
                 {
+                    this.muc.convertLock = true;
                     FrameDescription colorFrameDescription = colorFrame.FrameDescription;
 
                     using (KinectBuffer colorBuffer = colorFrame.LockRawImageBuffer())
@@ -120,9 +121,10 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                             video_converter.ColorViewToAVI(this.colorBitmap);
                         }
                     }
+                    this.muc.convertLock = false;
                 }
             }
-            this.muc.convertLock = false;
+            
         }
 
         public List<Image<Bgr, byte>> Video
