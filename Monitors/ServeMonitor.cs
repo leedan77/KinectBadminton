@@ -13,7 +13,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
     class ServeMonitor:Monitor
     {
         private double hipWidthWhenBalanceChange = 0;
-        private String[] goals = { "重心腳在慣用腳" , "重心轉移至非慣用腳", "轉腰" , "手腕發力" , "手肘向前" };
+        private String[] goals = { "重心腳在慣用腳" , "重心轉移至非慣用腳", "轉腰" , "手腕發力" , "肩膀轉向前" };
 
         public ServeMonitor(List<Frames> frameList, String handedness)
         {
@@ -162,12 +162,12 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
                 if(this.handedness == "right")
                 {
                     if (elbowRight.Y > shoulderRight.Y)
-                        return Record(i, "手肘向前");
+                        return Record(i, "肩膀轉向前");
                 }
                 else if(this.handedness == "left")
                 {
                     if (elbowLeft.Y > shoulderLeft.Y)
-                        return Record(i, "手肘向前");
+                        return Record(i, "肩膀轉向前");
                 }
             }
             return this.FrameList.Count;

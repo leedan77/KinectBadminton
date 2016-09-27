@@ -336,6 +336,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         private void RecordStopButton_Click(object sender, RoutedEventArgs e)
         {
             this.recordingStop = true;
+            NameUpdateState();
         }
         
         /// <summary>
@@ -402,14 +403,22 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                         MessageBox.Show("影片轉檔Lose frame嚴重，請重新轉檔。建議：將程式關閉重新開啟。", "轉檔失敗");
                         this.bodyConvertBad = false;
                         this.ColorConvertBad = false;
-                        if (File.Exists($"{this.frontDataPath}\\color.avi"))
+                        if (Directory.Exists(this.frontDataPath))
                         {
-                            File.Delete($"{this.frontDataPath}\\color.avi");
+                            Directory.Delete(this.frontDataPath, true);
                         }
-                        if (File.Exists($"{this.frontDataPath}\\body.avi"))
-                        {
-                            File.Delete($"{this.frontDataPath}\\body.avi");
-                        }
+                        //if (File.Exists($"{this.frontDataPath}\\color.avi"))
+                        //{
+                        //    File.Delete($"{this.frontDataPath}\\color.avi");
+                        //}
+                        //if (File.Exists($"{this.frontDataPath}\\body.avi"))
+                        //{
+                        //    File.Delete($"{this.frontDataPath}\\body.avi");
+                        //}
+                        //if (File.Exists($"{this.frontDataPath}\\judgement.json"))
+                        //{
+                        //    File.Delete($"{this.frontDataPath}\\judgement.json");
+                        //}
                     }
                     else
                     {
@@ -465,6 +474,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         {
             string fileDir = string.Empty;
             string newName = string.Empty;
+            this.xefFilePath = string.Empty;
             if (identity == "coach")
             {
                 newName = Microsoft.VisualBasic.Interaction.InputBox("請輸入選手名稱", "新增錄影", "", -1, -1);
@@ -501,8 +511,11 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                     }
                 }
             }
-            this.xefFilePath = $"{fileDir}\\{newName}.xef";
-            this.jointsJsonPath = $"{fileDir}\\{newName}.json";
+            if (!string.IsNullOrEmpty(newName))
+            {
+                this.xefFilePath = $"{fileDir}\\{newName}.xef";
+                this.jointsJsonPath = $"{fileDir}\\{newName}.json";
+            }
         }
 
         private void ConvertButton_Click(object sender, RoutedEventArgs e)
@@ -635,8 +648,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
             int videoCount = makeVideo("body");
             double loseFrameRate = 1 - (double)videoCount/totalFrame;
-            if (loseFrameRate > 0.045)
+            if ((loseFrameRate > 0.05 && totalFrame > 100) || (loseFrameRate > 0.8 && totalFrame < 80))
             {
+                Console.WriteLine($"{videoCount} / {totalFrame} = {loseFrameRate}");
                 this.bodyConvertBad = true;
             }
             this.converting = false;
@@ -701,8 +715,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             int videoCount = makeVideo("color");
             double loseFrameRate = 1 - (double)videoCount/totalFrame;
             Console.WriteLine(loseFrameRate);
-            if (loseFrameRate > 0.045)
+            if ((loseFrameRate > 0.05 && totalFrame > 100) || (loseFrameRate > 0.8 && totalFrame < 80))
             {
+                Console.WriteLine($"{videoCount} / {totalFrame} = {loseFrameRate}");
                 this.ColorConvertBad = true;
             }
             this.converting = false;

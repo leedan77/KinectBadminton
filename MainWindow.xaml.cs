@@ -738,7 +738,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
             String jsonFilePath = $"{cur}\\..\\..\\..\\data\\student\\{this.className}\\{this.week}\\{this.action_type}\\class_record.json";
             List<PersonalRecord> recordList = new List<PersonalRecord>();
             List<string> smashGoals = new List<string>(new string[] { "姓名", "側身", "手肘抬高", "手肘轉向前", "手腕發力", "收拍"});
-            List<string> serveGoals = new List<string>(new string[] { "姓名", "重心腳在慣用腳", "重心轉移至非慣用腳", "轉腰", "手腕發力", "手肘向前"});
+            List<string> serveGoals = new List<string>(new string[] { "姓名", "重心腳在慣用腳", "重心轉移至非慣用腳", "轉腰", "手腕發力", "肩膀轉向前"});
             List<string> lobGoals = new List<string>(new string[] { "姓名", "持拍立腕", "慣用腳跨步", "手腕轉動", "腳跟著地", "手腕發力"});
             string delimiter = ",";
             //StringBuilder sb = new StringBuilder();
