@@ -16,12 +16,14 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
         private double initRightShoulderElbowDiff = 0;
         private double headNeckDiff = 0;
         private double elbowSpineMaxDiff = 0;
+        private String[] goals = { "雙手手肘抬高", "雙手平衡", "側身", "手肘轉向前", "手腕發力", "肩膀向前收拍" };
 
         public SmashMonitor(List<Frames> frameList, String handedness)
         {
             this.FrameList = frameList;
             this.result = new List<CriticalPoint>();
             this.handedness = handedness;
+            initCriticalPoints(goals);
         }
 
         public override void Start()
