@@ -113,5 +113,10 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
             }
             return this.FrameList.Count;
         }
+
+        public Point3D GetJoint(int frameNum, Microsoft.Kinect.JointType jointType)
+        {
+            return this.FrameList[frameNum].jointDict[jointType];
+        }
     }
 }
