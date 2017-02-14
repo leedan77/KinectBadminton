@@ -66,14 +66,37 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
 
         private int CheckElbowsUp (int nowFrame)
         {
+            bool elbowUp = false;
+            bool bodySide = false;
+            bool armBalance = false;
             for (int i = nowFrame; i < this.FrameList.Count; i++)
             {
                 Point3D elbowRight = GetJoint(i, JointType.ElbowRight);
                 Point3D elbowLeft = GetJoint(i, JointType.ElbowLeft);
                 Point3D spineShoulder = GetJoint(i, JointType.SpineShoulder);
-                if (spineShoulder.Y - elbowRight.Y < 0.1 && spineShoulder.Y - elbowLeft.Y < 0.1)
+                Point3D shoulderRight = GetJoint(i, JointType.ShoulderRight);
+                Point3D shoulderLeft = GetJoint(i, JointType.ShoulderLeft);
+                Point3D hipRight = this.FrameList[i].jointDict[JointType.HipRight];
+                Point3D hipLeft = this.FrameList[i].jointDict[JointType.HipLeft];
+                
+                double rightAngle = GetAngle(elbowRight, shoulderRight, spineShoulder);
+                double leftAngle = GetAngle(elbowLeft, shoulderLeft, spineShoulder);
+
+                int frame = 0;
+                if (rightAngle > 160 && leftAngle > 145 && !elbowUp)
                 {
-                    return Record(i, "雙手手肘抬高");
+                    frame = Record(i, "雙手手肘抬高");
+                    elbowUp = true;
+                }
+                Debug(i, Math.Abs(hipRight.X - hipLeft.X) / hipMaxDiff);
+                if (Math.Abs(hipRight.X - hipLeft.X) < hipMaxDiff * 0.7 && Math.Abs(hipRight.X - hipLeft.X) != 0 && !bodySide)
+                {
+                    frame = Record(i, "側身");
+                    bodySide = true;
+                }
+                if (elbowUp && bodySide && armBalance)
+                {
+                    return frame;
                 }
             }
             return this.FrameList.Count;
