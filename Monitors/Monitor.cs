@@ -119,12 +119,21 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
             return this.FrameList[frameNum].jointDict[jointType];
         }
 
-        public double GetAngle(Point3D first, Point3D vertex, Point3D second)
+        public double GetAngle2D(Point3D first, Point3D vertex, Point3D second)
         {
             double angle = 0;
             Vector2 v1 = new Vector2(first, vertex);
             Vector2 v2 = new Vector2(second, vertex);
             angle = Math.Acos((v1.x * v2.x + v1.y * v2.y) / (v1.d * v2.d)) * 180 / Math.PI;
+            return angle;
+        }
+
+        public double GetAngle3D(Point3D first, Point3D vertex, Point3D second)
+        {
+            double angle = 0;
+            Vector3 v1 = new Vector3(first, vertex);
+            Vector3 v2 = new Vector3(second, vertex);
+            angle = Math.Acos((v1.x * v2.x + v1.y * v2.y + v1.z * v2.z) / (v1.d * v2.d)) * 180 / Math.PI;
             return angle;
         }
     }
