@@ -134,8 +134,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
         {
             double rightAngle = GetAngle2D(handRight, elbowRight, new Point3D(elbowRight.X, elbowRight.Y + 10, elbowRight.Z));
             double leftAngle = GetAngle2D(handLeft, elbowLeft, new Point3D(elbowLeft.X, elbowLeft.Y + 10, elbowLeft.Z));
-            Debug(frame, rightAngle);
-            Debug(frame, leftAngle);
             if (rightAngle < 40 && handRight.Y > elbowRight.Y && leftAngle < 40 && handLeft.Y > elbowLeft.Y)
             {
                 return true;
@@ -145,17 +143,15 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
 
         private int CheckElbowForward(int nowFrame)
         {
-            double prevRightElbowShoulderDiff = 0, nowRightElbowShoulderDiff = 0;
             for (int i = nowFrame; i < this.FrameList.Count; i++)
             {
-                Point3D elbowRight = this.FrameList[i].jointDict[JointType.ElbowRight];
-                Point3D shoulderRight = this.FrameList[i].jointDict[JointType.ShoulderRight];
-                nowRightElbowShoulderDiff = elbowRight.Z - shoulderRight.Z;
-                if (nowRightElbowShoulderDiff * prevRightElbowShoulderDiff < 0)
+                Point3D elbowRight = GetJoint(i, JointType.ElbowRight);
+                Point3D shoulderRight = GetJoint(i, JointType.ShoulderRight);
+                Debug(i, elbowRight.Z - shoulderRight.Z);
+                if (elbowRight.Z < shoulderRight.Z)
                 {
                     return Record(i, "手肘轉向前");
                 }
-                prevRightElbowShoulderDiff = nowRightElbowShoulderDiff;
             }
             return this.FrameList.Count;
         }
