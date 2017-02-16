@@ -33,32 +33,13 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
             GenerateCompareData(nowFrame);
             nowFrame = CheckElbowsUpBodySideArmBalance(nowFrame);
             nowFrame = CheckElbowForward(nowFrame);
-            //nowFrame = CheckWristForward(nowFrame);
-            //nowFrame = CheckElbowEnded(nowFrame);
+            nowFrame = CheckWristForward(nowFrame);
+            nowFrame = CheckElbowEnded(nowFrame);
         }
 
         public override void GenerateCompareData(int nowFrame)
         {
-            int headNeckCount = 0;
-            for (int i = nowFrame; i < this.FrameList.Count; i++)
-            {
-                Point3D hipRight = this.FrameList[i].jointDict[JointType.HipRight];
-                Point3D hipLeft = this.FrameList[i].jointDict[JointType.HipLeft];
-                Point3D elbowRight = this.FrameList[i].jointDict[JointType.ElbowRight];
-                Point3D shoulderRight = this.FrameList[i].jointDict[JointType.ShoulderRight];
-                Point3D head = this.FrameList[i].jointDict[JointType.Head];
-                Point3D neck = this.FrameList[i].jointDict[JointType.Neck];
-                Point3D spineMid = this.FrameList[i].jointDict[JointType.SpineMid];
-                if (Math.Abs(hipRight.X - hipLeft.X) > hipMaxDiff)
-                    hipMaxDiff = Math.Abs(hipRight.X - hipLeft.X);
-                if (Math.Abs(elbowRight.Y - shoulderRight.Y) != 0 && initRightShoulderElbowDiff == 0)
-                    initRightShoulderElbowDiff = Math.Abs(elbowRight.Y - shoulderRight.Y);
-                if (headNeckCount <= 10)
-                    headNeckDiff += Math.Sqrt(Math.Pow(head.X - neck.X, 2) + Math.Pow(head.Y - neck.Y, 2) + Math.Pow(head.Z- neck.Z, 2));
-                if (Math.Abs(elbowRight.X - spineMid.X) > elbowSpineMaxDiff)
-                    elbowSpineMaxDiff = Math.Abs(elbowRight.X - spineMid.X);
-            }
-            headNeckDiff /= 10;
+            
         }
 
         private int CheckElbowsUpBodySideArmBalance (int nowFrame)
@@ -147,7 +128,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
             {
                 Point3D elbowRight = GetJoint(i, JointType.ElbowRight);
                 Point3D shoulderRight = GetJoint(i, JointType.ShoulderRight);
-                Debug(i, elbowRight.Z - shoulderRight.Z);
                 if (elbowRight.Z < shoulderRight.Z)
                 {
                     return Record(i, "手肘轉向前");
@@ -156,27 +136,46 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
             return this.FrameList.Count;
         }
 
-        //private int CheckWristForward(int nowFrame)
-        //{
-        //    double prevHandtipWristDiff = 0, nowHandtipWristDiff = 0;
-        //    for (int i = nowFrame; i < this.FrameList.Count; i++)
-        //    {
-        //        Point3D handTipRight = this.FrameList[i].jointDict[JointType.HandTipRight];
-        //        Point3D wristRight = this.FrameList[i].jointDict[JointType.WristRight];
-        //        nowHandtipWristDiff = handTipRight.Y - wristRight.Y;
-        //        if (prevHandtipWristDiff - nowHandtipWristDiff > this.headNeckDiff / 3 && prevHandtipWristDiff != 0)
-        //        {
-        //            return Record(i, "手腕發力");
-        //        }
-        //        prevHandtipWristDiff = nowHandtipWristDiff;
-        //    }
-        //    return this.FrameList.Count;
-        //}
+        private int CheckWristForward(int nowFrame)
+        {
+            for (int i = nowFrame; i < this.FrameList.Count; i++)
+            {
+                Point3D wristRight = GetJoint(i, JointType.WristRight);
+                Point3D handTipRight = GetJoint(i, JointType.HandTipRight);
+                Point3D handRight = GetJoint(i, JointType.HandRight);
+                Point3D handLeft = GetJoint(i, JointType.HandLeft);
+                JointType[] joints = { JointType.WristRight, JointType.HandTipRight, JointType.HandRight };
+                if (!GetInferred(i, joints))
+                {
+                    if (wristRight.Y > handTipRight.Y && handRight.X < handLeft.X)   
+                    {
+                        return Record(i, "手腕發力");
+                    }
+                }
+            }
+            return this.FrameList.Count;
+        }
+
+        private int CheckElbowEnded(int nowFrame)
+        {
+            for (int i = nowFrame; i < this.FrameList.Count; i++)
+            {
+                Point3D handRight = GetJoint(i, JointType.HandRight);
+                Point3D spineBase = GetJoint(i, JointType.SpineBase);
+                JointType[] joints = { JointType.HandRight, JointType.SpineBase };
+                if (handRight.Y < spineBase.Y && !GetInferred(i, joints))
+                {
+                    return Record(i, "肩膀向前收拍");
+                }
+            }
+            return this.FrameList.Count;
+        }
+
         //private int CheckElbowEnded(int nowFrame)
         //{
         //    for (int i = nowFrame; i < this.FrameList.Count; i++)
         //    {
-        //        Point3D elbowRight = this.FrameList[i].jointDict[JointType.ElbowRight];
+        //        Point3D elbo wRight = this.FrameList[i].jointDict[JointType.ElbowRight];
         //        Point3D spineMid = this.FrameList[i].jointDict[JointType.SpineMid];
         //        double elbowSpineDiff = Math.Abs(elbowRight.X - spineMid.X);
         //        if (elbowSpineDiff < elbowSpineMaxDiff / 6)

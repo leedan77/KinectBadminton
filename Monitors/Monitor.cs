@@ -116,7 +116,16 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
 
         public Point3D GetJoint(int frameNum, Microsoft.Kinect.JointType jointType)
         {
-            return this.FrameList[frameNum].jointDict[jointType];
+            return this.FrameList[frameNum].jointDict[jointType].position;
+        }
+
+        public bool GetInferred(int frameNum, Microsoft.Kinect.JointType[] jointTypes)
+        {
+            for (int i = 0; i < jointTypes.Length; i++)
+            {
+                if (this.FrameList[frameNum].jointDict[jointTypes[i]].inferred) return true;
+            }
+            return false;
         }
 
         public double GetAngle2D(Point3D first, Point3D vertex, Point3D second)

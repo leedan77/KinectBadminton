@@ -18,26 +18,23 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
     using System.Windows.Media.Media3D;
     using Monitors;
     using System.Threading;
-    class Joints
+
+    public struct Joints
     {
-        public string jointType;
-        public double x;
-        public double y;
-        public double z;
-        public Joints(string jointType, double x, double y, double z)
+        public Point3D position;
+        public bool inferred;
+        public Joints (Point3D position, bool inferred)
         {
-            this.jointType = jointType;
-            this.x = x;
-            this.y = y;
-            this.z = z;
+            this.position = position;
+            this.inferred = inferred;
         }
     }
 
     class Frames
     {
         public int num;
-        public Dictionary<JointType, Point3D> jointDict = new Dictionary<JointType, Point3D>();
-        public Frames(int num, Dictionary<JointType, Point3D> jointDict)
+        public Dictionary<JointType, Joints> jointDict = new Dictionary<JointType, Joints>();
+        public Frames(int num, Dictionary<JointType, Joints> jointDict)
         {
             this.num = num;
             this.jointDict = jointDict;
@@ -346,7 +343,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
         /// <param name="bodies">Array of bodies to update</param>
         public void UpdateBodyFrame(Body[] bodies)
         {
-            Dictionary<JointType, Point3D> jointDict = new Dictionary<JointType, Point3D>();
+            Dictionary<JointType, Joints> jointDict = new Dictionary<JointType, Joints>();
 
             if (bodies != null)
             {
@@ -391,7 +388,15 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                                 position.X += spineMid.X;
                                 position.Y += spineMid.Y;
                                 position.Z += spineMid.Z;
-                                jointDict[jointType] = new Point3D(position.X, position.Y, position.Z);
+
+                                if (joints[jointType].TrackingState == TrackingState.Inferred)
+                                {
+                                    jointDict[jointType] = new Joints(new Point3D(position.X, position.Y, position.Z), true);
+                                }
+                                else
+                                {
+                                    jointDict[jointType] = new Joints(new Point3D(position.X, position.Y, position.Z), false);
+                                }
 
                                 DepthSpacePoint depthSpacePoint = this.coordinateMapper.MapCameraPointToDepthSpace(position);
                                 jointPoints[jointType] = new Point(depthSpacePoint.X, depthSpacePoint.Y);

@@ -197,6 +197,7 @@
                                     <RowDefinition Height="60"/>
                                     <RowDefinition Height="60"/>
                                     <RowDefinition Height="60"/>
+                                    <RowDefinition Height="60"/>
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="50"/>
@@ -214,6 +215,7 @@
                             </UniformGrid>
                             <Grid Grid.Row="1" x:Name="coachGrid">
                                 <Grid.RowDefinitions>
+                                    <RowDefinition Height="60"/>
                                     <RowDefinition Height="60"/>
                                     <RowDefinition Height="60"/>
                                     <RowDefinition Height="60"/>

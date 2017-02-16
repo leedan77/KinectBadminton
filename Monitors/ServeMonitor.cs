@@ -38,12 +38,12 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
             bool init = false;
             for(int i = nowFrame; i < FrameList.Count; i++)
             {
-                Point3D hipRight = this.FrameList[i].jointDict[JointType.HipRight];
-                Point3D kneeRight = this.FrameList[i].jointDict[JointType.KneeRight];
-                Point3D ankleRight = this.FrameList[i].jointDict[JointType.AnkleRight];
-                Point3D hipLeft = this.FrameList[i].jointDict[JointType.HipLeft];
-                Point3D kneeLeft = this.FrameList[i].jointDict[JointType.KneeLeft];
-                Point3D ankleLeft = this.FrameList[i].jointDict[JointType.AnkleLeft];
+                Point3D hipRight = GetJoint(i, JointType.HipRight);
+                Point3D kneeRight = GetJoint(i, JointType.KneeRight);
+                Point3D ankleRight = GetJoint(i, JointType.AnkleRight);
+                Point3D hipLeft = GetJoint(i, JointType.HipLeft);
+                Point3D kneeLeft = GetJoint(i, JointType.KneeLeft);
+                Point3D ankleLeft = GetJoint(i, JointType.AnkleLeft);
 
                 Vector2 hipAngleRight = new Vector2(ankleRight, hipRight);
                 Vector2 hipAngleLeft = new Vector2(ankleLeft, hipLeft);
@@ -99,9 +99,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
         {
             for(int i = nowFrame; i < this.FrameList.Count; i++)
             {
-                Point3D hipRight = this.FrameList[i].jointDict[JointType.HipRight];
-                Point3D hipLeft = this.FrameList[i].jointDict[JointType.HipLeft];
-                if(this.handedness == "right")
+                Point3D hipRight = GetJoint(i, JointType.HipRight);
+                Point3D hipLeft = GetJoint(i, JointType.HipLeft);
+                if (this.handedness == "right")
                 {
                     if (hipRight.Z < hipLeft.Z)
                         return Record(i, "轉腰");
@@ -121,16 +121,16 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
             int prevResult = 0;
             for (int i = nowFrame; i < this.FrameList.Count; i++)
             {
-                Point3D handTipRight = this.FrameList[i].jointDict[JointType.HandTipRight];
-                Point3D wristRight = this.FrameList[i].jointDict[JointType.WristRight];
-                Point3D elbowRight = this.FrameList[i].jointDict[JointType.ElbowRight];
-                Point3D handTipLeft = this.FrameList[i].jointDict[JointType.HandTipLeft];
-                Point3D wristLeft = this.FrameList[i].jointDict[JointType.WristLeft];
-                Point3D elbowLeft = this.FrameList[i].jointDict[JointType.ElbowLeft];
-                Point3D spineBase = this.FrameList[i].jointDict[JointType.SpineBase];
-                Point3D spineShoulder = this.FrameList[i].jointDict[JointType.SpineShoulder];
+                Point3D handTipRight = GetJoint(i, JointType.HandTipRight);
+                Point3D wristRight = GetJoint(i, JointType.WristRight);
+                Point3D elbowRight = GetJoint(i, JointType.ElbowRight);
+                Point3D handTipLeft = GetJoint(i, JointType.HandTipLeft);
+                Point3D wristLeft = GetJoint(i, JointType.WristLeft);
+                Point3D elbowLeft = GetJoint(i, JointType.ElbowLeft);
+                Point3D spineBase = GetJoint(i, JointType.SpineBase);
+                Point3D spineShoulder = GetJoint(i, JointType.SpineShoulder);
 
-                if(this.handedness == "right")
+                if (this.handedness == "right")
                 {
                     nowResult = CheckSide(elbowRight, wristRight, handTipRight);
                     double wristSpineAngle = CheckVec2Angle(spineShoulder, spineBase, wristRight);
@@ -155,11 +155,11 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
         {
             for (int i = nowFrame; i < this.FrameList.Count; i++)
             {
-                Point3D shoulderRight = this.FrameList[i].jointDict[JointType.ShoulderRight];
-                Point3D elbowRight = this.FrameList[i].jointDict[JointType.ElbowRight];
-                Point3D shoulderLeft = this.FrameList[i].jointDict[JointType.ShoulderLeft];
-                Point3D elbowLeft = this.FrameList[i].jointDict[JointType.ElbowLeft];
-                if(this.handedness == "right")
+                Point3D shoulderRight = GetJoint(i, JointType.ShoulderRight);
+                Point3D elbowRight = GetJoint(i, JointType.ElbowRight);
+                Point3D shoulderLeft = GetJoint(i, JointType.ShoulderLeft);
+                Point3D elbowLeft = GetJoint(i, JointType.ElbowLeft);
+                if (this.handedness == "right")
                 {
                     if (elbowRight.Y > shoulderRight.Y)
                         return Record(i, "肩膀轉向前");
