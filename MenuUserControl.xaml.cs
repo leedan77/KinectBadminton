@@ -40,9 +40,9 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
 
         private bool converting = false;
 
-        private string identity = "student";
+        private string identity = "coach";
 
-        private string motion = "lob";
+        private string motion = "smash";
         private string handedness = string.Empty;
         private string className = string.Empty;
         private string week = "week1";
