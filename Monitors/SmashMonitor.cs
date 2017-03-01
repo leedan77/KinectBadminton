@@ -13,6 +13,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
     class SmashMonitor:Monitor
     {
         private String[] goals = { "雙手手肘抬高", "雙手平衡", "側身", "手肘轉向前", "手腕發力", "肩膀向前收拍" };
+        private double leftInitShoulderAngle = 0;
+        private double rightInitShoulderAngle = 0;
 
         public SmashMonitor(List<Frames> frameList, String handedness)
         {
@@ -35,7 +37,22 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
 
         public override void GenerateCompareData(int nowFrame)
         {
-            
+            int shoulderAngleCount = 0;
+            double leftShoulderAngleSum = 0;
+            double rightShoulderAngleSum = 0;
+            for (int i = nowFrame; i < this.FrameList.Count; i++)
+            {
+                Point3D shoulderLeft = GetJoint(i, JointType.ShoulderLeft);
+                Point3D shoulderRight = GetJoint(i, JointType.ShoulderRight);
+                if (shoulderAngleCount < 1)
+                {
+                    leftShoulderAngleSum += GetAngle3D(shoulderLeft, shoulderRight, new Point3D(shoulderRight.X, shoulderRight.Y, shoulderRight.Z - 10));
+                    rightShoulderAngleSum += GetAngle3D(shoulderRight, shoulderLeft, new Point3D(shoulderLeft.X, shoulderLeft.Y, shoulderLeft.Z - 10));
+                    shoulderAngleCount++;
+                }
+            }
+            rightInitShoulderAngle = rightShoulderAngleSum;
+            leftInitShoulderAngle = leftShoulderAngleSum;
         }
 
         private int CheckElbowsUpBodySideArmBalance (int nowFrame)
@@ -100,21 +117,30 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
         {
             Point3D shoulderRight = GetJoint(i, JointType.ShoulderRight);
             Point3D shoulderLeft = GetJoint(i, JointType.ShoulderLeft);
-            double rightAngle = GetAngle3D(shoulderRight, shoulderLeft, new Point3D(shoulderLeft.X + 10, shoulderLeft.Y, shoulderLeft.Z));
-            double leftAngle = GetAngle3D(shoulderLeft, shoulderRight, new Point3D(shoulderRight.X - 10 , shoulderRight.Y, shoulderRight.Z));
+            //double rightAngle = GetAngle3D(shoulderRight, shoulderLeft, new Point3D(shoulderLeft.X + 10, shoulderLeft.Y, shoulderLeft.Z));
+            double rightAngle = GetAngle3D(shoulderRight, shoulderLeft, new Point3D(shoulderLeft.X, shoulderLeft.Y, shoulderLeft.Z - 10));
+            //double leftAngle = GetAngle3D(shoulderLeft, shoulderRight, new Point3D(shoulderRight.X - 10 , shoulderRight.Y, shoulderRight.Z));
+            double leftAngle = GetAngle3D(shoulderLeft, shoulderRight, new Point3D(shoulderRight.X , shoulderRight.Y, shoulderRight.Z - 10));
+            JointType[] joints = { JointType.ShoulderRight, JointType.ShoulderLeft};
             if (this.handedness == "right")
             {
-                if (rightAngle > 25 && shoulderRight.Z > shoulderLeft.Z)
+                if (!GetInferred(i, joints))
                 {
-                    return true;
+                    if (rightAngle - rightInitShoulderAngle > 55)
+                    {
+                        return true;
+                    }
                 }
                 return false;
             }
             else
             {
-                if (leftAngle > 25 && shoulderLeft.Z > shoulderRight.Z)
+                if (!GetInferred(i, joints))
                 {
-                    return true;
+                    if (leftAngle - leftInitShoulderAngle > 55)
+                    {
+                        return true;
+                    }
                 }
                 return false;
             }
@@ -192,7 +218,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
                 }
                 else
                 {
-                    //Debug(i, elbowLeft.Z = shoulderLeft.Z);
                     if (elbowLeft.Z < spineShoulder.Z)
                     {
                         return Record(i, "手肘轉向前");
