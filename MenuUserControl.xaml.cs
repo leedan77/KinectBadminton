@@ -572,6 +572,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics
                         }
                         else if (File.Exists(this.jointsJsonPath))
                         {
+                            this.kinectBodyView = new KinectBodyView(this.kinectSensor, this.motion, MainWindow.MediaPlayerSize, this);
                             this.kinectBodyView.Judge(this.jointsJsonPath, this.handedness);
                         }
                     }

@@ -44,13 +44,13 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
             int handSpineMidCount = 0;
             for (int i = nowFrame; i < this.FrameList.Count; i++)
             {
-                Point3D spineShoulder = this.FrameList[i].jointDict[JointType.SpineShoulder];
-                Point3D spineBase = this.FrameList[i].jointDict[JointType.SpineBase];
-                Point3D ankleRight = this.FrameList[i].jointDict[JointType.AnkleRight];
-                Point3D ankleLeft = this.FrameList[i].jointDict[JointType.AnkleLeft];
-                Point3D handRight = this.FrameList[i].jointDict[JointType.HandRight];
-                Point3D handLeft = this.FrameList[i].jointDict[JointType.HandLeft];
-                Point3D spineMid = this.FrameList[i].jointDict[JointType.SpineMid];
+                Point3D spineShoulder = GetJoint(i, JointType.SpineShoulder);
+                Point3D spineBase = GetJoint(i, JointType.SpineBase);
+                Point3D ankleRight = GetJoint(i, JointType.AnkleRight);
+                Point3D ankleLeft = GetJoint(i, JointType.AnkleLeft);
+                Point3D handRight = GetJoint(i, JointType.HandRight);
+                Point3D handLeft = GetJoint(i, JointType.HandLeft);
+                Point3D spineMid = GetJoint(i, JointType.SpineMid);
                 Vector3 spineShoulderBaseVec = new Vector3(spineShoulder, spineBase);
                 if (spineShoulder.X != 0)
                 {
@@ -81,8 +81,8 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
             {
                 if(this.handedness == "right")
                 {
-                    Point3D handRight = this.FrameList[i].jointDict[JointType.HandRight];
-                    Point3D handTipRight = this.FrameList[i].jointDict[JointType.HandTipRight];
+                    Point3D handRight = GetJoint(i, JointType.HandRight);
+                    Point3D handTipRight = GetJoint(i, JointType.HandTipRight);
                     double handTipHandYDiff = handTipRight.Y - handRight.Y;
                     steadyCount++;
                     if (handTipHandYDiff <= -0.01)
@@ -91,15 +91,15 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
                             steadyCount = i - errorFrame;
                         errorFrame = i;
                     }
-                    Point3D ankleRight = this.FrameList[i].jointDict[JointType.AnkleRight];
+                    Point3D ankleRight = GetJoint(i, JointType.AnkleRight);
                     double stepSpineRatio = (this.initAnkleRightZ - ankleRight.Z) / this.spineShoulderBaseDiff;
                     if (steadyCount > 2 && stepSpineRatio <= 0.75)
                         return Record(i, "持拍立腕");
                 }
                 else
                 {
-                    Point3D handLeft = this.FrameList[i].jointDict[JointType.HandLeft];
-                    Point3D handTipLeft = this.FrameList[i].jointDict[JointType.HandTipLeft];
+                    Point3D handLeft = GetJoint(i, JointType.HandLeft);
+                    Point3D handTipLeft = GetJoint(i, JointType.HandTipLeft);
                     double handTipHandYDiff = handTipLeft.Y - handLeft.Y;
                     steadyCount++;
                     if (handTipHandYDiff <= -0.01)
@@ -108,7 +108,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
                             steadyCount = i - errorFrame;
                         errorFrame = i;
                     }
-                    Point3D ankleLeft = this.FrameList[i].jointDict[JointType.AnkleLeft];
+                    Point3D ankleLeft = GetJoint(i, JointType.AnkleLeft);
                     double stepSpineRatio = (this.initAnkleRightZ - ankleLeft.Z) / this.spineShoulderBaseDiff;
                     if (steadyCount > 2 && stepSpineRatio <= 0.75)
                         return Record(i, "持拍立腕");
@@ -125,10 +125,10 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
 
             for (int i = nowFrame; i < this.FrameList.Count; i++)
             {
-                Point3D spineMid = this.FrameList[i].jointDict[JointType.SpineMid];
+                Point3D spineMid = GetJoint(i, JointType.SpineMid);
                 if (this.handedness == "right" && !wristTurned)
                 {
-                    Point3D handRight = this.FrameList[i].jointDict[JointType.HandRight];
+                    Point3D handRight = GetJoint(i, JointType.HandRight);
                     if (handRight.X - spineMid.X < this.initHandRightSpineMidXDiff / 6)
                     {
                         cp = i;
@@ -138,7 +138,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
                 }
                 else if (this.handedness == "left" && !wristTurned)
                 {
-                    Point3D handLeft = this.FrameList[i].jointDict[JointType.HandLeft];
+                    Point3D handLeft = GetJoint(i, JointType.HandLeft);
                     if (spineMid.X - handLeft.X < this.initHandLeftSpineMidXDiff / 6)
                     {
                         cp = i;
@@ -149,7 +149,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
 
                 if (this.handedness == "right" && !steppedForward)
                 {
-                    Point3D ankleRight = this.FrameList[i].jointDict[JointType.AnkleRight];
+                    Point3D ankleRight = GetJoint(i, JointType.AnkleRight);
                     double stepSpineRatio = (this.initAnkleRightZ - ankleRight.Z) / this.spineShoulderBaseDiff;
                     if (stepSpineRatio > 0.75)
                     {
@@ -160,7 +160,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
                 }
                 else if(this.handedness == "left" && !steppedForward)
                 {
-                    Point3D ankleLeft = this.FrameList[i].jointDict[JointType.AnkleLeft];
+                    Point3D ankleLeft = GetJoint(i, JointType.AnkleLeft);
                     double stepSpineRatio = (this.initAnkleRightZ - ankleLeft.Z) / this.spineShoulderBaseDiff;
                     if (stepSpineRatio > 0.75)
                     {
@@ -182,12 +182,12 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
             
             for (int i = nowFrame; i < this.FrameList.Count; i++)
             {
-                Point3D spineMid = this.FrameList[i].jointDict[JointType.SpineMid];
-                Point3D spineShoulder = this.FrameList[i].jointDict[JointType.SpineShoulder];
-                Point3D spineBase = this.FrameList[i].jointDict[JointType.SpineBase];
+                Point3D spineMid = GetJoint(i, JointType.SpineMid);
+                Point3D spineShoulder = GetJoint(i, JointType.SpineShoulder);
+                Point3D spineBase = GetJoint(i, JointType.SpineBase);
                 if (this.handedness == "right")
                 {
-                    Point3D handRight = this.FrameList[i].jointDict[JointType.HandRight];
+                    Point3D handRight = GetJoint(i, JointType.HandRight);
                     if (handRight.X - spineMid.X< this.initHandRightSpineMidXDiff / 5)
                     {
                         return Record(i, "手腕轉動");
@@ -195,7 +195,7 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
                 }
                 else if(this.handedness == "left")
                 {
-                    Point3D handLeft = this.FrameList[i].jointDict[JointType.HandRight];
+                    Point3D handLeft = GetJoint(i, JointType.HandLeft);
                     if (spineMid.X - handLeft.X > this.initHandLeftSpineMidXDiff / 5)
                     {
                         return Record(i, "手腕轉動");
@@ -209,18 +209,18 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
         {
             for (int i = nowFrame; i < this.FrameList.Count; i++)
             {
-                Point3D spineShoulder = this.FrameList[i].jointDict[JointType.SpineShoulder];
-                Point3D spineBase = this.FrameList[i].jointDict[JointType.SpineBase];
+                Point3D spineShoulder = GetJoint(i, JointType.SpineShoulder);
+                Point3D spineBase = GetJoint(i, JointType.SpineBase);
                 if (this.handedness == "right")
                 {
-                    Point3D ankleRight = this.FrameList[i].jointDict[JointType.AnkleRight];
+                    Point3D ankleRight = GetJoint(i, JointType.AnkleRight);
                     double stepSpineRatio = (this.initAnkleRightZ - ankleRight.Z) / this.spineShoulderBaseDiff;
                     if (stepSpineRatio > 0.75)
                         return Record(i, "慣用腳跨步");
                 }
                 else
                 {
-                    Point3D ankleLeft = this.FrameList[i].jointDict[JointType.AnkleLeft];
+                    Point3D ankleLeft = GetJoint(i, JointType.AnkleLeft);
                     double stepSpineRatio = (this.initAnkleRightZ - ankleLeft.Z) / this.spineShoulderBaseDiff;
                     if (stepSpineRatio > 0.75)
                         return Record(i, "慣用腳跨步");
@@ -246,13 +246,13 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
             {
                 if (this.handedness == "right")
                 {
-                    Point3D footRight = this.FrameList[i].jointDict[JointType.FootRight];
-                    Point3D ankleRight = this.FrameList[i].jointDict[JointType.AnkleRight];
-                    Point3D elbowRight = this.FrameList[i].jointDict[JointType.ElbowRight];
-                    Point3D wristRight = this.FrameList[i].jointDict[JointType.WristRight];
-                    Point3D handTipRight = this.FrameList[i].jointDict[JointType.HandTipRight];
-                    Point3D handRight = this.FrameList[i].jointDict[JointType.HandRight];
-                    Point3D spineShoulder = this.FrameList[i].jointDict[JointType.SpineShoulder];
+                    Point3D footRight = GetJoint(i, JointType.FootRight);
+                    Point3D ankleRight = GetJoint(i, JointType.AnkleRight);
+                    Point3D elbowRight = GetJoint(i, JointType.ElbowRight);
+                    Point3D wristRight = GetJoint(i, JointType.WristRight);
+                    Point3D handTipRight = GetJoint(i, JointType.HandTipRight);
+                    Point3D handRight = GetJoint(i, JointType.HandRight);
+                    Point3D spineShoulder = GetJoint(i, JointType.SpineShoulder);
                     Vector3 ankleMovement = new Vector3(ankleRight, prevAnkleRight);
                     steadyCount++;
                     if (Math.Abs(ankleMovement.d) > 0.01)
@@ -282,13 +282,13 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
                 }
                 else
                 {
-                    Point3D footLeft = this.FrameList[i].jointDict[JointType.FootLeft];
-                    Point3D ankleLeft = this.FrameList[i].jointDict[JointType.AnkleLeft];
-                    Point3D elbowLeft = this.FrameList[i].jointDict[JointType.ElbowLeft];
-                    Point3D wristLeft = this.FrameList[i].jointDict[JointType.WristLeft];
-                    Point3D handTipLeft = this.FrameList[i].jointDict[JointType.HandTipLeft];
-                    Point3D handLeft = this.FrameList[i].jointDict[JointType.HandLeft];
-                    Point3D spineShoulder = this.FrameList[i].jointDict[JointType.SpineShoulder];
+                    Point3D footLeft = GetJoint(i, JointType.FootLeft);
+                    Point3D ankleLeft = GetJoint(i, JointType.AnkleLeft);
+                    Point3D elbowLeft = GetJoint(i, JointType.ElbowLeft);
+                    Point3D wristLeft = GetJoint(i, JointType.WristLeft);
+                    Point3D handTipLeft = GetJoint(i, JointType.HandTipLeft);
+                    Point3D handLeft = GetJoint(i, JointType.HandLeft);
+                    Point3D spineShoulder = GetJoint(i, JointType.SpineShoulder);
                     Vector3 ankleMovement = new Vector3(ankleLeft, prevAnkleLeft);
                     steadyCount++;
                     if (Math.Abs(ankleMovement.d) > 0.01)
