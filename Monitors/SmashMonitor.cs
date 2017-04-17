@@ -46,8 +46,6 @@ namespace Microsoft.Samples.Kinect.RecordAndPlaybackBasics.Monitors
             {
                 Point3D shoulderLeft = GetJoint(i, JointType.ShoulderLeft);
                 Point3D shoulderRight = GetJoint(i, JointType.ShoulderRight);
-                //JointType[] joints = { JointType.ShoulderRight, JointType.ShoulderLeft };
-                //Console.WriteLine(GetInferred(i, joints));
                 if (shoulderAngleCount < shoulderAngleCountTo)
                 {
                     leftShoulderAngleSum += GetAngle3D(shoulderLeft, shoulderRight, new Point3D(shoulderRight.X, shoulderRight.Y, shoulderRight.Z - 10));
